@@ -11,6 +11,7 @@ import {
   Menu,
   User,
   PanelLeft,
+  MessageCircle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -104,6 +105,7 @@ function MainSidebar() {
   
   const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
+    { href: "/coach", label: "FinSarthi Coach", icon: MessageCircle },
     { href: "/summarizer", label: "News Summarizer", icon: FileText },
     { href: "/translator", label: "Term Translator", icon: Languages },
     { href: "/advice", label: "Personalized Advice", icon: Lightbulb },
