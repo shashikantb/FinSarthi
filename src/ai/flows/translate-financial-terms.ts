@@ -1,0 +1,67 @@
+'use server';
+
+/**
+ * @fileOverview An AI agent for translating financial terms and concepts into simpler language.
+ *
+ * - translateFinancialTerms - A function that handles the translation process.
+ * - TranslateFinancialTermsInput - The input type for the translateFinancialTerms function.
+ * - TranslateFinancialTermsOutput - The return type for the translateFinancialTerms function.
+ */
+
+import {ai} from '@/ai/genkit';
+import {z} from 'genkit';
+
+const TranslateFinancialTermsInputSchema = z.object({
+  term: z.string().describe('The financial term or concept to translate.'),
+  language: z
+    .string() 
+    .describe(
+      'The target language for the translation (e.g., English, Hindi, Marathi).'
+    ),
+  userLiteracyLevel: z
+    .enum(['beginner', 'intermediate', 'advanced'])
+    .describe('The user literacy level to tailor the explanation.'),
+});
+export type TranslateFinancialTermsInput = z.infer<
+  typeof TranslateFinancialTermsInputSchema
+>;
+
+const TranslateFinancialTermsOutputSchema = z.object({
+  simplifiedExplanation: z
+    .string()
+    .describe('The simplified explanation of the financial term in the target language.'),
+});
+export type TranslateFinancialTermsOutput = z.infer<
+  typeof TranslateFinancialTermsOutputSchema
+>;
+
+export async function translateFinancialTerms(
+  input: TranslateFinancialTermsInput
+): Promise<TranslateFinancialTermsOutput> {
+  return translateFinancialTermsFlow(input);
+}
+
+const prompt = ai.definePrompt({
+  name: 'translateFinancialTermsPrompt',
+  input: {schema: TranslateFinancialTermsInputSchema},
+  output: {schema: TranslateFinancialTermsOutputSchema},
+  prompt: `You are a financial expert who can translate complex financial terms into easy-to-understand language.
+
+  Term: {{{term}}}
+  Language: {{{language}}}
+  Literacy Level: {{{userLiteracyLevel}}}
+
+  Please provide a simplified explanation of the term in the specified language, tailored to the user's literacy level.`, 
+});
+
+const translateFinancialTermsFlow = ai.defineFlow(
+  {
+    name: 'translateFinancialTermsFlow',
+    inputSchema: TranslateFinancialTermsInputSchema,
+    outputSchema: TranslateFinancialTermsOutputSchema,
+  },
+  async input => {
+    const {output} = await prompt(input);
+    return output!;
+  }
+);
