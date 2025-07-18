@@ -1,4 +1,4 @@
-import { AdviceForm } from "@/components/advice-form";
+import { OnboardingStepper } from "@/components/onboarding-stepper";
 
 export default function OnboardingPage() {
   return (
@@ -11,7 +11,7 @@ export default function OnboardingPage() {
         </p>
       </div>
       <div className="mt-6 max-w-4xl mx-auto">
-        <AdviceForm />
+        <OnboardingStepper />
       </div>
     </div>
   );

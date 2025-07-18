@@ -26,6 +26,11 @@ export default function HomePage() {
                     Get Started <ArrowRight className="ml-2" />
                   </Link>
                 </Button>
+                <Button asChild size="lg" variant="outline">
+                   <Link href="/login">
+                    Login
+                  </Link>
+                </Button>
               </div>
             </div>
             <Image

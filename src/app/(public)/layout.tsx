@@ -1,25 +1,5 @@
 import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import React from "react";
-
-function PublicHeader() {
-  return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-        <Logo />
-        <div className="flex items-center justify-end space-x-4">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/signup">Sign Up</Link>
-          </Button>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 function PublicFooter() {
     return (
@@ -41,7 +21,11 @@ export default function PublicLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <PublicHeader />
+      <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+          <Logo />
+        </div>
+      </header>
       <main className="flex-1">{children}</main>
       <PublicFooter/>
     </div>
