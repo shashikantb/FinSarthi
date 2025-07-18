@@ -1,4 +1,4 @@
-// src/ai/flows/text-to-speech.ts
+// src/ai/flows/text-to-speech-flow.ts
 'use server';
 /**
  * @fileOverview A flow for converting text to speech.
@@ -7,8 +7,12 @@
  */
 import {ai} from '@/ai/genkit';
 import {googleAI} from '@genkit-ai/googleai';
-import {z} from 'zod';
 import wav from 'wav';
+import {
+  TextToSpeechInputSchema,
+  TextToSpeechOutputSchema,
+  type TextToSpeechInput,
+} from './text-to-speech-schema';
 
 // Define the function to convert PCM data to WAV format
 async function toWav(
@@ -32,18 +36,8 @@ async function toWav(
   });
 }
 
-export const TextToSpeechInputSchema = z.object({
-  text: z.string(),
-});
-export type TextToSpeechInput = z.infer<typeof TextToSpeechInputSchema>;
-
-export const TextToSpeechOutputSchema = z.object({
-  audio: z.string().describe('The base64 encoded audio data URI.'),
-});
-export type TextToSpeechOutput = z.infer<typeof TextToSpeechOutputSchema>;
-
 // Define the main Text-to-Speech flow
-export const textToSpeechFlow = ai.defineFlow(
+const textToSpeechFlow = ai.defineFlow(
   {
     name: 'textToSpeechFlow',
     inputSchema: TextToSpeechInputSchema,
@@ -81,6 +75,6 @@ export const textToSpeechFlow = ai.defineFlow(
 
 export async function textToSpeech(
   input: TextToSpeechInput
-): Promise<TextToSpeechOutput> {
+) {
   return textToSpeechFlow(input);
 }
