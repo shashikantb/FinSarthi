@@ -8,6 +8,7 @@ import {
   financialCoach,
   type FinancialCoachInput,
 } from "@/ai/flows/financial-coach";
+import { textToSpeech } from "@/ai/flows/text-to-speech";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Send, Bot, User } from "lucide-react";
+import { Loader2, Send, Bot, User, Volume2, Play } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -41,6 +42,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 type Message = {
   role: "user" | "model";
   content: string;
+  audioUrl?: string;
 };
 
 const formSchema = z.object({
@@ -49,6 +51,43 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+function AudioPlayer({ audioUrl }: { audioUrl?: string }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  if (!audioUrl) return null;
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+    }
+  };
+
+  return (
+    <div>
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => setIsPlaying(false)}
+      />
+      <Button variant="ghost" size="icon" onClick={togglePlay} className="h-7 w-7">
+        {isPlaying ? (
+          <Volume2 className="h-4 w-4" />
+        ) : (
+          <Play className="h-4 w-4" />
+        )}
+        <span className="sr-only">Play audio</span>
+      </Button>
+    </div>
+  );
+}
 
 export function FinancialCoach() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -92,6 +131,17 @@ export function FinancialCoach() {
       const result = await financialCoach(input);
       const modelMessage: Message = { role: "model", content: result.response };
       setMessages((prev) => [...prev, modelMessage]);
+
+      const ttsResult = await textToSpeech({ text: result.response });
+
+      setMessages((prev) =>
+        prev.map((msg, i) =>
+          i === prev.length - 1
+            ? { ...msg, audioUrl: ttsResult.audio }
+            : msg
+        )
+      );
+
       form.reset({ query: "", language: data.language });
     } catch (e) {
       setError("Failed to get response. Please try again.");
@@ -134,7 +184,10 @@ export function FinancialCoach() {
                       : "bg-muted"
                   )}
                 >
-                  {message.content}
+                  <div className="flex items-center gap-2">
+                    <p>{message.content}</p>
+                    {message.role === "model" && <AudioPlayer audioUrl={message.audioUrl} />}
+                  </div>
                 </div>
                  {message.role === "user" && (
                   <Avatar className="h-8 w-8">
