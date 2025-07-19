@@ -14,11 +14,13 @@ import {z} from 'genkit';
 import { findFinancialProducts } from '../tools/financial-products-tool';
 
 const GeneratePersonalizedAdviceInputSchema = z.object({
-  income: z.number().describe('Your monthly income.'),
-  expenses: z.number().describe('Your monthly expenses.'),
-  financialGoals: z.string().describe('Your financial goals, e.g., saving for retirement, buying a house.'),
-  literacyLevel: z.enum(['beginner', 'intermediate', 'advanced']).describe('Your financial literacy level.'),
-  language: z.enum(['en', 'hi', 'mr']).describe('The language for the advice (en - English, hi - Hindi, mr - Marathi).'),
+  income: z.coerce.number().positive({ message: "Income must be positive." }),
+  expenses: z.coerce.number().positive({ message: "Expenses must be positive." }),
+  financialGoals: z
+    .string()
+    .min(10, "Please describe your goals in more detail."),
+  literacyLevel: z.enum(["beginner", "intermediate", "advanced"]),
+  language: z.enum(["en", "hi", "mr"]),
 });
 
 export type GeneratePersonalizedAdviceInput = z.infer<typeof GeneratePersonalizedAdviceInputSchema>;
@@ -66,6 +68,13 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    
+    if (output === null) {
+      return {
+        advice: "I'm sorry, I was unable to generate advice at this time. This could be due to a temporary issue or safety settings. Please try adjusting your input or try again later.",
+      };
+    }
+    
+    return output;
   }
 );
