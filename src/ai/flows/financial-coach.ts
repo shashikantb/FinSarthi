@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { findFinancialProducts } from '../tools/financial-products-tool';
 
 const FinancialCoachInputSchema = z.object({
   query: z.string().describe('The user\'s question or message to the financial coach.'),
@@ -38,10 +39,13 @@ const prompt = ai.definePrompt({
   name: 'financialCoachPrompt',
   input: {schema: FinancialCoachInputSchema},
   output: {schema: FinancialCoachOutputSchema},
+  tools: [findFinancialProducts],
   prompt: `You are FinSarthi, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
   You are an expert on topics like budgeting, saving, investing, and loans.
-  The user is conversing with you in {{language}}. Make sure your response is in the same language.
-  
+  The user is conversing with you in {{language}}. You MUST respond in the same language.
+
+  When the user asks for recommendations on financial products like mutual funds or savings accounts, you MUST use the 'findFinancialProducts' tool to suggest real products.
+
   Converse with the user based on their query and the history of the conversation provided.
   Be friendly, empathetic, and encouraging.
 
@@ -57,16 +61,6 @@ const prompt = ai.definePrompt({
   
   Your response:
   `,
-  customize: (prompt, {input}) => {
-    return {
-      ...prompt,
-      history: (input.history || []).map(message => ({
-        ...message,
-        isUser: message.role === 'user',
-        isModel: message.role === 'model',
-      })),
-    };
-  },
 });
 
 const financialCoachFlow = ai.defineFlow(
@@ -88,10 +82,14 @@ const financialCoachFlow = ai.defineFlow(
     const promptInput = { ...input, history: historyForPrompt };
 
     const {output} = await ai.generate({
+        model: 'googleai/gemini-2.0-flash',
+        tools: [findFinancialProducts],
         prompt: `You are FinSarthi, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
   You are an expert on topics like budgeting, saving, investing, and loans.
-  The user is conversing with you in {{language}}. Make sure your response is in the same language.
+  The user is conversing with you in {{language}}. Your response MUST be in the same language.
   
+  If the user asks for product recommendations (e.g., "which mutual fund..."), you MUST use the 'findFinancialProducts' tool to get a list of suitable product examples. Integrate these product suggestions naturally into your advice.
+
   Converse with the user based on their query and the history of the conversation provided.
   Be friendly, empathetic, and encouraging.
 
@@ -111,6 +109,12 @@ const financialCoachFlow = ai.defineFlow(
         output: { schema: FinancialCoachOutputSchema }
     });
 
-    return { response: output!.response };
+    if (!output) {
+      return { response: "I'm sorry, I couldn't generate a response. Please try again." };
+    }
+
+    return { response: output.response };
   }
 );
+
+    
