@@ -21,7 +21,7 @@ const mockProducts: Product[] = [
   { id: 'hys-2', name: 'FinFuture Online Savings', category: 'savings', description: 'Easy-to-use online savings with competitive interest rates.' },
   { id: 'cd-1', name: 'CapitalGrowth 12-Month CD', category: 'savings', description: 'A fixed-rate certificate of deposit for guaranteed returns.' },
 
-  // Investments
+  // Investments (These are used as a fallback if the live API fails)
   { id: 'mf-1', name: 'Global Tech Leaders Mutual Fund', category: 'investment', description: 'Invests in a diversified portfolio of leading technology companies.' },
   { id: 'etf-1', name: 'All-World Index ETF', category: 'investment', description: 'A low-cost ETF that tracks the global stock market.' },
   { id: 'bond-1', name: 'Govt. Infrastructure Bond', category: 'investment', description: 'A government-backed bond with stable, long-term returns.' },
@@ -33,51 +33,63 @@ const mockProducts: Product[] = [
 ];
 
 /**
+ * Parses the raw text data from the AMFI NAV file.
+ * @param textData The raw text data from the AMFI file.
+ * @returns An array of financial products.
+ */
+function parseAmfiData(textData: string): Omit<Product, 'id' | 'category'>[] {
+  const lines = textData.split('\n').slice(1); // Skip header row
+  const products = lines
+    .map(line => {
+      const parts = line.split(';');
+      // Expected format: Scheme Code;ISIN;...;Scheme Name;NAV;Date
+      if (parts.length >= 6) {
+        const schemeName = parts[3]?.trim();
+        const nav = parts[4]?.trim();
+        if (schemeName && nav && !isNaN(parseFloat(nav)) && parseFloat(nav) > 0) {
+          return {
+            name: schemeName,
+            description: `A mutual fund with a Net Asset Value (NAV) of ₹${nav}.`,
+          };
+        }
+      }
+      return null;
+    })
+    .filter((p): p is { name: string; description: string } => p !== null)
+    .slice(0, 5); // Return a small subset to avoid overwhelming the user
+
+  return products;
+}
+
+/**
  * Fetches a list of financial products based on a category.
  * @param category The category of products to fetch.
  * @returns A promise that resolves to an array of products.
  */
 export async function getProducts(category: ProductCategory): Promise<Omit<Product, 'id' | 'category'>[]> {
-  // --- REAL API INTEGRATION POINT ---
-  // To use a real API, you would replace the mock implementation below
-  // with a fetch call to your chosen financial data provider.
-
-  // Example of how a real API call might look:
-  /*
-  const API_KEY = process.env.FINANCIAL_API_KEY;
-  const API_ENDPOINT = `https://api.yourprovider.com/products?category=${category}`;
-
-  try {
-    const response = await fetch(API_ENDPOINT, {
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`
+  if (category === 'investment') {
+    try {
+      // Use the public AMFI data source for investments
+      const response = await fetch('https://www.amfiindia.com/spages/NAVAll.txt');
+      if (!response.ok) {
+        console.error('Failed to fetch AMFI data, falling back to mock data.');
+        return getMockProducts(category);
       }
-    });
+      const textData = await response.text();
+      const parsedData = parseAmfiData(textData);
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch financial products');
+      // If parsing is successful and returns data, use it. Otherwise, fallback.
+      return parsedData.length > 0 ? parsedData : getMockProducts(category);
+    } catch (error) {
+      console.error('Error fetching or parsing AMFI data:', error);
+      // Fallback to mock data in case of any error
+      return getMockProducts(category);
     }
-
-    const data = await response.json();
-    
-    // You might need to transform the data from the API to match the 
-    // expected return format: { name: string, description: string }[]
-    return data.products.map(product => ({
-        name: product.productName,
-        description: product.summary
-    }));
-
-  } catch (error) {
-    console.error("Error fetching real financial products:", error);
-    // Fallback to mock data or return an empty array if the API fails
-    return getMockProducts(category);
   }
-  */
 
-  // For this prototype, we will continue to use the mock service.
+  // For other categories, use the mock service.
   return getMockProducts(category);
 }
-
 
 /**
  * Returns mock product data after a simulated delay.
