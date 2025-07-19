@@ -6,7 +6,7 @@ FinSarthi is a Next.js application that provides AI-powered financial guidance. 
 
 - **Framework**: [Next.js](https://nextjs.org/) (with React)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [ShadCN UI](https://ui.shadcn.com/) components
-- **AI/Generative**: [Genkit](https://firebase.google.com/docs/genkit) (with Google's Gemini models)
+- **AI/Generative**: [Genkit](https://firebase.google.com/docs/genkit) (with Groq's Llama 3 models)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 
 ## Local Development Setup
@@ -36,14 +36,14 @@ npm install
 
 ### 4. Set Up Environment Variables
 
-The application uses Genkit to connect to Google's AI services, which requires an API key.
+The application uses Genkit to connect to Groq's AI services, which requires an API key.
 
 1.  Create a new file named `.env` in the root of your project directory.
-2.  Get your API key for the Gemini API from [Google AI Studio](https://aistudio.google.com/app/apikey).
+2.  Get your API key from the [Groq Console](https://console.groq.com/keys).
 3.  Add the following line to your `.env` file, replacing `YOUR_API_KEY` with your actual key:
 
 ```
-GEMINI_API_KEY=YOUR_API_KEY
+GROQ_API_KEY=YOUR_API_KEY
 ```
 
 ### 5. Run the Development Servers

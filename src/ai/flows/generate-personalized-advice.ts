@@ -1,4 +1,3 @@
-
 // src/ai/flows/generate-personalized-advice.ts
 'use server';
 
@@ -41,7 +40,6 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
   async (input) => {
     try {
       const { text } = await ai.generate({
-        model: 'googleai/gemini-2.0-flash',
         tools: [findFinancialProducts],
         prompt: `You are FinSarthi, a friendly and expert financial coach. Your goal is to provide clear, empathetic, and highly actionable financial advice. You MUST suggest suitable financial products using the provided tool.
 
@@ -62,26 +60,6 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
         5.  **Structure and Tone:** Use headings or bullet points. Be encouraging and supportive throughout. Your name is FinSarthi.
         6.  **Output Format**: Your response MUST be a valid JSON object with a single 'advice' field containing your full response as a string. Example: { "advice": "Here is your advice..." }
         `,
-        config: {
-          safetySettings: [
-            {
-              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-              threshold: 'BLOCK_ONLY_HIGH',
-            },
-            {
-              category: 'HARM_CATEGORY_HATE_SPEECH',
-              threshold: 'BLOCK_ONLY_HIGH',
-            },
-            {
-              category: 'HARM_CATEGORY_HARASSMENT',
-              threshold: 'BLOCK_ONLY_HIGH',
-            },
-            {
-              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-              threshold: 'BLOCK_ONLY_HIGH',
-            },
-          ],
-        },
         input,
       });
 
