@@ -2,8 +2,8 @@
 // src/components/onboarding-stepper.tsx
 "use client";
 
-import { useState } from "react";
-import { useForm, type SubmitHandler, useFormState } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -45,11 +45,13 @@ import {
   Mic,
   Volume2,
   Play,
+  MicOff,
 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import React from 'react';
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 
 const translations = {
   en: {
@@ -189,10 +191,31 @@ export function OnboardingStepper() {
     },
   });
 
-  const { trigger, formState } = form;
+  const { trigger, setValue } = form;
   const selectedLanguage = form.watch("language") as Language;
   const T = translations[selectedLanguage];
   const TOTAL_STEPS = 5;
+
+  const {
+    isListening,
+    transcript,
+    startListening,
+    stopListening,
+  } = useSpeechRecognition({
+    onTranscript: (text) => {
+      const field = step === 2 ? 'income' : step === 3 ? 'expenses' : 'financialGoals';
+      if (step > 1 && step < 5) {
+        setValue(field, text, { shouldValidate: true });
+      }
+    }
+  });
+  
+  useEffect(() => {
+    startListening({lang: selectedLanguage});
+    return () => stopListening();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isListening]);
+
 
   const playQuestionAudio = async (text: string) => {
     try {
@@ -301,7 +324,10 @@ export function OnboardingStepper() {
                       <FormItem>
                         <FormLabel>{T.language}</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValueChange={(value) => {
+                            field.onChange(value)
+                            startListening({lang: value})
+                          }}
                           defaultValue={field.value}
                         >
                           <FormControl>
@@ -337,8 +363,8 @@ export function OnboardingStepper() {
                       <FormControl>
                           <div className="relative">
                               <Input type="number" placeholder="e.g., 5000" {...field} />
-                              <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                                  <Mic className="h-4 w-4"/>
+                              <Button variant="ghost" size="icon" type="button" onClick={() => isListening ? stopListening() : startListening({lang: selectedLanguage})} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
+                                  {isListening ? <MicOff className="h-4 w-4 text-primary"/> : <Mic className="h-4 w-4"/>}
                               </Button>
                           </div>
                       </FormControl>
@@ -363,8 +389,8 @@ export function OnboardingStepper() {
                       <FormControl>
                           <div className="relative">
                               <Input type="number" placeholder="e.g., 3000" {...field} />
-                              <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                                  <Mic className="h-4 w-4"/>
+                              <Button variant="ghost" size="icon" type="button" onClick={() => isListening ? stopListening() : startListening({lang: selectedLanguage})} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
+                                  {isListening ? <MicOff className="h-4 w-4 text-primary"/> : <Mic className="h-4 w-4"/>}
                               </Button>
                           </div>
                       </FormControl>
@@ -393,8 +419,8 @@ export function OnboardingStepper() {
                               className="resize-none pr-10"
                               {...field}
                           />
-                          <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-2 h-8 w-8">
-                              <Mic className="h-4 w-4"/>
+                          <Button variant="ghost" size="icon" type="button" onClick={() => isListening ? stopListening() : startListening({lang: selectedLanguage})} className="absolute right-1 top-2 h-8 w-8">
+                               {isListening ? <MicOff className="h-4 w-4 text-primary"/> : <Mic className="h-4 w-4"/>}
                           </Button>
                       </div>
 
@@ -473,3 +499,5 @@ export function OnboardingStepper() {
     </Card>
   );
 }
+
+    
