@@ -123,7 +123,9 @@ const translations = {
 };
 
 const formSchema = z.object({
-  language: z.enum(["en", "hi", "mr"]),
+  language: z.enum(["en", "hi", "mr"], {
+    required_error: "Please select a language.",
+  }),
   income: z.coerce.number().positive({ message: "Income must be positive." }),
   expenses: z.coerce.number().positive({ message: "Expenses must be positive." }),
   financialGoals: z
@@ -193,7 +195,7 @@ export function OnboardingStepper() {
 
   const { trigger, setValue, getValues } = form;
   const selectedLanguage = form.watch("language") as Language;
-  const T = translations[selectedLanguage];
+  const T = translations[selectedLanguage] || translations.en;
   const TOTAL_STEPS = 5;
 
   const {
@@ -247,7 +249,9 @@ export function OnboardingStepper() {
 
   const nextStep = async () => {
     let isValid = false;
-    if (step === 2) {
+    if (step === 1) {
+      isValid = await trigger("language");
+    } else if (step === 2) {
       isValid = await trigger("income");
     } else if (step === 3) {
       isValid = await trigger("expenses");
@@ -479,7 +483,7 @@ export function OnboardingStepper() {
                   <ArrowLeft className="mr-2 h-4 w-4" /> {T.back}
                 </Button>
               )}
-              <div className={cn(step === 1 ? 'w-full' : 'ml-auto')}>
+              <div className={cn(step === 1 ? 'w-full flex justify-end' : 'ml-auto')}>
                 {step < TOTAL_STEPS ? (
                   <Button type="button" onClick={nextStep}>
                     {T.next} <ArrowRight className="ml-2 h-4 w-4" />
