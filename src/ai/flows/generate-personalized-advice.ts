@@ -1,3 +1,4 @@
+
 // src/ai/flows/generate-personalized-advice.ts
 'use server';
 
@@ -67,15 +68,26 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
     inputSchema: GeneratePersonalizedAdviceInputSchema,
     outputSchema: GeneratePersonalizedAdviceOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    
-    if (output === null) {
+  async (input) => {
+    try {
+      const { output } = await prompt(input);
+
+      if (output === null) {
+        // This case handles if the prompt succeeds but returns null without an error.
+        return {
+          advice:
+            "I'm sorry, I was unable to generate advice at this time. The model returned an empty response. Please try adjusting your input or try again later.",
+        };
+      }
+
+      return output;
+    } catch (error) {
+      console.error("Error in generatePersonalizedAdviceFlow:", error);
+      // This case handles errors during the prompt execution, like validation or safety issues.
       return {
-        advice: "I'm sorry, I was unable to generate advice at this time. This could be due to a temporary issue or safety settings. Please try adjusting your input or try again later.",
+        advice:
+          "I'm sorry, I was unable to generate advice at this time. This could be due to a temporary issue or the content triggering safety settings. Please try adjusting your input or try again later.",
       };
     }
-    
-    return output;
   }
 );
