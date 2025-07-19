@@ -71,6 +71,7 @@ const translateFinancialTermsFlow = ai.defineFlow(
         model: 'llama3-8b-8192',
         temperature: 0.3,
         max_tokens: 1024,
+        response_format: { type: 'json_object' },
       });
 
       const content = completion.choices[0].message.content;
@@ -80,14 +81,7 @@ const translateFinancialTermsFlow = ai.defineFlow(
 
       console.log("AI Response for Term Translation:", content);
 
-      // Sanitize the response and extract the JSON object
-      const sanitizedContent = content.replace(/[\n\r\t]/g, ' ').trim();
-      const jsonMatch = sanitizedContent.match(/\{.*\}/s);
-      if (!jsonMatch) {
-          throw new Error("The AI model did not return a valid JSON object.");
-      }
-      const jsonString = jsonMatch[0];
-      const output = TranslateFinancialTermsOutputSchema.parse(JSON.parse(jsonString));
+      const output = TranslateFinancialTermsOutputSchema.parse(JSON.parse(content));
       return output;
     } catch (error) {
       console.error("Error in translateFinancialTermsFlow:", error);
