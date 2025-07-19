@@ -12,7 +12,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import OpenAI from 'openai';
-import { findFinancialProducts } from '../tools/financial-products-tool';
+import { getProducts } from '@/services/financial-product-service';
 import { GeneratePersonalizedAdviceOutputSchema } from './generate-personalized-advice-schema';
 
 const groq = new OpenAI({
@@ -45,7 +45,21 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const prompt = `You are FinSarthi, a friendly and expert financial coach. Your goal is to provide clear, empathetic, and highly actionable financial advice. You MUST suggest suitable financial products using the provided tool.
+      // Proactively fetch all product types to have them ready for the prompt.
+      const [savings, investments, loans] = await Promise.all([
+        getProducts('savings'),
+        getProducts('investment'),
+        getProducts('loan'),
+      ]);
+
+      const productContext = `
+      Here is a list of available financial products. When you suggest a product type (like a savings account, mutual fund, or loan), you MUST use appropriate examples from this list.
+      - Savings Products: ${JSON.stringify(savings)}
+      - Investment Products: ${JSON.stringify(investments)}
+      - Loan Products: ${JSON.stringify(loans)}
+      `;
+
+      const prompt = `You are FinSarthi, a friendly and expert financial coach. Your goal is to provide clear, empathetic, and highly actionable financial advice.
 
       Analyze the user's financial situation based on the details below and generate a personalized plan. The language for the advice must be ${input.language}.
 
@@ -55,12 +69,15 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       - **Stated Financial Goals:** "${input.financialGoals}"
       - **Financial Literacy Level:** ${input.literacyLevel}
 
+      **Available Financial Products for Recommendation:**
+      ${productContext}
+
       **Your Task:**
       1.  **Acknowledge and Empathize:** Start by acknowledging their goals in a positive and encouraging tone.
       2.  **Analyze Cash Flow:** Calculate their monthly savings (income - expenses). Comment on this briefly.
       3.  **Provide Actionable Steps:** Give 3-5 clear, simple, and prioritized steps the user can take to move toward their goals.
-      4.  **Suggest Products using Tools:** For any step that involves a financial product (like a savings account, mutual fund, or loan), you MUST use the 'findFinancialProducts' tool to get a list of suitable product examples. You MUST integrate these product suggestions naturally into your advice. DO NOT invent or hallucinate product names.
-          - **Example Integration:** "You could consider opening a high-yield savings account, such as '[Product Name from Tool 1]' or '[Product Name from Tool 2]'."
+      4.  **Suggest Products:** For any step that involves a financial product (like a savings account, mutual fund, or loan), you MUST suggest suitable product examples from the list provided above. Integrate these product suggestions naturally into your advice. DO NOT invent or hallucinate product names.
+          - **Example Integration:** "You could consider opening a high-yield savings account, such as '${savings[0]?.name || 'a good savings account'}'."
       5.  **Structure and Tone:** Use headings or bullet points. Be encouraging and supportive throughout. Your name is FinSarthi.
       6.  **Output Format**: Your response MUST be a valid JSON object with a single 'advice' field containing your full response as a string. Example: { "advice": "Here is your advice..." }
       `;
@@ -69,51 +86,22 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
         messages: [{ role: 'user', content: prompt }],
         model: 'llama3-8b-8192',
         temperature: 0.7,
-        max_tokens: 1024,
-        response_format: { type: 'json_object' },
-        // @ts-ignore - Genkit tools are compatible with the OpenAI tool format
-        tools: [{ type: 'function', function: findFinancialProducts.definition }],
-        tool_choice: 'auto',
+        max_tokens: 2048,
       });
 
-      const message = completion.choices[0].message;
-
-      // Handle tool calls if the model requests them
-      if (message.tool_calls) {
-        const toolCall = message.tool_calls[0];
-        const toolName = toolCall.function.name;
-
-        if (toolName === 'findFinancialProducts') {
-          const toolInput = JSON.parse(toolCall.function.arguments);
-          const toolResult = await findFinancialProducts(toolInput);
-
-          // Send the tool result back to the model
-          const secondCompletion = await groq.chat.completions.create({
-            messages: [
-                { role: 'user', content: prompt },
-                message,
-                {
-                    tool_call_id: toolCall.id,
-                    role: 'tool',
-                    name: toolName,
-                    content: JSON.stringify(toolResult),
-                },
-            ],
-            model: 'llama3-8b-8192',
-            response_format: { type: 'json_object' },
-          });
-
-          const finalContent = secondCompletion.choices[0].message.content;
-          if (!finalContent) throw new Error("The AI model returned an empty response after the tool call.");
-          const output = GeneratePersonalizedAdviceOutputSchema.parse(JSON.parse(finalContent));
-          return output;
-        }
+      const content = completion.choices[0].message.content;
+      if (!content) {
+        throw new Error("The AI model returned an empty response.");
       }
 
-      const content = message.content;
-      if (!content) throw new Error("The AI model returned an empty response.");
+      // Find the JSON object within the response string
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+          throw new Error("The AI model did not return a valid JSON object.");
+      }
       
-      const output = GeneratePersonalizedAdviceOutputSchema.parse(JSON.parse(content));
+      const jsonString = jsonMatch[0];
+      const output = GeneratePersonalizedAdviceOutputSchema.parse(JSON.parse(jsonString));
       return output;
 
     } catch (error) {
