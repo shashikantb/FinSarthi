@@ -44,7 +44,7 @@ function AppHeader() {
   const isMobile = useIsMobile();
   
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:px-6">
+    <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
       <div className="flex items-center gap-2">
         {isMobile && <SidebarTrigger asChild><Button variant="outline" size="icon" className="shrink-0"><Menu className="h-5 w-5"/></Button></SidebarTrigger>}
          <div className="hidden md:block">
@@ -136,9 +136,9 @@ function MainSidebar() {
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full flex-col bg-background">
+      <div className="flex min-h-screen w-full bg-background">
         <MainSidebar />
-        <div className="flex flex-col sm:gap-4 sm:py-4 md:pl-[var(--sidebar-width-icon)] group-data-[state=expanded]/sidebar-wrapper:md:pl-[var(--sidebar-width)] transition-[padding-left] duration-200">
+        <div className="flex flex-1 flex-col sm:gap-4 sm:py-4 md:pl-[var(--sidebar-width-icon)] group-data-[state=expanded]/sidebar-wrapper:md:pl-[var(--sidebar-width)] transition-[padding-left] duration-200">
            <AppHeader/>
            <main className="flex-1 p-4 sm:px-6 sm:py-0">{children}</main>
         </div>
