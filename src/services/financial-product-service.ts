@@ -38,55 +38,98 @@ const mockProducts: Product[] = [
 ];
 
 /**
- * Parses the raw text data from the AMFI NAV file.
+ * Parses and filters the raw text data from the AMFI NAV file to get a diverse sample.
  * @param textData The raw text data from the AMFI file.
  * @returns An array of financial products.
  */
 function parseAmfiData(textData: string): Omit<Product, 'id' | 'category'>[] {
-    const lines = textData.split('\n').filter(line => line.includes(';')); // Ensure line has data
-  
-    const products = lines
-      .map(line => {
-        const parts = line.split(';');
-        // Scheme Code;ISIN Div Payout/ISIN Growth;ISIN Div Reinvestment;Scheme Name;Net Asset Value;Date
-        if (parts.length >= 6) {
-          const schemeName = parts[3]?.trim();
-          const nav = parts[4]?.trim();
-  
-          // Filter for more relevant "Growth" funds and ensure it's not an "IDCW" plan.
-          // Also, ensure NAV is a valid, positive number.
-          if (
-            schemeName &&
-            schemeName.toLowerCase().includes('growth') &&
-            !schemeName.toLowerCase().includes('idcw') &&
-            nav &&
-            !isNaN(parseFloat(nav)) &&
-            parseFloat(nav) > 0
-          ) {
-            // Simplify the name for better processing by the LLM
-            const simplifiedName = schemeName
-              .replace(/Regular Plan[ -]?Growth/i, '(Regular)')
-              .replace(/Direct Plan[ -]?Growth/i, '(Direct)')
-              .split(' - ')[0]; // Take the part before the first hyphen
+  const lines = textData.split('\n').filter(line => line.includes(';'));
 
-            return {
-              name: simplifiedName,
-              description: `A mutual fund with a Net Asset Value (NAV) of ₹${nav}.`,
-            };
-          }
+  const fundCategories = {
+    equityLargeCap: [] as any[],
+    equityMidCap: [] as any[],
+    equitySmallCap: [] as any[],
+    debt: [] as any[],
+    hybrid: [] as any[],
+    index: [] as any[],
+  };
+
+  const seenNames = new Set();
+
+  for (const line of lines) {
+    const parts = line.split(';');
+    // Scheme Code;ISIN Div Payout/ISIN Growth;ISIN Div Reinvestment;Scheme Name;Net Asset Value;Date
+    if (parts.length >= 6) {
+      const schemeName = parts[3]?.trim();
+      const nav = parts[4]?.trim();
+
+      if (
+        schemeName &&
+        schemeName.toLowerCase().includes('growth') &&
+        !schemeName.toLowerCase().includes('idcw') &&
+        nav &&
+        !isNaN(parseFloat(nav)) &&
+        parseFloat(nav) > 0
+      ) {
+        const simplifiedName = schemeName
+          .replace(/Regular Plan[ -]?Growth/i, '(Regular)')
+          .replace(/Direct Plan[ -]?Growth/i, '(Direct)')
+          .split(' - ')[0]
+          .replace(/\s+/g, ' ')
+          .trim();
+        
+        if (simplifiedName.length > 50 || seenNames.has(simplifiedName)) {
+            continue;
         }
-        return null;
-      })
-      .filter((p): p is { name: string; description: string } => p !== null && p.name.length < 50) // Filter out very long names
-      .slice(0, 3); // Return a smaller subset to avoid overwhelming the user
-  
-    // This can happen if the AMFI data format changes or parsing fails.
-    if (products.length === 0) {
-        return getMockProducts('investment');
+
+        const lowerCaseName = simplifiedName.toLowerCase();
+        let fundType = 'Other';
+
+        if (lowerCaseName.includes('large cap') && fundCategories.equityLargeCap.length < 2) {
+            fundType = 'Equity - Large Cap';
+            fundCategories.equityLargeCap.push({ name: simplifiedName, description: `A ${fundType} fund with NAV of ₹${nav}.` });
+            seenNames.add(simplifiedName);
+        } else if (lowerCaseName.includes('mid cap') && fundCategories.equityMidCap.length < 2) {
+            fundType = 'Equity - Mid Cap';
+            fundCategories.equityMidCap.push({ name: simplifiedName, description: `A ${fundType} fund with NAV of ₹${nav}.` });
+            seenNames.add(simplifiedName);
+        } else if (lowerCaseName.includes('small cap') && fundCategories.equitySmallCap.length < 1) {
+            fundType = 'Equity - Small Cap';
+            fundCategories.equitySmallCap.push({ name: simplifiedName, description: `A ${fundType} fund with NAV of ₹${nav}.` });
+            seenNames.add(simplifiedName);
+        } else if ((lowerCaseName.includes('debt') || lowerCaseName.includes('bond')) && fundCategories.debt.length < 2) {
+            fundType = 'Debt Fund';
+            fundCategories.debt.push({ name: simplifiedName, description: `A ${fundType} with NAV of ₹${nav}.` });
+            seenNames.add(simplifiedName);
+        } else if (lowerCaseName.includes('hybrid') && fundCategories.hybrid.length < 1) {
+            fundType = 'Hybrid Fund';
+            fundCategories.hybrid.push({ name: simplifiedName, description: `A ${fundType} with NAV of ₹${nav}.` });
+            seenNames.add(simplifiedName);
+        } else if ((lowerCaseName.includes('index') || lowerCaseName.includes('nifty') || lowerCaseName.includes('sensex')) && fundCategories.index.length < 1) {
+            fundType = 'Index Fund';
+            fundCategories.index.push({ name: simplifiedName, description: `An ${fundType} with NAV of ₹${nav}.` });
+            seenNames.add(simplifiedName);
+        }
+      }
     }
-      
-    return products;
   }
+
+  const allFunds = [
+      ...fundCategories.equityLargeCap,
+      ...fundCategories.equityMidCap,
+      ...fundCategories.equitySmallCap,
+      ...fundCategories.debt,
+      ...fundCategories.hybrid,
+      ...fundCategories.index,
+  ];
+  
+  // Fallback if parsing returns no data
+  if (allFunds.length === 0) {
+      return getMockProducts('investment');
+  }
+    
+  return allFunds;
+}
 
 /**
  * Fetches investment products from AMFI, using a cache to avoid repeated downloads.
