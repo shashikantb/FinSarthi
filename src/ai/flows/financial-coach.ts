@@ -35,34 +35,6 @@ export async function financialCoach(
   return financialCoachFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'financialCoachPrompt',
-  input: {schema: FinancialCoachInputSchema},
-  output: {schema: FinancialCoachOutputSchema},
-  tools: [findFinancialProducts],
-  prompt: `You are FinSarthi, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
-  You are an expert on topics like budgeting, saving, investing, and loans.
-  The user is conversing with you in {{language}}. You MUST respond in the same language.
-
-  When the user asks for recommendations on financial products like mutual funds or savings accounts, you MUST use the 'findFinancialProducts' tool to suggest real products.
-
-  Converse with the user based on their query and the history of the conversation provided.
-  Be friendly, empathetic, and encouraging.
-
-  {{#if history}}
-  Conversation History:
-  {{#each history}}
-    {{#if (eq this.role "user")}}User: {{this.content}}{{/if}}
-    {{#if (eq this.role "model")}}FinSarthi: {{this.content}}{{/if}}
-  {{/each}}
-  {{/if}}
-
-  User's latest message: {{{query}}}
-  
-  Your response:
-  `,
-});
-
 const financialCoachFlow = ai.defineFlow(
   {
     name: 'financialCoachFlow',
@@ -70,11 +42,10 @@ const financialCoachFlow = ai.defineFlow(
     outputSchema: FinancialCoachOutputSchema,
   },
   async input => {
-    // We need to re-map the history for the prompt context because the 'eq' helper is not standard.
-    // A better approach is to use a structure Handlebars can work with easily.
+    // We need to re-map the history for the prompt context because complex logic in Handlebars is not ideal.
+    // This creates simple boolean flags that the standard {{#if}} helper can use.
     const historyForPrompt = (input.history || []).map(msg => ({
-        role: msg.role,
-        content: msg.content,
+        ...msg,
         isUser: msg.role === 'user',
         isModel: msg.role === 'model'
     }));
@@ -85,26 +56,28 @@ const financialCoachFlow = ai.defineFlow(
         model: 'googleai/gemini-2.0-flash',
         tools: [findFinancialProducts],
         prompt: `You are FinSarthi, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
-  You are an expert on topics like budgeting, saving, investing, and loans.
-  The user is conversing with you in {{language}}. Your response MUST be in the same language.
-  
-  If the user asks for product recommendations (e.g., "which mutual fund..."), you MUST use the 'findFinancialProducts' tool to get a list of suitable product examples. Integrate these product suggestions naturally into your advice.
+You are an expert on topics like budgeting, saving, investing, and loans.
+The user is conversing with you in {{language}}. Your response MUST be in the same language.
 
-  Converse with the user based on their query and the history of the conversation provided.
-  Be friendly, empathetic, and encouraging.
+If the user asks for product recommendations (e.g., "which mutual fund..."), you MUST use the 'findFinancialProducts' tool to get a list of suitable product examples. Integrate these product suggestions naturally into your advice. DO NOT make up product names.
 
-  {{#if history}}
-  Conversation History:
-  {{#each history}}
-    {{#if this.isUser}}User: {{this.content}}{{/if}}
-    {{#if this.isModel}}FinSarthi: {{this.content}}{{/if}}
-  {{/each}}
-  {{/if}}
+Converse with the user based on their query and the history of the conversation provided.
+Be friendly, empathetic, and encouraging.
 
-  User's latest message: {{{query}}}
-  
-  Your response:
-  `,
+{{#if history}}
+Conversation History:
+{{#each history}}
+{{#if this.isUser}}User: {{this.content}}
+{{/if}}
+{{#if this.isModel}}FinSarthi: {{this.content}}
+{{/if}}
+{{/each}}
+{{/if}}
+
+User's latest message: {{{query}}}
+
+Your response:
+`,
         input: promptInput,
         output: { schema: FinancialCoachOutputSchema }
     });
@@ -116,5 +89,3 @@ const financialCoachFlow = ai.defineFlow(
     return { response: output.response };
   }
 );
-
-    
