@@ -193,7 +193,7 @@ export function OnboardingStepper() {
     },
   });
 
-  const { trigger, setValue, getValues } = form;
+  const { trigger, setValue, getValues, handleSubmit } = form;
   const selectedLanguage = form.watch("language") as Language;
   const T = translations[selectedLanguage] || translations.en;
   const TOTAL_STEPS = 5;
@@ -281,9 +281,9 @@ export function OnboardingStepper() {
   const handleGenerateAdvice = async () => {
     const isValid = await trigger();
     if (isValid) {
-        form.handleSubmit(onSubmit)();
+      handleSubmit(onSubmit)();
     }
-  }
+  };
 
   if (step === TOTAL_STEPS + 1) {
     return (
@@ -478,7 +478,7 @@ export function OnboardingStepper() {
             </div>
 
             <div className="flex justify-between">
-              {step > 1 && (
+              {step > 1 && step <= TOTAL_STEPS && (
                 <Button type="button" variant="outline" onClick={prevStep}>
                   <ArrowLeft className="mr-2 h-4 w-4" /> {T.back}
                 </Button>
@@ -489,6 +489,7 @@ export function OnboardingStepper() {
                     {T.next} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
+                  step === TOTAL_STEPS &&
                   <Button type="button" onClick={handleGenerateAdvice} disabled={isLoading}>
                     {isLoading ? (
                       <>
