@@ -182,8 +182,8 @@ export function OnboardingStepper() {
     mode: 'onChange',
     defaultValues: {
       language: "en",
-      income: undefined,
-      expenses: undefined,
+      income: '' as any,
+      expenses: '' as any,
       financialGoals: "",
       literacyLevel: "beginner",
     },
@@ -197,10 +197,12 @@ export function OnboardingStepper() {
   const playQuestionAudio = async (text: string) => {
     try {
         const { audio } = await textToSpeech({ text });
-        const audioBlob = await (await fetch(audio)).blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audioEl = new Audio(audioUrl);
-        audioEl.play();
+        if (audio) {
+          const audioBlob = await (await fetch(audio)).blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audioEl = new Audio(audioUrl);
+          audioEl.play();
+        }
       } catch (e) {
         console.error("Failed to play audio:", e);
       }
