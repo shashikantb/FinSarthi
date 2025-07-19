@@ -1,4 +1,3 @@
-
 // src/components/onboarding-stepper.tsx
 "use client";
 
@@ -52,6 +51,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import React from 'react';
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { Progress } from "@/components/ui/progress";
 
 const translations = {
   en: {
@@ -75,6 +75,8 @@ const translations = {
     error: "Failed to generate advice. Please try again.",
     saveAndContinue: "Save and Continue",
     createAnAccount: "Create an Account",
+    generatingAdviceTitle: "Crafting Your Plan",
+    generatingAdviceDescription: "Our AI is analyzing your information to create a personalized financial plan. This might take a moment.",
   },
   hi: {
     language: "भाषा",
@@ -97,6 +99,8 @@ const translations = {
     error: "सलाह उत्पन्न करने में विफल। कृपया पुन: प्रयास करें।",
     saveAndContinue: "सहेजें और जारी रखें",
     createAnAccount: "खाता बनाएं",
+    generatingAdviceTitle: "आपकी योजना तैयार हो रही है",
+    generatingAdviceDescription: "हमारा AI व्यक्तिगत वित्तीय योजना बनाने के लिए आपकी जानकारी का विश्लेषण कर रहा है। इसमें कुछ समय लग सकता है।",
   },
   mr: {
     language: "भाषा",
@@ -114,11 +118,13 @@ const translations = {
     generating: "तयार होत आहे...",
     adviceResultTitle: "तुमचा वैयक्तिक सल्ला",
     adviceResultDescription:
-      "येथे तुमच्यासाठी तयार केलेला AI-शक्तीवर आधारित आर्थिक सल्ला आहे. तुमची प्रगती जतन કરવા आणि ટ્રॅक करण्यासाठी साइन अप करा.",
+      "येथे तुमच्यासाठी तयार केलेला AI-शक्तीवर आधारित आर्थिक सल्ला आहे. तुमची प्रगती जतन करण्यासाठी आणि ट्रॅक करण्यासाठी साइन अप करा.",
     yourAdviceHere: "तुमचा सल्ला येथे दिसेल.",
     error: "सल्ला तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.",
     saveAndContinue: "जतन करा आणि पुढे जा",
     createAnAccount: "खाते तयार करा",
+    generatingAdviceTitle: "तुमची योजना तयार करत आहे",
+    generatingAdviceDescription: "आमचे AI वैयक्तिक आर्थिक योजना तयार करण्यासाठी तुमच्या माहितीचे विश्लेषण करत आहे. यास थोडा वेळ लागू शकतो.",
   },
 };
 
@@ -180,6 +186,7 @@ export function OnboardingStepper() {
   const [adviceAudioUrl, setAdviceAudioUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [progress, setProgress] = useState(0);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -193,7 +200,7 @@ export function OnboardingStepper() {
     },
   });
 
-  const { trigger, setValue, getValues, handleSubmit } = form;
+  const { trigger, setValue, getValues, handleSubmit, formState } = form;
   const selectedLanguage = form.watch("language") as Language;
   const T = translations[selectedLanguage] || translations.en;
   const TOTAL_STEPS = 5;
@@ -225,9 +232,26 @@ export function OnboardingStepper() {
         console.error("Failed to play audio:", e);
       }
   };
+  
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(interval);
+            return 95;
+          }
+          return prev + 5;
+        });
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
+
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
+    setProgress(0);
     setAdvice("");
     setError("");
     try {
@@ -235,6 +259,7 @@ export function OnboardingStepper() {
         data as GeneratePersonalizedAdviceInput
       );
       setAdvice(result.advice);
+      setProgress(100);
 
       const ttsResult = await textToSpeech({ text: result.advice });
       setAdviceAudioUrl(ttsResult.audio);
@@ -245,6 +270,10 @@ export function OnboardingStepper() {
       console.error(e);
     }
     setIsLoading(false);
+  };
+  
+  const handleGenerateAdvice = async () => {
+    await handleSubmit(onSubmit)();
   };
 
   const nextStep = async () => {
@@ -278,12 +307,22 @@ export function OnboardingStepper() {
     }
   }
 
-  const handleGenerateAdvice = async () => {
-    const isValid = await trigger();
-    if (isValid) {
-      handleSubmit(onSubmit)();
-    }
-  };
+  if (isLoading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{T.generatingAdviceTitle}</CardTitle>
+          <CardDescription>{T.generatingAdviceDescription}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center space-y-4 pt-8 pb-12">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <Progress value={progress} className="w-full" />
+            <p className="text-sm text-muted-foreground">{T.generating}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
 
   if (step === TOTAL_STEPS + 1) {
     return (
@@ -293,13 +332,6 @@ export function OnboardingStepper() {
           <CardDescription>{T.adviceResultDescription}</CardDescription>
         </CardHeader>
         <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
-          {isLoading && (
-            <div className="space-y-4">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-            </div>
-          )}
           {error && <p className="text-destructive">{error}</p>}
           {!isLoading && !error && !advice && <p>{T.yourAdviceHere}</p>}
           {advice && (
@@ -325,7 +357,7 @@ export function OnboardingStepper() {
     <Card className="w-full">
       <CardContent className="pt-6">
         <Form {...form}>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             <div className="min-h-[280px]">
               {step === 1 && (
                 <div className="space-y-6">
@@ -490,8 +522,8 @@ export function OnboardingStepper() {
                   </Button>
                 ) : (
                   step === TOTAL_STEPS &&
-                  <Button type="button" onClick={handleGenerateAdvice} disabled={isLoading}>
-                    {isLoading ? (
+                  <Button type="submit" disabled={formState.isSubmitting}>
+                    {formState.isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         {T.generating}
