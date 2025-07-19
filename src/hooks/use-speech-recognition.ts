@@ -1,4 +1,3 @@
-
 // src/hooks/use-speech-recognition.ts
 "use client";
 
@@ -45,8 +44,8 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
     };
 
     recognition.onerror = (event) => {
-      // The "aborted" error is common when recognition is stopped manually and can be safely ignored.
-      if (event.error !== 'aborted') {
+      // The "aborted" and "network" errors are common and can be safely ignored.
+      if (event.error !== 'aborted' && event.error !== 'network') {
         console.error("Speech recognition error", event.error);
       }
       setIsListening(false);
