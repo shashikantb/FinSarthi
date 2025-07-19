@@ -1,4 +1,6 @@
 // src/hooks/use-speech-recognition.ts
+// This hook uses the browser's built-in Web Speech API for speech-to-text functionality.
+// It does not require any external npm packages.
 "use client";
 
 import { useState, useEffect, useRef } from "react";
