@@ -128,12 +128,15 @@ export function FinancialCoach() {
         language: data.language,
         history: messages,
       };
+      // Get text response first
       const result = await financialCoach(input);
       const modelMessage: Message = { role: "model", content: result.response };
       setMessages((prev) => [...prev, modelMessage]);
 
+      // Then, try to get the audio. This might fail if quota is exceeded.
       const ttsResult = await textToSpeech({ text: result.response });
 
+      // Update the last message with the audio URL, even if it's empty
       setMessages((prev) =>
         prev.map((msg, i) =>
           i === prev.length - 1
