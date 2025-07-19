@@ -38,28 +38,45 @@ const mockProducts: Product[] = [
  * @returns An array of financial products.
  */
 function parseAmfiData(textData: string): Omit<Product, 'id' | 'category'>[] {
-  const lines = textData.split('\n').slice(1); // Skip header row
-  const products = lines
-    .map(line => {
-      const parts = line.split(';');
-      // Expected format: Scheme Code;ISIN;...;Scheme Name;NAV;Date
-      if (parts.length >= 6) {
-        const schemeName = parts[3]?.trim();
-        const nav = parts[4]?.trim();
-        if (schemeName && nav && !isNaN(parseFloat(nav)) && parseFloat(nav) > 0) {
-          return {
-            name: schemeName,
-            description: `A mutual fund with a Net Asset Value (NAV) of ₹${nav}.`,
-          };
+    const lines = textData.split('\n').filter(line => line.includes(';')); // Ensure line has data
+  
+    const products = lines
+      .map(line => {
+        const parts = line.split(';');
+        // Scheme Code;ISIN Div Payout/ISIN Growth;ISIN Div Reinvestment;Scheme Name;Net Asset Value;Date
+        if (parts.length >= 6) {
+          const schemeName = parts[3]?.trim();
+          const nav = parts[4]?.trim();
+  
+          // Filter for more relevant "Growth" funds and ensure it's not an "IDCW" plan.
+          // Also, ensure NAV is a valid, positive number.
+          if (
+            schemeName &&
+            schemeName.toLowerCase().includes('growth') &&
+            !schemeName.toLowerCase().includes('idcw') &&
+            nav &&
+            !isNaN(parseFloat(nav)) &&
+            parseFloat(nav) > 0
+          ) {
+            // Simplify the name for better processing by the LLM
+            const simplifiedName = schemeName
+              .replace(/Regular Plan[ -]?Growth/i, '(Regular Growth)')
+              .replace(/Direct Plan[ -]?Growth/i, '(Direct Growth)')
+              .split(' - ')[0]; // Take the part before the first hyphen
+  
+            return {
+              name: simplifiedName,
+              description: `A mutual fund with a Net Asset Value (NAV) of ₹${nav}.`,
+            };
+          }
         }
-      }
-      return null;
-    })
-    .filter((p): p is { name: string; description: string } => p !== null)
-    .slice(0, 5); // Return a small subset to avoid overwhelming the user
-
-  return products;
-}
+        return null;
+      })
+      .filter((p): p is { name: string; description: string } => p !== null && p.name.length < 50) // Filter out very long names
+      .slice(0, 3); // Return a smaller subset to avoid overwhelming the user
+  
+    return products;
+  }
 
 /**
  * Fetches a list of financial products based on a category.
