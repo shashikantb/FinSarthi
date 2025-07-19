@@ -53,7 +53,7 @@ const summarizeFinancialNewsFlow = ai.defineFlow(
     try {
       const prompt = `You are an AI that summarizes financial news articles.
 
-      Summarize the following article in the specified language. Your response MUST be a JSON object with a single key "summary".
+      Summarize the following article in the specified language. Your response MUST be ONLY a valid JSON object with a single key "summary". Do not add any other text, explanations, or markdown formatting.
 
       Article Content: """${input.articleContent}"""
 
@@ -72,8 +72,9 @@ const summarizeFinancialNewsFlow = ai.defineFlow(
         throw new Error("The AI model returned an empty response.");
       }
       
-      // Find the JSON object within the response string
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      // Sanitize the response and extract the JSON object
+      const sanitizedContent = content.replace(/[\n\r\t]/g, ' ').trim();
+      const jsonMatch = sanitizedContent.match(/\{.*\}/s);
       if (!jsonMatch) {
           throw new Error("The AI model did not return a valid JSON object.");
       }

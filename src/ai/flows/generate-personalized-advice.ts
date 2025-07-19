@@ -79,7 +79,7 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       4.  **Suggest Products:** For any step that involves a financial product (like a savings account, mutual fund, or loan), you MUST suggest suitable product examples from the list provided above. Integrate these product suggestions naturally into your advice. DO NOT invent or hallucinate product names.
           - **Example Integration:** "You could consider opening a high-yield savings account, such as '${savings[0]?.name || 'a good savings account'}'."
       5.  **Structure and Tone:** Use headings or bullet points. Be encouraging and supportive throughout. Your name is FinSarthi.
-      6.  **Output Format**: Your response MUST be a valid JSON object with a single 'advice' field containing your full response as a string. Example: { "advice": "Here is your advice..." }
+      6.  **Output Format**: Your response MUST be ONLY a valid JSON object with a single 'advice' field containing your full response as a string. Do not include any other text, explanations, or markdown formatting like \`\`\`json. Example: { "advice": "Here is your advice..." }
       `;
 
       const completion = await groq.chat.completions.create({
@@ -94,8 +94,9 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
         throw new Error("The AI model returned an empty response.");
       }
 
-      // Find the JSON object within the response string
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      // Sanitize the response and extract the JSON object
+      const sanitizedContent = content.replace(/[\n\r\t]/g, ' ').trim();
+      const jsonMatch = sanitizedContent.match(/\{.*\}/s);
       if (!jsonMatch) {
           throw new Error("The AI model did not return a valid JSON object.");
       }
