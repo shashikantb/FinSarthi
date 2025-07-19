@@ -48,8 +48,8 @@ const prompt = ai.definePrompt({
   {{#if history}}
   Conversation History:
   {{#each history}}
-    {{#if (equals this.role "user")}}User: {{this.content}}{{/if}}
-    {{#if (equals this.role "model")}}FinSarthi: {{this.content}}{{/if}}
+    {{#if (eq this.role "user")}}User: {{this.content}}{{/if}}
+    {{#if (eq this.role "model")}}FinSarthi: {{this.content}}{{/if}}
   {{/each}}
   {{/if}}
 
@@ -57,13 +57,6 @@ const prompt = ai.definePrompt({
   
   Your response:
   `,
-  customize: (prompt) => {
-    prompt.handlebars.registerHelper('equals', function (arg1, arg2, options) {
-      // @ts-ignore
-      return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-    });
-    return prompt;
-  }
 });
 
 const financialCoachFlow = ai.defineFlow(
