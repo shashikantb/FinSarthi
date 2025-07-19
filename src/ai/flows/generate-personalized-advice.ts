@@ -60,6 +60,26 @@ const prompt = ai.definePrompt({
   5.  **Structure and Tone:** Use headings or bullet points. Be encouraging and supportive throughout. Your name is FinSarthi.
   6.  **Output Format**: Ensure your final output is a valid JSON object with an 'advice' field containing your full response.
   `,
+  config: {
+    safetySettings: [
+      {
+        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+        threshold: 'BLOCK_ONLY_HIGH',
+      },
+      {
+        category: 'HARM_CATEGORY_HATE_SPEECH',
+        threshold: 'BLOCK_ONLY_HIGH',
+      },
+      {
+        category: 'HARM_CATEGORY_HARASSMENT',
+        threshold: 'BLOCK_ONLY_HIGH',
+      },
+      {
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        threshold: 'BLOCK_ONLY_HIGH',
+      },
+    ],
+  },
 });
 
 const generatePersonalizedAdviceFlow = ai.defineFlow(
@@ -73,7 +93,6 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       const { output } = await prompt(input);
 
       if (output === null) {
-        // This case handles if the prompt succeeds but returns null without an error.
         return {
           advice:
             "I'm sorry, I was unable to generate advice at this time. The model returned an empty response. Please try adjusting your input or try again later.",
@@ -83,7 +102,6 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       return output;
     } catch (error) {
       console.error("Error in generatePersonalizedAdviceFlow:", error);
-      // This case handles errors during the prompt execution, like validation or safety issues.
       return {
         advice:
           "I'm sorry, I was unable to generate advice at this time. This could be due to a temporary issue or the content triggering safety settings. Please try adjusting your input or try again later.",
