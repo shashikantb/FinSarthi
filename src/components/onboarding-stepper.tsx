@@ -1,8 +1,9 @@
+
 // src/components/onboarding-stepper.tsx
 "use client";
 
 import { useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -178,25 +179,27 @@ export function OnboardingStepper() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       language: "en",
-      income: 1000,
-      expenses: 500,
-      financialGoals: "Save for retirement and a down payment on a house.",
+      income: undefined,
+      expenses: undefined,
+      financialGoals: "",
       literacyLevel: "beginner",
     },
   });
 
+  const { trigger, formState } = form;
   const selectedLanguage = form.watch("language") as Language;
   const T = translations[selectedLanguage];
+  const TOTAL_STEPS = 5;
 
   const playQuestionAudio = async (text: string) => {
     try {
         const { audio } = await textToSpeech({ text });
         const audioBlob = await (await fetch(audio)).blob();
         const audioUrl = URL.createObjectURL(audioBlob);
-        const
-         audioEl = new Audio(audioUrl);
+        const audioEl = new Audio(audioUrl);
         audioEl.play();
       } catch (e) {
         console.error("Failed to play audio:", e);
@@ -216,7 +219,7 @@ export function OnboardingStepper() {
       const ttsResult = await textToSpeech({ text: result.advice });
       setAdviceAudioUrl(ttsResult.audio);
 
-      setStep(3); // Move to results step
+      setStep(TOTAL_STEPS + 1); // Move to results step
     } catch (e) {
       setError(T.error);
       console.error(e);
@@ -224,10 +227,28 @@ export function OnboardingStepper() {
     setIsLoading(false);
   };
 
-  const nextStep = () => setStep((s) => s + 1);
+  const nextStep = async () => {
+    let isValid = false;
+    if (step === 2) {
+      isValid = await trigger("income");
+    } else if (step === 3) {
+      isValid = await trigger("expenses");
+    } else if (step === 4) {
+      isValid = await trigger("financialGoals");
+    } else if (step === 5) {
+      isValid = await trigger("literacyLevel");
+    } else {
+        isValid = true;
+    }
+    
+    if (isValid) {
+      setStep((s) => s + 1);
+    }
+  };
+
   const prevStep = () => setStep((s) => s - 1);
 
-  if (step === 3) {
+  if (step === TOTAL_STEPS + 1) {
     return (
       <Card className="w-full">
         <CardHeader>
@@ -268,125 +289,132 @@ export function OnboardingStepper() {
       <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {step === 1 && (
-              <div className="space-y-6">
-                 <FormField
-                  control={form.control}
-                  name="language"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{T.language}</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a language" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="en">English</SelectItem>
-                          <SelectItem value="hi">Hindi</SelectItem>
-                          <SelectItem value="mr">Marathi</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="min-h-[280px]">
+              {step === 1 && (
+                <div className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="income"
+                    name="language"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center">
-                            {T.monthlyIncome}
-                            <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.monthlyIncome)}>
-                                <Volume2 className="h-4 w-4"/>
-                            </Button>
-                        </FormLabel>
-                        <FormControl>
-                            <div className="relative">
-                                <Input type="number" placeholder="e.g., 5000" {...field} />
-                                <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                                    <Mic className="h-4 w-4"/>
-                                </Button>
-                            </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="expenses"
-                    render={({ field }) => (
-                      <FormItem>
-                         <FormLabel className="flex items-center">
-                            {T.monthlyExpenses}
-                            <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.monthlyExpenses)}>
-                                <Volume2 className="h-4 w-4"/>
-                            </Button>
-                        </FormLabel>
-                        <FormControl>
-                           <div className="relative">
-                                <Input type="number" placeholder="e.g., 3000" {...field} />
-                                <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                                    <Mic className="h-4 w-4"/>
-                                </Button>
-                            </div>
-                        </FormControl>
+                        <FormLabel>{T.language}</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a language" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="en">English</SelectItem>
+                            <SelectItem value="hi">Hindi</SelectItem>
+                            <SelectItem value="mr">Marathi</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+              )}
+
+              {step === 2 && (
+                <FormField
+                  control={form.control}
+                  name="income"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                          {T.monthlyIncome}
+                          <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.monthlyIncome)}>
+                              <Volume2 className="h-4 w-4"/>
+                          </Button>
+                      </FormLabel>
+                      <FormControl>
+                          <div className="relative">
+                              <Input type="number" placeholder="e.g., 5000" {...field} />
+                              <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
+                                  <Mic className="h-4 w-4"/>
+                              </Button>
+                          </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {step === 3 && (
+                <FormField
+                  control={form.control}
+                  name="expenses"
+                  render={({ field }) => (
+                    <FormItem>
+                        <FormLabel className="flex items-center">
+                          {T.monthlyExpenses}
+                          <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.monthlyExpenses)}>
+                              <Volume2 className="h-4 w-4"/>
+                          </Button>
+                      </FormLabel>
+                      <FormControl>
+                          <div className="relative">
+                              <Input type="number" placeholder="e.g., 3000" {...field} />
+                              <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
+                                  <Mic className="h-4 w-4"/>
+                              </Button>
+                          </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {step === 4 && (
                 <FormField
                   control={form.control}
                   name="financialGoals"
                   render={({ field }) => (
                     <FormItem>
-                       <FormLabel className="flex items-center">
-                            {T.financialGoals}
-                            <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.financialGoals)}>
-                                <Volume2 className="h-4 w-4"/>
-                            </Button>
-                        </FormLabel>
+                        <FormLabel className="flex items-center">
+                          {T.financialGoals}
+                          <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.financialGoals)}>
+                              <Volume2 className="h-4 w-4"/>
+                          </Button>
+                      </FormLabel>
                       <FormControl>
-                        <div className="relative">
-                            <Textarea
-                                placeholder="e.g., Save for a house, invest in stocks..."
-                                className="resize-none pr-10"
-                                {...field}
-                            />
-                            <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-2 h-8 w-8">
-                                <Mic className="h-4 w-4"/>
-                            </Button>
-                        </div>
+                      <div className="relative">
+                          <Textarea
+                              placeholder="e.g., Save for a house, invest in stocks..."
+                              className="resize-none pr-10"
+                              {...field}
+                          />
+                          <Button variant="ghost" size="icon" type="button" className="absolute right-1 top-2 h-8 w-8">
+                              <Mic className="h-4 w-4"/>
+                          </Button>
+                      </div>
 
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
+              )}
+
+              {step === 5 && (
+                 <FormField
                   control={form.control}
                   name="literacyLevel"
                   render={({ field }) => (
                     <FormItem>
-                       <FormLabel className="flex items-center">
-                            {T.literacy}
-                             <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.literacy)}>
-                                <Volume2 className="h-4 w-4"/>
-                            </Button>
-                        </FormLabel>
+                        <FormLabel className="flex items-center">
+                          {T.literacy}
+                            <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.literacy)}>
+                              <Volume2 className="h-4 w-4"/>
+                          </Button>
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -406,8 +434,8 @@ export function OnboardingStepper() {
                     </FormItem>
                   )}
                 />
-              </div>
-            )}
+              )}
+            </div>
 
             <div className="flex justify-between">
               {step > 1 && (
@@ -415,9 +443,9 @@ export function OnboardingStepper() {
                   <ArrowLeft className="mr-2 h-4 w-4" /> {T.back}
                 </Button>
               )}
-              <div className={cn(step === 1 ? 'w-full' : '')}>
-                {step < 2 ? (
-                  <Button type="button" onClick={nextStep} className="w-full">
+              <div className={cn(step === 1 ? 'w-full' : 'ml-auto')}>
+                {step < TOTAL_STEPS ? (
+                  <Button type="button" onClick={nextStep}>
                     {T.next} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
