@@ -1,3 +1,4 @@
+
 // src/components/advice-form.tsx
 "use client";
 
@@ -57,8 +58,8 @@ export function AdviceForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      income: undefined,
-      expenses: undefined,
+      income: "" as any,
+      expenses: "" as any,
       financialGoals: "",
       literacyLevel: "beginner",
       language: "en",
@@ -73,7 +74,11 @@ export function AdviceForm() {
       const result = await generatePersonalizedAdvice(
         data as GeneratePersonalizedAdviceInput
       );
-      setAdvice(result.advice);
+      if (result.advice) {
+        setAdvice(result.advice);
+      } else {
+        setError("Failed to generate advice. The AI did not return a valid response.");
+      }
     } catch (e) {
       setError("Failed to generate advice. Please try again.");
       console.error(e);
