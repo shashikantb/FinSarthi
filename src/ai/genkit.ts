@@ -1,12 +1,11 @@
 import {genkit} from 'genkit';
-import {openai} from 'genkitx-openai';
+import {googleAI} from '@genkit-ai/googleai';
 
 export const ai = genkit({
   plugins: [
-    openai({
-      apiKey: process.env.GROQ_API_KEY as string,
-      baseURL: 'https://api.groq.com/openai/v1',
+    googleAI({
+      apiKey: process.env.GEMINI_API_KEY,
     }),
   ],
-  model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+  model: 'gemini-1.5-flash-latest',
 });
