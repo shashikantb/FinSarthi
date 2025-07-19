@@ -94,6 +94,8 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
         throw new Error("The AI model returned an empty response.");
       }
 
+      console.log("AI Response for Personalized Advice:", content);
+
       // Sanitize the response and extract the JSON object
       const sanitizedContent = content.replace(/[\n\r\t]/g, ' ').trim();
       const jsonMatch = sanitizedContent.match(/\{.*\}/s);
