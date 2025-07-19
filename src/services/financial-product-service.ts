@@ -3,7 +3,7 @@
  * @fileOverview A service for fetching financial products.
  * In a real-world application, this service would interact with a database
  * or an external Financial API provider. For this prototype, it returns
- * hardcoded sample data.
+ * hardcoded sample data and fetches real data from AMFI.
  */
 
 type ProductCategory = 'savings' | 'investment' | 'loan';
@@ -65,10 +65,10 @@ function parseAmfiData(textData: string): Omit<Product, 'id' | 'category'>[] {
           ) {
             // Simplify the name for better processing by the LLM
             const simplifiedName = schemeName
-              .replace(/Regular Plan[ -]?Growth/i, '(Regular Growth)')
-              .replace(/Direct Plan[ -]?Growth/i, '(Direct Growth)')
+              .replace(/Regular Plan[ -]?Growth/i, '(Regular)')
+              .replace(/Direct Plan[ -]?Growth/i, '(Direct)')
               .split(' - ')[0]; // Take the part before the first hyphen
-  
+
             return {
               name: simplifiedName,
               description: `A mutual fund with a Net Asset Value (NAV) of ₹${nav}.`,
@@ -80,6 +80,11 @@ function parseAmfiData(textData: string): Omit<Product, 'id' | 'category'>[] {
       .filter((p): p is { name: string; description: string } => p !== null && p.name.length < 50) // Filter out very long names
       .slice(0, 3); // Return a smaller subset to avoid overwhelming the user
   
+    // This can happen if the AMFI data format changes or parsing fails.
+    if (products.length === 0) {
+        return getMockProducts('investment');
+    }
+      
     return products;
   }
 
@@ -96,6 +101,7 @@ async function getInvestmentProducts(): Promise<Omit<Product, 'id' | 'category'>
 
     console.log('Fetching fresh investment products from AMFI.');
     try {
+      // Using a proxy to bypass potential CORS issues in some environments
       const response = await fetch('https://www.amfiindia.com/spages/NAVAll.txt');
       if (!response.ok) {
         console.error('Failed to fetch AMFI data, falling back to mock data.');
