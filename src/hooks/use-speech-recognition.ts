@@ -45,21 +45,32 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
     };
 
     recognition.onerror = (event) => {
-      console.error("Speech recognition error", event.error);
+      // The "aborted" error is common when recognition is stopped manually and can be safely ignored.
+      if (event.error !== 'aborted') {
+        console.error("Speech recognition error", event.error);
+      }
       setIsListening(false);
     };
 
     return () => {
-      recognition.stop();
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
     };
   }, [onTranscript]);
 
   const startListening = ({lang = 'en-US'} = {}) => {
     if (recognitionRef.current && !isListening) {
-      recognitionRef.current.lang = lang;
-      recognitionRef.current.start();
-      setIsListening(true);
-      setTranscript("");
+      try {
+        recognitionRef.current.lang = lang;
+        recognitionRef.current.start();
+        setIsListening(true);
+        setTranscript("");
+      } catch(e) {
+        // This can happen if start is called while already started.
+        console.error(e);
+        setIsListening(false);
+      }
     }
   };
 
@@ -77,5 +88,3 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
     stopListening,
   };
 }
-
-    
