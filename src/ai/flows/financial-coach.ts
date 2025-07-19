@@ -48,8 +48,8 @@ const prompt = ai.definePrompt({
   {{#if history}}
   Conversation History:
   {{#each history}}
-    {{#if (this.role === "user")}}User: {{this.content}}{{/if}}
-    {{#if (this.role === "model")}}FinSarthi: {{this.content}}{{/if}}
+    {{#if (eq this.role "user")}}User: {{this.content}}{{/if}}
+    {{#if (eq this.role "model")}}FinSarthi: {{this.content}}{{/if}}
   {{/each}}
   {{/if}}
 
@@ -57,6 +57,16 @@ const prompt = ai.definePrompt({
   
   Your response:
   `,
+  customize: (prompt, {input}) => {
+    return {
+      ...prompt,
+      history: (input.history || []).map(message => ({
+        ...message,
+        isUser: message.role === 'user',
+        isModel: message.role === 'model',
+      })),
+    };
+  },
 });
 
 const financialCoachFlow = ai.defineFlow(
@@ -66,7 +76,41 @@ const financialCoachFlow = ai.defineFlow(
     outputSchema: FinancialCoachOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    // We need to re-map the history for the prompt context because the 'eq' helper is not standard.
+    // A better approach is to use a structure Handlebars can work with easily.
+    const historyForPrompt = (input.history || []).map(msg => ({
+        role: msg.role,
+        content: msg.content,
+        isUser: msg.role === 'user',
+        isModel: msg.role === 'model'
+    }));
+
+    const promptInput = { ...input, history: historyForPrompt };
+
+    const {output} = await ai.generate({
+        prompt: `You are FinSarthi, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
+  You are an expert on topics like budgeting, saving, investing, and loans.
+  The user is conversing with you in {{language}}. Make sure your response is in the same language.
+  
+  Converse with the user based on their query and the history of the conversation provided.
+  Be friendly, empathetic, and encouraging.
+
+  {{#if history}}
+  Conversation History:
+  {{#each history}}
+    {{#if this.isUser}}User: {{this.content}}{{/if}}
+    {{#if this.isModel}}FinSarthi: {{this.content}}{{/if}}
+  {{/each}}
+  {{/if}}
+
+  User's latest message: {{{query}}}
+  
+  Your response:
+  `,
+        input: promptInput,
+        output: { schema: FinancialCoachOutputSchema }
+    });
+
     return { response: output!.response };
   }
 );
