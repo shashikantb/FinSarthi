@@ -1,3 +1,4 @@
+// src/components/financial-coach.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -8,7 +9,6 @@ import {
   financialCoach,
   type FinancialCoachInput,
 } from "@/ai/flows/financial-coach";
-import { textToSpeech } from "@/ai/flows/text-to-speech";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,7 +23,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -38,11 +37,12 @@ import { Loader2, Send, Bot, User, Volume2, Play } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useBrowserTts } from "@/hooks/use-browser-tts";
 
 type Message = {
+  id: string;
   role: "user" | "model";
   content: string;
-  audioUrl?: string;
 };
 
 const formSchema = z.object({
@@ -52,40 +52,31 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-function AudioPlayer({ audioUrl }: { audioUrl?: string }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
+const langToLocale: Record<string, string> = {
+  English: "en-US",
+  Hindi: "hi-IN",
+  Marathi: "mr-IN",
+};
 
-  if (!audioUrl) return null;
-
-  const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-    }
-  };
+function AudioPlayer({ message, language }: { message: Message, language: string }) {
+  const { speak, isPlaying } = useBrowserTts();
+  
+  if (message.role !== "model") return null;
 
   return (
-    <div>
-      <audio
-        ref={audioRef}
-        src={audioUrl}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => setIsPlaying(false)}
-      />
-      <Button variant="ghost" size="icon" onClick={togglePlay} className="h-7 w-7">
-        {isPlaying ? (
-          <Volume2 className="h-4 w-4" />
-        ) : (
-          <Play className="h-4 w-4" />
-        )}
-        <span className="sr-only">Play audio</span>
-      </Button>
-    </div>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => speak(message.content, langToLocale[language])}
+      className="h-7 w-7"
+    >
+      {isPlaying ? (
+        <Volume2 className="h-4 w-4" />
+      ) : (
+        <Play className="h-4 w-4" />
+      )}
+      <span className="sr-only">Play audio</span>
+    </Button>
   );
 }
 
@@ -102,16 +93,15 @@ export function FinancialCoach() {
       language: "English",
     },
   });
-  
-  const { watch } = form;
-  const language = watch("language");
+
+  const language = form.watch("language");
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-        scrollAreaRef.current.scrollTo({
-            top: scrollAreaRef.current.scrollHeight,
-            behavior: 'smooth'
-        });
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
   }, [messages]);
 
@@ -119,31 +109,24 @@ export function FinancialCoach() {
     setIsLoading(true);
     setError("");
 
-    const userMessage: Message = { role: "user", content: data.query };
-    setMessages((prev) => [...prev, userMessage]);
+    const userMessage: Message = { role: "user", content: data.query, id: crypto.randomUUID() };
+    const currentMessages = [...messages, userMessage];
+    setMessages(currentMessages);
 
     try {
       const input: FinancialCoachInput = {
         query: data.query,
         language: data.language,
-        history: messages,
+        history: currentMessages.map(({id, ...rest}) => rest), // Don't send ID to flow
       };
-      // Get text response first
+      
       const result = await financialCoach(input);
-      const modelMessage: Message = { role: "model", content: result.response };
+      const modelMessage: Message = {
+        role: "model",
+        content: result.response,
+        id: crypto.randomUUID(),
+      };
       setMessages((prev) => [...prev, modelMessage]);
-
-      // Then, try to get the audio. This might fail if quota is exceeded.
-      const ttsResult = await textToSpeech({ text: result.response });
-
-      // Update the last message with the audio URL, even if it's empty
-      setMessages((prev) =>
-        prev.map((msg, i) =>
-          i === prev.length - 1
-            ? { ...msg, audioUrl: ttsResult.audio }
-            : msg
-        )
-      );
 
       form.reset({ query: "", language: data.language });
     } catch (e) {
@@ -166,9 +149,9 @@ export function FinancialCoach() {
       <CardContent>
         <ScrollArea className="h-[400px] w-full pr-4" ref={scrollAreaRef}>
           <div className="space-y-4">
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <div
-                key={index}
+                key={message.id}
                 className={cn(
                   "flex items-start gap-3",
                   message.role === "user" ? "justify-end" : "justify-start"
@@ -176,7 +159,9 @@ export function FinancialCoach() {
               >
                 {message.role === "model" && (
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback><Bot className="h-5 w-5"/></AvatarFallback>
+                    <AvatarFallback>
+                      <Bot className="h-5 w-5" />
+                    </AvatarFallback>
                   </Avatar>
                 )}
                 <div
@@ -189,25 +174,29 @@ export function FinancialCoach() {
                 >
                   <div className="flex items-center gap-2">
                     <p>{message.content}</p>
-                    {message.role === "model" && <AudioPlayer audioUrl={message.audioUrl} />}
+                    {message.role === "model" && <AudioPlayer message={message} language={language} />}
                   </div>
                 </div>
-                 {message.role === "user" && (
+                {message.role === "user" && (
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback><User className="h-5 w-5"/></AvatarFallback>
+                    <AvatarFallback>
+                      <User className="h-5 w-5" />
+                    </AvatarFallback>
                   </Avatar>
                 )}
               </div>
             ))}
             {isLoading && (
-               <div className="flex items-start gap-3 justify-start">
-                   <Avatar className="h-8 w-8">
-                    <AvatarFallback><Bot className="h-5 w-5"/></AvatarFallback>
-                  </Avatar>
-                  <div className="max-w-xs rounded-lg p-3 text-sm md:max-w-md bg-muted">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  </div>
-               </div>
+              <div className="flex items-start gap-3 justify-start">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>
+                    <Bot className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="max-w-xs rounded-lg p-3 text-sm md:max-w-md bg-muted">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                </div>
+              </div>
             )}
             {error && <p className="text-destructive text-center">{error}</p>}
           </div>
@@ -219,7 +208,7 @@ export function FinancialCoach() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex w-full items-start gap-4"
           >
-            <FormField
+             <FormField
               control={form.control}
               name="language"
               render={({ field }) => (
@@ -261,7 +250,12 @@ export function FinancialCoach() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isLoading} size="icon" className="shrink-0">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              size="icon"
+              className="shrink-0"
+            >
               {isLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (

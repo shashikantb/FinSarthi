@@ -9,7 +9,6 @@ import {
   generatePersonalizedAdvice,
   type GeneratePersonalizedAdviceInput,
 } from "@/ai/flows/generate-personalized-advice";
-import { textToSpeech } from "@/ai/flows/text-to-speech";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -46,12 +45,12 @@ import {
   Play,
   MicOff,
 } from "lucide-react";
-import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import React from 'react';
+import React from "react";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { Progress } from "@/components/ui/progress";
+import { useBrowserTts } from "@/hooks/use-browser-tts";
 
 const translations = {
   en: {
@@ -76,7 +75,8 @@ const translations = {
     saveAndContinue: "Save and Continue",
     createAnAccount: "Create an Account",
     generatingAdviceTitle: "Crafting Your Plan",
-    generatingAdviceDescription: "Our AI is analyzing your information to create a personalized financial plan. This might take a moment.",
+    generatingAdviceDescription:
+      "Our AI is analyzing your information to create a personalized financial plan. This might take a moment.",
   },
   hi: {
     language: "भाषा",
@@ -100,7 +100,8 @@ const translations = {
     saveAndContinue: "सहेजें और जारी रखें",
     createAnAccount: "खाता बनाएं",
     generatingAdviceTitle: "आपकी योजना तैयार हो रही है",
-    generatingAdviceDescription: "हमारा AI व्यक्तिगत वित्तीय योजना बनाने के लिए आपकी जानकारी का विश्लेषण कर रहा है। इसमें कुछ समय लग सकता है।",
+    generatingAdviceDescription:
+      "हमारा AI व्यक्तिगत वित्तीय योजना बनाने के लिए आपकी जानकारी का विश्लेषण कर रहा है। इसमें कुछ समय लग सकता है।",
   },
   mr: {
     language: "भाषा",
@@ -124,7 +125,8 @@ const translations = {
     saveAndContinue: "जतन करा आणि पुढे जा",
     createAnAccount: "खाते तयार करा",
     generatingAdviceTitle: "तुमची योजना तयार करत आहे",
-    generatingAdviceDescription: "आमचे AI वैयक्तिक आर्थिक योजना तयार करण्यासाठी तुमच्या माहितीचे विश्लेषण करत आहे. यास थोडा वेळ लागू शकतो.",
+    generatingAdviceDescription:
+      "आमचे AI वैयक्तिक आर्थिक योजना तयार करण्यासाठी तुमच्या माहितीचे विश्लेषण करत आहे. यास थोडा वेळ लागू शकतो.",
   },
 };
 
@@ -143,58 +145,45 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 type Language = keyof typeof translations;
 
-function AudioPlayer({ audioUrl }: { audioUrl?: string }) {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const audioRef = React.useRef<HTMLAudioElement>(null);
-  
-    if (!audioUrl) return null;
-  
-    const togglePlay = () => {
-      if (audioRef.current) {
-        if (isPlaying) {
-          audioRef.current.pause();
-        } else {
-          audioRef.current.play();
-        }
-      }
-    };
-  
-    return (
-      <div className="inline-flex items-center">
-        <audio
-          ref={audioRef}
-          src={audioUrl}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onEnded={() => setIsPlaying(false)}
-        />
-        <Button variant="ghost" size="icon" onClick={togglePlay} className="h-7 w-7">
-          {isPlaying ? (
-            <Volume2 className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
-          <span className="sr-only">Play audio</span>
-        </Button>
-      </div>
-    );
-  }
+function AudioPlayer({ text, lang }: { text?: string; lang: string }) {
+  const { speak, isPlaying } = useBrowserTts();
+  if (!text) return null;
+
+  return (
+    <div className="inline-flex items-center">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => speak(text, lang)}
+        className="h-7 w-7"
+      >
+        {isPlaying ? (
+          <Volume2 className="h-4 w-4" />
+        ) : (
+          <Play className="h-4 w-4" />
+        )}
+        <span className="sr-only">Play audio</span>
+      </Button>
+    </div>
+  );
+}
 
 export function OnboardingStepper() {
   const [step, setStep] = useState(1);
   const [advice, setAdvice] = useState<string>("");
-  const [adviceAudioUrl, setAdviceAudioUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [progress, setProgress] = useState(0);
 
+  const { speak: playQuestionAudio } = useBrowserTts();
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: {
       language: "en",
-      income: '' as any,
-      expenses: '' as any,
+      income: "" as any,
+      expenses: "" as any,
       financialGoals: "",
       literacyLevel: "beginner",
     },
@@ -205,34 +194,21 @@ export function OnboardingStepper() {
   const T = translations[selectedLanguage] || translations.en;
   const TOTAL_STEPS = 5;
 
-  const {
-    isListening,
-    transcript,
-    startListening,
-    stopListening,
-  } = useSpeechRecognition({
-    onTranscript: (text) => {
-      const field = step === 2 ? 'income' : step === 3 ? 'expenses' : 'financialGoals';
-      if (step > 1 && step < 5) {
-        setValue(field, text, { shouldValidate: true });
-      }
-    }
-  });
-
-  const playQuestionAudio = async (text: string) => {
-    try {
-        const { audio } = await textToSpeech({ text });
-        if (audio) {
-          const audioBlob = await (await fetch(audio)).blob();
-          const audioUrl = URL.createObjectURL(audioBlob);
-          const audioEl = new Audio(audioUrl);
-          audioEl.play();
+  const { isListening, startListening, stopListening } =
+    useSpeechRecognition({
+      onTranscript: (text) => {
+        const field =
+          step === 2
+            ? "income"
+            : step === 3
+            ? "expenses"
+            : "financialGoals";
+        if (step > 1 && step < 5) {
+          setValue(field, text, { shouldValidate: true });
         }
-      } catch (e) {
-        console.error("Failed to play audio:", e);
-      }
-  };
-  
+      },
+    });
+
   useEffect(() => {
     if (isLoading) {
       const interval = setInterval(() => {
@@ -248,7 +224,6 @@ export function OnboardingStepper() {
     }
   }, [isLoading]);
 
-
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setProgress(0);
@@ -260,10 +235,6 @@ export function OnboardingStepper() {
       );
       setAdvice(result.advice);
       setProgress(100);
-
-      const ttsResult = await textToSpeech({ text: result.advice });
-      setAdviceAudioUrl(ttsResult.audio);
-
       setStep(TOTAL_STEPS + 1); // Move to results step
     } catch (e) {
       setError(T.error);
@@ -271,7 +242,7 @@ export function OnboardingStepper() {
     }
     setIsLoading(false);
   };
-  
+
   const handleGenerateAdvice = async () => {
     await handleSubmit(onSubmit)();
   };
@@ -289,23 +260,23 @@ export function OnboardingStepper() {
     } else if (step === 5) {
       isValid = await trigger("literacyLevel");
     } else {
-        isValid = true;
+      isValid = true;
     }
-    
+
     if (isValid) {
       setStep((s) => s + 1);
     }
   };
 
   const prevStep = () => setStep((s) => s - 1);
-  
+
   const handleMicClick = () => {
     if (isListening) {
       stopListening();
     } else {
-      startListening({ lang: getValues('language') });
+      startListening({ lang: getValues("language") });
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -315,14 +286,13 @@ export function OnboardingStepper() {
           <CardDescription>{T.generatingAdviceDescription}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center space-y-4 pt-8 pb-12">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <Progress value={progress} className="w-full" />
-            <p className="text-sm text-muted-foreground">{T.generating}</p>
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <Progress value={progress} className="w-full" />
+          <p className="text-sm text-muted-foreground">{T.generating}</p>
         </CardContent>
       </Card>
     );
   }
-
 
   if (step === TOTAL_STEPS + 1) {
     return (
@@ -335,9 +305,9 @@ export function OnboardingStepper() {
           {error && <p className="text-destructive">{error}</p>}
           {!isLoading && !error && !advice && <p>{T.yourAdviceHere}</p>}
           {advice && (
-            <div className="flex items-center gap-2">
-                <p>{advice}</p>
-                <AudioPlayer audioUrl={adviceAudioUrl} />
+            <div className="flex items-start gap-2">
+              <p>{advice}</p>
+              <AudioPlayer text={advice} lang={selectedLanguage} />
             </div>
           )}
         </CardContent>
@@ -370,7 +340,7 @@ export function OnboardingStepper() {
                         <Select
                           onValueChange={(value) => {
                             if (isListening) stopListening();
-                            field.onChange(value)
+                            field.onChange(value);
                           }}
                           defaultValue={field.value}
                         >
@@ -399,18 +369,40 @@ export function OnboardingStepper() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center">
-                          {T.monthlyIncome}
-                          <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.monthlyIncome)}>
-                              <Volume2 className="h-4 w-4"/>
-                          </Button>
+                        {T.monthlyIncome}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          type="button"
+                          className="h-6 w-6 ml-2"
+                          onClick={() =>
+                            playQuestionAudio(T.monthlyIncome, selectedLanguage)
+                          }
+                        >
+                          <Volume2 className="h-4 w-4" />
+                        </Button>
                       </FormLabel>
                       <FormControl>
-                          <div className="relative">
-                              <Input type="number" placeholder="e.g., 5000" {...field} />
-                              <Button variant="ghost" size="icon" type="button" onClick={handleMicClick} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                                  {isListening ? <MicOff className="h-4 w-4 text-primary"/> : <Mic className="h-4 w-4"/>}
-                              </Button>
-                          </div>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            placeholder="e.g., 5000"
+                            {...field}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            type="button"
+                            onClick={handleMicClick}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                          >
+                            {isListening ? (
+                              <MicOff className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Mic className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -424,19 +416,41 @@ export function OnboardingStepper() {
                   name="expenses"
                   render={({ field }) => (
                     <FormItem>
-                        <FormLabel className="flex items-center">
-                          {T.monthlyExpenses}
-                          <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.monthlyExpenses)}>
-                              <Volume2 className="h-4 w-4"/>
-                          </Button>
+                      <FormLabel className="flex items-center">
+                        {T.monthlyExpenses}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          type="button"
+                          className="h-6 w-6 ml-2"
+                          onClick={() =>
+                            playQuestionAudio(T.monthlyExpenses, selectedLanguage)
+                          }
+                        >
+                          <Volume2 className="h-4 w-4" />
+                        </Button>
                       </FormLabel>
                       <FormControl>
-                          <div className="relative">
-                              <Input type="number" placeholder="e.g., 3000" {...field} />
-                              <Button variant="ghost" size="icon" type="button" onClick={handleMicClick} className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
-                                  {isListening ? <MicOff className="h-4 w-4 text-primary"/> : <Mic className="h-4 w-4"/>}
-                              </Button>
-                          </div>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            placeholder="e.g., 3000"
+                            {...field}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            type="button"
+                            onClick={handleMicClick}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                          >
+                            {isListening ? (
+                              <MicOff className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Mic className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -450,24 +464,41 @@ export function OnboardingStepper() {
                   name="financialGoals"
                   render={({ field }) => (
                     <FormItem>
-                        <FormLabel className="flex items-center">
-                          {T.financialGoals}
-                          <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.financialGoals)}>
-                              <Volume2 className="h-4 w-4"/>
-                          </Button>
+                      <FormLabel className="flex items-center">
+                        {T.financialGoals}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          type="button"
+                          className="h-6 w-6 ml-2"
+                          onClick={() =>
+                            playQuestionAudio(T.financialGoals, selectedLanguage)
+                          }
+                        >
+                          <Volume2 className="h-4 w-4" />
+                        </Button>
                       </FormLabel>
                       <FormControl>
-                      <div className="relative">
+                        <div className="relative">
                           <Textarea
-                              placeholder="e.g., Save for a house, invest in stocks..."
-                              className="resize-none pr-10"
-                              {...field}
+                            placeholder="e.g., Save for a house, invest in stocks..."
+                            className="resize-none pr-10"
+                            {...field}
                           />
-                          <Button variant="ghost" size="icon" type="button" onClick={handleMicClick} className="absolute right-1 top-2 h-8 w-8">
-                               {isListening ? <MicOff className="h-4 w-4 text-primary"/> : <Mic className="h-4 w-4"/>}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            type="button"
+                            onClick={handleMicClick}
+                            className="absolute right-1 top-2 h-8 w-8"
+                          >
+                            {isListening ? (
+                              <MicOff className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Mic className="h-4 w-4" />
+                            )}
                           </Button>
-                      </div>
-
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -476,16 +507,24 @@ export function OnboardingStepper() {
               )}
 
               {step === 5 && (
-                 <FormField
+                <FormField
                   control={form.control}
                   name="literacyLevel"
                   render={({ field }) => (
                     <FormItem>
-                        <FormLabel className="flex items-center">
-                          {T.literacy}
-                            <Button variant="ghost" size="icon" type="button" className="h-6 w-6 ml-2" onClick={() => playQuestionAudio(T.literacy)}>
-                              <Volume2 className="h-4 w-4"/>
-                          </Button>
+                      <FormLabel className="flex items-center">
+                        {T.literacy}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          type="button"
+                          className="h-6 w-6 ml-2"
+                          onClick={() =>
+                            playQuestionAudio(T.literacy, selectedLanguage)
+                          }
+                        >
+                          <Volume2 className="h-4 w-4" />
+                        </Button>
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -498,7 +537,9 @@ export function OnboardingStepper() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="beginner">{T.beginner}</SelectItem>
-                          <SelectItem value="intermediate">{T.intermediate}</SelectItem>
+                          <SelectItem value="intermediate">
+                            {T.intermediate}
+                          </SelectItem>
                           <SelectItem value="advanced">{T.advanced}</SelectItem>
                         </SelectContent>
                       </Select>
@@ -515,26 +556,29 @@ export function OnboardingStepper() {
                   <ArrowLeft className="mr-2 h-4 w-4" /> {T.back}
                 </Button>
               )}
-              <div className={cn(step === 1 ? 'w-full flex justify-end' : 'ml-auto')}>
+              <div
+                className={cn(step === 1 ? "w-full flex justify-end" : "ml-auto")}
+              >
                 {step < TOTAL_STEPS ? (
                   <Button type="button" onClick={nextStep}>
                     {T.next} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
-                  step === TOTAL_STEPS &&
-                  <Button type="submit" disabled={formState.isSubmitting}>
-                    {formState.isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {T.generating}
-                      </>
-                    ) : (
-                      <>
-                        {T.generateAdvice}
-                        <Wand2 className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
+                  step === TOTAL_STEPS && (
+                    <Button type="submit" disabled={formState.isSubmitting}>
+                      {formState.isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {T.generating}
+                        </>
+                      ) : (
+                        <>
+                          {T.generateAdvice}
+                          <Wand2 className="ml-2 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  )
                 )}
               </div>
             </div>
