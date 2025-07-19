@@ -15,6 +15,11 @@ interface Product {
   description: string;
 }
 
+// In-memory cache for AMFI data
+let amfiCache: Omit<Product, 'id' | 'category'>[] | null = null;
+let lastFetchTimestamp = 0;
+const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
 const mockProducts: Product[] = [
   // Savings
   { id: 'hys-1', name: 'SecureBank High-Yield Savings', category: 'savings', description: 'A high-interest savings account with no monthly fees.' },
@@ -79,29 +84,51 @@ function parseAmfiData(textData: string): Omit<Product, 'id' | 'category'>[] {
   }
 
 /**
+ * Fetches investment products from AMFI, using a cache to avoid repeated downloads.
+ */
+async function getInvestmentProducts(): Promise<Omit<Product, 'id' | 'category'>[]> {
+    const now = Date.now();
+    // Check if cache is valid (not empty and not older than 24 hours)
+    if (amfiCache && now - lastFetchTimestamp < CACHE_DURATION_MS) {
+      console.log('Serving investment products from cache.');
+      return amfiCache;
+    }
+
+    console.log('Fetching fresh investment products from AMFI.');
+    try {
+      const response = await fetch('https://www.amfiindia.com/spages/NAVAll.txt');
+      if (!response.ok) {
+        console.error('Failed to fetch AMFI data, falling back to mock data.');
+        return getMockProducts('investment');
+      }
+      const textData = await response.text();
+      const parsedData = parseAmfiData(textData);
+
+      if (parsedData.length > 0) {
+        // Update cache
+        amfiCache = parsedData;
+        lastFetchTimestamp = now;
+        return parsedData;
+      } else {
+        // Fallback if parsing returns no data
+        return getMockProducts('investment');
+      }
+    } catch (error) {
+      console.error('Error fetching or parsing AMFI data:', error);
+      // Fallback to mock data in case of any network or parsing error
+      return getMockProducts('investment');
+    }
+}
+
+
+/**
  * Fetches a list of financial products based on a category.
  * @param category The category of products to fetch.
  * @returns A promise that resolves to an array of products.
  */
 export async function getProducts(category: ProductCategory): Promise<Omit<Product, 'id' | 'category'>[]> {
   if (category === 'investment') {
-    try {
-      // Use the public AMFI data source for investments
-      const response = await fetch('https://www.amfiindia.com/spages/NAVAll.txt');
-      if (!response.ok) {
-        console.error('Failed to fetch AMFI data, falling back to mock data.');
-        return getMockProducts(category);
-      }
-      const textData = await response.text();
-      const parsedData = parseAmfiData(textData);
-
-      // If parsing is successful and returns data, use it. Otherwise, fallback.
-      return parsedData.length > 0 ? parsedData : getMockProducts(category);
-    } catch (error) {
-      console.error('Error fetching or parsing AMFI data:', error);
-      // Fallback to mock data in case of any error
-      return getMockProducts(category);
-    }
+    return getInvestmentProducts();
   }
 
   // For other categories, use the mock service.
@@ -113,6 +140,7 @@ export async function getProducts(category: ProductCategory): Promise<Omit<Produ
  * @param category The category of products to fetch.
  */
 function getMockProducts(category: ProductCategory): Promise<Omit<Product, 'id' | 'category'>[]> {
+    console.log(`Serving mock products for category: ${category}`);
     // Simulate an async API call
     return new Promise((resolve) => {
         setTimeout(() => {
