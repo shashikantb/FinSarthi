@@ -1,20 +1,27 @@
+
 'use server';
 
 /**
- * @fileOverview An AI agent for translating financial terms and concepts into simpler language.
+ * @fileOverview An AI agent for translating financial terms and concepts into simpler language using Groq.
  *
  * - translateFinancialTerms - A function that handles the translation process.
  * - TranslateFinancialTermsInput - The input type for the translateFinancialTerms function.
  * - TranslateFinancialTermsOutput - The return type for the translateFinancialTerms function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import OpenAI from 'openai';
+
+const groq = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: 'https://api.groq.com/openai/v1',
+});
 
 const TranslateFinancialTermsInputSchema = z.object({
   term: z.string().describe('The financial term or concept to translate.'),
   language: z
-    .string() 
+    .string()
     .describe(
       'The target language for the translation (e.g., English, Hindi, Marathi).'
     ),
@@ -41,27 +48,42 @@ export async function translateFinancialTerms(
   return translateFinancialTermsFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'translateFinancialTermsPrompt',
-  input: {schema: TranslateFinancialTermsInputSchema},
-  output: {schema: TranslateFinancialTermsOutputSchema},
-  prompt: `You are a financial expert who can translate complex financial terms into easy-to-understand language.
-
-  Term: {{{term}}}
-  Language: {{{language}}}
-  Literacy Level: {{{userLiteracyLevel}}}
-
-  Please provide a simplified explanation of the term in the specified language, tailored to the user's literacy level.`, 
-});
-
 const translateFinancialTermsFlow = ai.defineFlow(
   {
     name: 'translateFinancialTermsFlow',
     inputSchema: TranslateFinancialTermsInputSchema,
     outputSchema: TranslateFinancialTermsOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    try {
+      const prompt = `You are a financial expert who can translate complex financial terms into easy-to-understand language.
+
+      Term: "${input.term}"
+      Language: ${input.language}
+      Literacy Level: ${input.userLiteracyLevel}
+
+      Please provide a simplified explanation of the term in the specified language, tailored to the user's literacy level.
+      Your response should be a JSON object with a single key "simplifiedExplanation".
+      `;
+
+      const completion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama3-8b-8192',
+        temperature: 0.3,
+        max_tokens: 1024,
+        response_format: { type: 'json_object' },
+      });
+
+      const content = completion.choices[0].message.content;
+      if (!content) {
+        throw new Error("The AI model returned an empty response.");
+      }
+
+      const output = TranslateFinancialTermsOutputSchema.parse(JSON.parse(content));
+      return output;
+    } catch (error) {
+      console.error("Error in translateFinancialTermsFlow:", error);
+      return { simplifiedExplanation: "Failed to generate explanation." };
+    }
   }
 );

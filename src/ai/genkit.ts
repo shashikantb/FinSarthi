@@ -1,11 +1,10 @@
 import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
+
+// This file is now primarily used for initializing Genkit itself
+// and for defining tools. Model definitions are handled directly
+// in the flows via the OpenAI SDK pointing to Groq.
 
 export const ai = genkit({
-  plugins: [
-    googleAI({
-      apiKey: process.env.GEMINI_API_KEY,
-    }),
-  ],
-  model: 'gemini-pro',
+  // Plugins can still be used for other purposes, e.g., logging.
+  plugins: [],
 });

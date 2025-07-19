@@ -1,16 +1,22 @@
-// Summarize Financial News flow using Genkit and LLMs to provide summaries of financial articles in multiple languages.
+
 'use server';
 
 /**
- * @fileOverview Summarizes financial news articles in a chosen language.
+ * @fileOverview Summarizes financial news articles in a chosen language using Groq.
  *
  * - summarizeFinancialNews - A function that summarizes financial news.
  * - SummarizeFinancialNewsInput - The input type for the summarizeFinancialNews function.
  * - SummarizeFinancialNewsOutput - The return type for the summarizeFinancialNews function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import OpenAI from 'openai';
+
+const groq = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: 'https://api.groq.com/openai/v1',
+});
 
 const SummarizeFinancialNewsInputSchema = z.object({
   articleContent: z
@@ -37,28 +43,41 @@ export async function summarizeFinancialNews(
   return summarizeFinancialNewsFlow(input);
 }
 
-const summarizeFinancialNewsPrompt = ai.definePrompt({
-  name: 'summarizeFinancialNewsPrompt',
-  input: {schema: SummarizeFinancialNewsInputSchema},
-  output: {schema: SummarizeFinancialNewsOutputSchema},
-  prompt: `You are an AI that summarizes financial news articles.
-
-  Summarize the following article in the specified language:
-
-  Article Content: {{{articleContent}}}
-
-  Language: {{{language}}}
-  `,
-});
-
 const summarizeFinancialNewsFlow = ai.defineFlow(
   {
     name: 'summarizeFinancialNewsFlow',
     inputSchema: SummarizeFinancialNewsInputSchema,
     outputSchema: SummarizeFinancialNewsOutputSchema,
   },
-  async input => {
-    const {output} = await summarizeFinancialNewsPrompt(input);
-    return output!;
+  async (input) => {
+    try {
+      const prompt = `You are an AI that summarizes financial news articles.
+
+      Summarize the following article in the specified language. Your response should be a JSON object with a single key "summary".
+
+      Article Content: """${input.articleContent}"""
+
+      Language: ${input.language}
+      `;
+
+      const completion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama3-8b-8192',
+        temperature: 0.2,
+        max_tokens: 1024,
+        response_format: { type: 'json_object' },
+      });
+
+      const content = completion.choices[0].message.content;
+      if (!content) {
+        throw new Error("The AI model returned an empty response.");
+      }
+
+      const output = SummarizeFinancialNewsOutputSchema.parse(JSON.parse(content));
+      return output;
+    } catch (error) {
+      console.error("Error in summarizeFinancialNewsFlow:", error);
+      return { summary: "Failed to generate summary." };
+    }
   }
 );
