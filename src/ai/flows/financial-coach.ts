@@ -53,7 +53,7 @@ const financialCoachFlow = ai.defineFlow(
     const promptInput = { ...input, history: historyForPrompt };
 
     const {output} = await ai.generate({
-        model: 'llama3-8b-8192',
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         tools: [findFinancialProducts],
         prompt: `You are FinSarthi, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
 You are an expert on topics like budgeting, saving, investing, and loans.
