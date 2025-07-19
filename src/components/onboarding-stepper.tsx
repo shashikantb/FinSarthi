@@ -274,6 +274,13 @@ export function OnboardingStepper() {
     }
   }
 
+  const handleGenerateAdvice = async () => {
+    const isValid = await trigger();
+    if (isValid) {
+        form.handleSubmit(onSubmit)();
+    }
+  }
+
   if (step === TOTAL_STEPS + 1) {
     return (
       <Card className="w-full">
@@ -314,7 +321,7 @@ export function OnboardingStepper() {
     <Card className="w-full">
       <CardContent className="pt-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
             <div className="min-h-[280px]">
               {step === 1 && (
                 <div className="space-y-6">
@@ -478,7 +485,7 @@ export function OnboardingStepper() {
                     {T.next} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={isLoading}>
+                  <Button type="button" onClick={handleGenerateAdvice} disabled={isLoading}>
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
