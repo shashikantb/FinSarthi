@@ -1,6 +1,6 @@
 // src/services/financial-product-service.ts
 /**
- * @fileOverview A mock service for fetching financial products.
+ * @fileOverview A service for fetching financial products.
  * In a real-world application, this service would interact with a database
  * or an external Financial API provider. For this prototype, it returns
  * hardcoded sample data.
@@ -38,13 +38,59 @@ const mockProducts: Product[] = [
  * @returns A promise that resolves to an array of products.
  */
 export async function getProducts(category: ProductCategory): Promise<Omit<Product, 'id' | 'category'>[]> {
-  // Simulate an async API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const filteredProducts = mockProducts
-        .filter((p) => p.category === category)
-        .map(({ id, category, ...rest }) => rest); // Exclude id and category
-      resolve(filteredProducts);
-    }, 500); // Simulate network delay
-  });
+  // --- REAL API INTEGRATION POINT ---
+  // To use a real API, you would replace the mock implementation below
+  // with a fetch call to your chosen financial data provider.
+
+  // Example of how a real API call might look:
+  /*
+  const API_KEY = process.env.FINANCIAL_API_KEY;
+  const API_ENDPOINT = `https://api.yourprovider.com/products?category=${category}`;
+
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch financial products');
+    }
+
+    const data = await response.json();
+    
+    // You might need to transform the data from the API to match the 
+    // expected return format: { name: string, description: string }[]
+    return data.products.map(product => ({
+        name: product.productName,
+        description: product.summary
+    }));
+
+  } catch (error) {
+    console.error("Error fetching real financial products:", error);
+    // Fallback to mock data or return an empty array if the API fails
+    return getMockProducts(category);
+  }
+  */
+
+  // For this prototype, we will continue to use the mock service.
+  return getMockProducts(category);
+}
+
+
+/**
+ * Returns mock product data after a simulated delay.
+ * @param category The category of products to fetch.
+ */
+function getMockProducts(category: ProductCategory): Promise<Omit<Product, 'id' | 'category'>[]> {
+    // Simulate an async API call
+    return new Promise((resolve) => {
+        setTimeout(() => {
+        const filteredProducts = mockProducts
+            .filter((p) => p.category === category)
+            .map(({ id, category, ...rest }) => rest); // Exclude id and category
+        resolve(filteredProducts);
+        }, 500); // Simulate network delay
+    });
 }
