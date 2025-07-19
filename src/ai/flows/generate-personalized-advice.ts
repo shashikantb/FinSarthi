@@ -57,6 +57,7 @@ const prompt = ai.definePrompt({
   4.  **Suggest Products using Tools:** For any step that involves a financial product (like a savings account, mutual fund, or loan), you MUST use the 'findFinancialProducts' tool to get a list of suitable product examples. You MUST integrate these product suggestions naturally into your advice. DO NOT invent or hallucinate product names.
       - **Example Integration:** "You could consider opening a high-yield savings account, such as '[Product Name from Tool 1]' or '[Product Name from Tool 2]'."
   5.  **Structure and Tone:** Use headings or bullet points. Be encouraging and supportive throughout. Your name is FinSarthi.
+  6.  **Output Format**: Ensure your final output is a valid JSON object with an 'advice' field containing your full response.
   `,
 });
 
