@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -12,6 +13,7 @@ import {
   User,
   PanelLeft,
   MessageCircle,
+  Settings,
 } from "lucide-react";
 import {
   Sidebar,
@@ -68,7 +70,7 @@ function AppHeader() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild><Link href="/settings">Settings</Link></DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild><Link href="/">Logout</Link></DropdownMenuItem>
@@ -89,6 +91,7 @@ function MainSidebar() {
     { href: "/summarizer", label: "News Summarizer", icon: FileText },
     { href: "/translator", label: "Term Translator", icon: Languages },
     { href: "/advice", label: "Personalized Advice", icon: Lightbulb },
+    { href: "/settings", label: "Settings", icon: Settings },
   ];
 
   return (

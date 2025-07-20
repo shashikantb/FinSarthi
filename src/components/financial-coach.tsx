@@ -1,3 +1,4 @@
+
 // src/components/financial-coach.tsx
 "use client";
 
@@ -38,6 +39,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
+import { languages, langToLocale } from "@/lib/translations";
 
 type Message = {
   id: string;
@@ -52,22 +54,19 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const langToLocale: Record<string, string> = {
-  English: "en-US",
-  Hindi: "hi-IN",
-  Marathi: "mr-IN",
-};
 
 function AudioPlayer({ message, language }: { message: Message, language: string }) {
   const { speak, isPlaying } = useBrowserTts();
   
   if (message.role !== "model") return null;
 
+  const locale = langToLocale[language as keyof typeof langToLocale];
+
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => speak(message.content, langToLocale[language])}
+      onClick={() => speak(message.content, locale)}
       className="h-7 w-7"
     >
       {isPlaying ? (
@@ -85,6 +84,11 @@ export function FinancialCoach() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -95,6 +99,18 @@ export function FinancialCoach() {
   });
 
   const language = form.watch("language");
+
+  useEffect(() => {
+    if (isClient) {
+      const savedLangCode = localStorage.getItem("finsarthi_language") as keyof typeof languages | null;
+      if (savedLangCode) {
+        const langName = languages[savedLangCode]?.name;
+        if(langName) {
+            form.setValue("language", langName as "English" | "Hindi" | "Marathi");
+        }
+      }
+    }
+  }, [form, isClient]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -117,7 +133,7 @@ export function FinancialCoach() {
       const input: FinancialCoachInput = {
         query: data.query,
         language: data.language,
-        history: currentMessages.map(({id, ...rest}) => rest), // Don't send ID to flow
+        history: currentMessages.map(({id, ...rest}) => ({...rest, role: rest.role === 'model' ? 'assistant' : 'user'})),
       };
       
       const result = await financialCoach(input);
@@ -215,6 +231,7 @@ export function FinancialCoach() {
                 <FormItem className="w-1/4">
                   <Select
                     onValueChange={field.onChange}
+                    value={field.value}
                     defaultValue={field.value}
                     disabled={isLoading || messages.length > 0}
                   >

@@ -1,3 +1,4 @@
+
 // src/components/onboarding-stepper.tsx
 "use client";
 
@@ -44,6 +45,7 @@ import {
   Volume2,
   Play,
   MicOff,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -52,84 +54,8 @@ import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { Progress } from "@/components/ui/progress";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { useRouter } from "next/navigation";
-
-const translations = {
-  en: {
-    language: "Language",
-    monthlyIncome: "Monthly Income",
-    monthlyExpenses: "Monthly Expenses",
-    financialGoals: "Financial Goals",
-    literacy: "Financial Literacy",
-    selectLevel: "Select your level",
-    beginner: "Beginner",
-    intermediate: "Intermediate",
-    advanced: "Advanced",
-    next: "Next",
-    back: "Back",
-    generateAdvice: "Generate Advice",
-    generating: "Generating...",
-    adviceResultTitle: "Your Personalized Advice",
-    adviceResultDescription:
-      "Here's AI-powered financial advice tailored just for you. Your data is saved locally for your dashboard.",
-    yourAdviceHere: "Your advice will appear here.",
-    error: "Failed to generate advice. Please try again.",
-    saveAndContinue: "View Dashboard",
-    createAnAccount: "Create an Account",
-    generatingAdviceTitle: "Crafting Your Plan",
-    generatingAdviceDescription:
-      "Our AI is analyzing your information to create a personalized financial plan. This might take a moment.",
-  },
-  hi: {
-    language: "भाषा",
-    monthlyIncome: "मासिक आय",
-    monthlyExpenses: "मासिक खर्च",
-    financialGoals: "वित्तीय लक्ष्य",
-    literacy: "वित्तीय साक्षरता",
-    selectLevel: "अपना स्तर चुनें",
-    beginner: "शुरुआती",
-    intermediate: "मध्यम",
-    advanced: "उन्नत",
-    next: "अगला",
-    back: "वापस",
-    generateAdvice: "सलाह उत्पन्न करें",
-    generating: "उत्पन्न हो रहा है...",
-    adviceResultTitle: "आपकी व्यक्तिगत सलाह",
-    adviceResultDescription:
-      "यह आपके लिए विशेष रूप से तैयार की गई AI-संचालित वित्तीय सलाह है। आपका डेटा आपके डैशबोर्ड के लिए स्थानीय रूप से सहेजा गया है।",
-    yourAdviceHere: "आपकी सलाह यहां दिखाई देगी।",
-    error: "सलाह उत्पन्न करने में विफल। कृपया पुन: प्रयास करें।",
-    saveAndContinue: "डैशबोर्ड देखें",
-    createAnAccount: "खाता बनाएं",
-    generatingAdviceTitle: "आपकी योजना तैयार हो रही है",
-    generatingAdviceDescription:
-      "हमारा AI व्यक्तिगत वित्तीय योजना बनाने के लिए आपकी जानकारी का विश्लेषण कर रहा है। इसमें कुछ समय लग सकता है।",
-  },
-  mr: {
-    language: "भाषा",
-    monthlyIncome: "मासिक उत्पन्न",
-    monthlyExpenses: "मासिक खर्च",
-    financialGoals: "आर्थिक उद्दिष्ट्ये",
-    literacy: "आर्थिक साक्षरता",
-    selectLevel: "तुमची पातळी निवडा",
-    beginner: "नवशिक्या",
-    intermediate: "मध्यम",
-    advanced: "प्रगत",
-    next: "पुढे",
-    back: "मागे",
-    generateAdvice: "सल्ला मिळवा",
-    generating: "तयार होत आहे...",
-    adviceResultTitle: "तुमचा वैयक्तिक सल्ला",
-    adviceResultDescription:
-      "येथे तुमच्यासाठी तयार केलेला AI-शक्तीवर आधारित आर्थिक सल्ला आहे. तुमचा डेटा तुमच्या डॅशबोर्डसाठी स्थानिक पातळीवर सेव्ह केला आहे.",
-    yourAdviceHere: "तुमचा सल्ला येथे दिसेल.",
-    error: "सल्ला तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.",
-    saveAndContinue: "डॅशबोर्ड पहा",
-    createAnAccount: "खाते तयार करा",
-    generatingAdviceTitle: "तुमची योजना तयार करत आहे",
-    generatingAdviceDescription:
-      "आमचे AI वैयक्तिक आर्थिक योजना तयार करण्यासाठी तुमच्या माहितीचे विश्लेषण करत आहे. यास थोडा वेळ लागू शकतो.",
-  },
-};
+import { translations, languages } from "@/lib/translations";
+import type { AdviceRecord } from "@/app/(main)/advice/page";
 
 const formSchema = z.object({
   language: z.enum(["en", "hi", "mr"], {
@@ -143,8 +69,8 @@ const formSchema = z.object({
   literacyLevel: z.enum(["beginner", "intermediate", "advanced"]),
 });
 
-type FormValues = z.infer<typeof formSchema>;
-type Language = keyof typeof translations;
+export type FormValues = z.infer<typeof formSchema>;
+type LanguageCode = keyof typeof translations;
 
 function AudioPlayer({ text, lang }: { text?: string; lang: string }) {
   const { speak, isPlaying } = useBrowserTts();
@@ -169,7 +95,12 @@ function AudioPlayer({ text, lang }: { text?: string; lang: string }) {
   );
 }
 
-export function OnboardingStepper() {
+interface OnboardingStepperProps {
+    onComplete?: (newAdvice: AdviceRecord) => void;
+    onCancel?: () => void;
+}
+
+export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperProps) {
   const [step, setStep] = useState(1);
   const [advice, setAdvice] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -191,10 +122,28 @@ export function OnboardingStepper() {
     },
   });
 
-  const { trigger, setValue, getValues, handleSubmit, formState } = form;
-  const selectedLanguage = form.watch("language") as Language;
+  const { trigger, setValue, getValues, handleSubmit, formState, watch } = form;
+  const selectedLanguage = watch("language") as LanguageCode;
   const T = translations[selectedLanguage] || translations.en;
   const TOTAL_STEPS = 5;
+
+  // Set initial language from localStorage
+  useEffect(() => {
+    const savedLang = localStorage.getItem("finsarthi_language") as LanguageCode | null;
+    if (savedLang) {
+      setValue("language", savedLang);
+    }
+  }, [setValue]);
+
+  // Update localStorage when language changes
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name === "language" && value.language) {
+        localStorage.setItem("finsarthi_language", value.language);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const { isListening, startListening, stopListening } =
     useSpeechRecognition({
@@ -236,19 +185,25 @@ export function OnboardingStepper() {
         data as GeneratePersonalizedAdviceInput
       );
       setAdvice(result.advice);
+      
+      const newRecord: AdviceRecord = {
+        id: crypto.randomUUID(),
+        ...data,
+        advice: result.advice,
+        timestamp: new Date().toISOString(),
+      };
 
-      // Save data to localStorage on success
-      if (typeof window !== "undefined") {
-        const userData = {
-            ...data,
-            advice: result.advice,
-            timestamp: new Date().toISOString(),
-        };
-        localStorage.setItem("finsarthi_userdata", JSON.stringify(userData));
+      if(onComplete) {
+        onComplete(newRecord);
+      } else {
+        // Fallback for standalone usage (e.g. /onboarding page)
+        const history = JSON.parse(localStorage.getItem("finsarthi_advice_history") || "[]");
+        const updatedHistory = [newRecord, ...history];
+        localStorage.setItem("finsarthi_advice_history", JSON.stringify(updatedHistory));
+        setProgress(100);
+        setStep(TOTAL_STEPS + 1); // Move to results step
       }
 
-      setProgress(100);
-      setStep(TOTAL_STEPS + 1); // Move to results step
     } catch (e) {
       setError(T.error);
       console.error(e);
@@ -259,10 +214,6 @@ export function OnboardingStepper() {
   const handleViewDashboard = () => {
     router.push('/dashboard');
   }
-
-  const handleGenerateAdvice = async () => {
-    await handleSubmit(onSubmit)();
-  };
 
   const nextStep = async () => {
     let isValid = false;
@@ -276,8 +227,6 @@ export function OnboardingStepper() {
       isValid = await trigger("financialGoals");
     } else if (step === 5) {
       isValid = await trigger("literacyLevel");
-    } else {
-      isValid = true;
     }
 
     if (isValid) {
@@ -342,6 +291,17 @@ export function OnboardingStepper() {
 
   return (
     <Card className="w-full">
+      {onCancel && (
+          <CardHeader className="flex-row items-center justify-between">
+              <div>
+                  <CardTitle>Generate New Advice</CardTitle>
+                  <CardDescription>Fill out the steps to get a new plan.</CardDescription>
+              </div>
+              <Button variant="ghost" size="icon" onClick={onCancel}>
+                  <X className="h-4 w-4" />
+              </Button>
+          </CardHeader>
+      )}
       <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -359,6 +319,7 @@ export function OnboardingStepper() {
                             if (isListening) stopListening();
                             field.onChange(value);
                           }}
+                          value={field.value}
                           defaultValue={field.value}
                         >
                           <FormControl>
@@ -367,9 +328,9 @@ export function OnboardingStepper() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="en">English</SelectItem>
-                            <SelectItem value="hi">Hindi</SelectItem>
-                            <SelectItem value="mr">Marathi</SelectItem>
+                             {Object.entries(languages).map(([code, lang]) => (
+                                <SelectItem key={code} value={code}>{lang.name}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -574,7 +535,7 @@ export function OnboardingStepper() {
                 </Button>
               )}
               <div
-                className={cn(step === 1 ? "w-full flex justify-end" : "ml-auto")}
+                className={cn(step === 1 && !onCancel ? "w-full flex justify-end" : "ml-auto", onCancel && step === 1 && "w-full flex justify-end")}
               >
                 {step < TOTAL_STEPS ? (
                   <Button type="button" onClick={nextStep}>

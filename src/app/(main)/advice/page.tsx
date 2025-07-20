@@ -1,17 +1,91 @@
+
+"use client";
+import { useState, useEffect } from "react";
 import { OnboardingStepper } from "@/components/onboarding-stepper";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Wand2, PlusCircle } from "lucide-react";
+import type { FormValues } from "@/components/onboarding-stepper";
+
+export interface AdviceRecord extends FormValues {
+  id: string;
+  advice: string;
+  timestamp: string;
+}
 
 export default function AdvicePage() {
+  const [adviceHistory, setAdviceHistory] = useState<AdviceRecord[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    const savedHistory = localStorage.getItem("finsarthi_advice_history");
+    if (savedHistory) {
+      setAdviceHistory(JSON.parse(savedHistory));
+    }
+  }, []);
+
+  const handleNewAdvice = (newAdvice: AdviceRecord) => {
+    const updatedHistory = [newAdvice, ...adviceHistory];
+    setAdviceHistory(updatedHistory);
+    localStorage.setItem("finsarthi_advice_history", JSON.stringify(updatedHistory));
+    setIsGenerating(false);
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="space-y-1 text-center">
-        <h1 className="text-2xl font-headline font-bold md:text-3xl">Personalized Financial Advice</h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">
-          Answer a few questions to receive AI-powered financial guidance tailored to your goals.
-        </p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-start">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-headline font-bold md:text-3xl">Personalized Advice</h1>
+          <p className="text-muted-foreground">
+            Generate new AI-powered financial advice or review your past sessions.
+          </p>
+        </div>
+        {!isGenerating && (
+          <Button onClick={() => setIsGenerating(true)}>
+            <PlusCircle className="mr-2" />
+            New Advice
+          </Button>
+        )}
       </div>
-      <div className="mt-6 max-w-4xl mx-auto">
-        <OnboardingStepper />
-      </div>
+
+      {isGenerating ? (
+        <div className="mt-6 max-w-4xl mx-auto">
+          <OnboardingStepper onComplete={handleNewAdvice} onCancel={() => setIsGenerating(false)} />
+        </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Advice History</CardTitle>
+            <CardDescription>Review your previously generated financial plans.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {adviceHistory.length > 0 ? (
+              <Accordion type="single" collapsible className="w-full">
+                {adviceHistory.map((record) => (
+                  <AccordionItem value={record.id} key={record.id}>
+                    <AccordionTrigger>
+                        <div className="flex justify-between w-full pr-4">
+                            <span>{record.financialGoals.substring(0, 50)}...</span>
+                            <span className="text-sm text-muted-foreground">{new Date(record.timestamp).toLocaleDateString()}</span>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
+                      <p>{record.advice}</p>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            ) : (
+              <div className="text-center py-10">
+                <Wand2 className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No advice generated yet</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Click "New Advice" to get your first personalized plan.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

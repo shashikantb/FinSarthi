@@ -1,3 +1,4 @@
+
 // src/components/dashboard-overview.tsx
 "use client";
 
@@ -35,7 +36,6 @@ const chartConfig = {
 interface FinancialData {
   income: number;
   expenses: number;
-  // Add other fields as necessary
 }
 
 export function DashboardOverview() {
@@ -43,15 +43,19 @@ export function DashboardOverview() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // This code runs only on the client, where localStorage is available.
     try {
-      const savedData = localStorage.getItem("finsarthi_userdata");
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        setData({
-            income: parsedData.income || 0,
-            expenses: parsedData.expenses || 0,
-        });
+      // Fetch the entire history
+      const savedHistory = localStorage.getItem("finsarthi_advice_history");
+      if (savedHistory) {
+        const history = JSON.parse(savedHistory);
+        // Use the most recent entry for the dashboard
+        if (history.length > 0) {
+            const latestEntry = history[0];
+            setData({
+                income: latestEntry.income || 0,
+                expenses: latestEntry.expenses || 0,
+            });
+        }
       }
     } catch (error) {
         console.error("Failed to load data from localStorage", error);

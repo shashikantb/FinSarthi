@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Wand2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
+import { languages } from "@/lib/translations";
 
 const formSchema = z.object({
   term: z.string().min(2, "Term must be at least 2 characters."),
@@ -47,6 +49,11 @@ export function TranslatorForm() {
   const [explanation, setExplanation] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -56,6 +63,19 @@ export function TranslatorForm() {
       userLiteracyLevel: "beginner",
     },
   });
+
+  useEffect(() => {
+    if (isClient) {
+      const savedLangCode = localStorage.getItem("finsarthi_language") as keyof typeof languages | null;
+      if (savedLangCode) {
+        const langName = languages[savedLangCode]?.name;
+        if(langName) {
+            form.setValue("language", langName as "English" | "Hindi" | "Marathi");
+        }
+      }
+    }
+  }, [form, isClient]);
+
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
@@ -130,6 +150,7 @@ export function TranslatorForm() {
                       <FormLabel>Language</FormLabel>
                       <Select
                         onValueChange={field.onChange}
+                        value={field.value}
                         defaultValue={field.value}
                       >
                         <FormControl>
