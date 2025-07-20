@@ -51,6 +51,7 @@ import React from "react";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { Progress } from "@/components/ui/progress";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
+import { useRouter } from "next/navigation";
 
 const translations = {
   en: {
@@ -69,10 +70,10 @@ const translations = {
     generating: "Generating...",
     adviceResultTitle: "Your Personalized Advice",
     adviceResultDescription:
-      "Here's AI-powered financial advice tailored just for you. Sign up to save and track your progress.",
+      "Here's AI-powered financial advice tailored just for you. Your data is saved locally for your dashboard.",
     yourAdviceHere: "Your advice will appear here.",
     error: "Failed to generate advice. Please try again.",
-    saveAndContinue: "Save and Continue",
+    saveAndContinue: "View Dashboard",
     createAnAccount: "Create an Account",
     generatingAdviceTitle: "Crafting Your Plan",
     generatingAdviceDescription:
@@ -94,10 +95,10 @@ const translations = {
     generating: "उत्पन्न हो रहा है...",
     adviceResultTitle: "आपकी व्यक्तिगत सलाह",
     adviceResultDescription:
-      "यह आपके लिए विशेष रूप से तैयार की गई AI-संचालित वित्तीय सलाह है। अपनी प्रगति को सहेजने और ट्रैक करने के लिए साइन अप करें।",
+      "यह आपके लिए विशेष रूप से तैयार की गई AI-संचालित वित्तीय सलाह है। आपका डेटा आपके डैशबोर्ड के लिए स्थानीय रूप से सहेजा गया है।",
     yourAdviceHere: "आपकी सलाह यहां दिखाई देगी।",
     error: "सलाह उत्पन्न करने में विफल। कृपया पुन: प्रयास करें।",
-    saveAndContinue: "सहेजें और जारी रखें",
+    saveAndContinue: "डैशबोर्ड देखें",
     createAnAccount: "खाता बनाएं",
     generatingAdviceTitle: "आपकी योजना तैयार हो रही है",
     generatingAdviceDescription:
@@ -119,10 +120,10 @@ const translations = {
     generating: "तयार होत आहे...",
     adviceResultTitle: "तुमचा वैयक्तिक सल्ला",
     adviceResultDescription:
-      "येथे तुमच्यासाठी तयार केलेला AI-शक्तीवर आधारित आर्थिक सल्ला आहे. तुमची प्रगती जतन करण्यासाठी आणि ट्रॅक करण्यासाठी साइन अप करा.",
+      "येथे तुमच्यासाठी तयार केलेला AI-शक्तीवर आधारित आर्थिक सल्ला आहे. तुमचा डेटा तुमच्या डॅशबोर्डसाठी स्थानिक पातळीवर सेव्ह केला आहे.",
     yourAdviceHere: "तुमचा सल्ला येथे दिसेल.",
     error: "सल्ला तयार करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.",
-    saveAndContinue: "जतन करा आणि पुढे जा",
+    saveAndContinue: "डॅशबोर्ड पहा",
     createAnAccount: "खाते तयार करा",
     generatingAdviceTitle: "तुमची योजना तयार करत आहे",
     generatingAdviceDescription:
@@ -174,6 +175,7 @@ export function OnboardingStepper() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [progress, setProgress] = useState(0);
+  const router = useRouter();
 
   const { speak: playQuestionAudio } = useBrowserTts();
 
@@ -234,6 +236,17 @@ export function OnboardingStepper() {
         data as GeneratePersonalizedAdviceInput
       );
       setAdvice(result.advice);
+
+      // Save data to localStorage on success
+      if (typeof window !== "undefined") {
+        const userData = {
+            ...data,
+            advice: result.advice,
+            timestamp: new Date().toISOString(),
+        };
+        localStorage.setItem("finsarthi_userdata", JSON.stringify(userData));
+      }
+
       setProgress(100);
       setStep(TOTAL_STEPS + 1); // Move to results step
     } catch (e) {
@@ -242,6 +255,10 @@ export function OnboardingStepper() {
     }
     setIsLoading(false);
   };
+
+  const handleViewDashboard = () => {
+    router.push('/dashboard');
+  }
 
   const handleGenerateAdvice = async () => {
     await handleSubmit(onSubmit)();
@@ -312,11 +329,11 @@ export function OnboardingStepper() {
           )}
         </CardContent>
         <CardFooter className="flex-col items-stretch gap-4">
-          <Button asChild>
-            <Link href="/signup">{T.createAnAccount}</Link>
+          <Button onClick={handleViewDashboard}>
+            {T.saveAndContinue}
           </Button>
           <Button variant="ghost" asChild>
-            <Link href="/login">{T.saveAndContinue}</Link>
+            <Link href="/signup">{T.createAnAccount}</Link>
           </Button>
         </CardFooter>
       </Card>

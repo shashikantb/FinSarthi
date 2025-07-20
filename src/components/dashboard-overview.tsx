@@ -1,6 +1,8 @@
+// src/components/dashboard-overview.tsx
 "use client";
 
-import { BarChart, CreditCard, DollarSign, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { BarChart, CreditCard, DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -15,15 +17,9 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Bar, BarChart as RechartsBarChart, XAxis, YAxis } from "recharts";
-
-const chartData = [
-  { month: "January", income: 186, expenses: 80 },
-  { month: "February", income: 305, expenses: 200 },
-  { month: "March", income: 237, expenses: 120 },
-  { month: "April", income: 73, expenses: 190 },
-  { month: "May", income: 209, expenses: 130 },
-  { month: "June", income: 214, expenses: 140 },
-];
+import { Skeleton } from "./ui/skeleton";
+import Link from "next/link";
+import { Button } from "./ui/button";
 
 const chartConfig = {
   income: {
@@ -36,7 +32,78 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+interface FinancialData {
+  income: number;
+  expenses: number;
+  // Add other fields as necessary
+}
+
 export function DashboardOverview() {
+  const [data, setData] = useState<FinancialData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // This code runs only on the client, where localStorage is available.
+    try {
+      const savedData = localStorage.getItem("finsarthi_userdata");
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        setData({
+            income: parsedData.income || 0,
+            expenses: parsedData.expenses || 0,
+        });
+      }
+    } catch (error) {
+        console.error("Failed to load data from localStorage", error);
+        setData(null);
+    }
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return (
+        <div className="space-y-8">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28" />)}
+            </div>
+            <Skeleton className="h-80" />
+        </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Card className="w-full text-center">
+        <CardHeader>
+          <div className="mx-auto bg-muted rounded-full p-3 w-fit">
+            <AlertTriangle className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <CardTitle>No Financial Data Found</CardTitle>
+          <CardDescription>
+            You haven't generated any personalized advice yet.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-sm text-muted-foreground">Get started by answering a few questions to create your financial snapshot.</p>
+          <Button asChild>
+            <Link href="/advice">Generate My Advice</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const monthlySavings = data.income - data.expenses;
+  
+  const chartData = [
+    { month: "Current", income: data.income, expenses: data.expenses },
+    { month: "Prev 1", income: data.income * 0.9, expenses: data.expenses * 1.05 },
+    { month: "Prev 2", income: data.income * 0.95, expenses: data.expenses * 0.98 },
+    { month: "Prev 3", income: data.income * 0.88, expenses: data.expenses * 1.1 },
+    { month: "Prev 4", income: data.income * 0.92, expenses: data.expenses * 1.02 },
+    { month: "Prev 5", income: data.income * 0.85, expenses: data.expenses * 0.95 },
+  ].reverse();
+
   return (
     <div className="space-y-8">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -46,8 +113,8 @@ export function DashboardOverview() {
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">$1,250.00</div>
-                    <p className="text-xs text-muted-foreground">+15.2% from last month</p>
+                    <div className="text-2xl font-bold">₹{monthlySavings.toLocaleString()}</div>
+                    <p className="text-xs text-muted-foreground">Based on your latest input</p>
                 </CardContent>
             </Card>
             <Card>
@@ -84,7 +151,7 @@ export function DashboardOverview() {
         <Card>
             <CardHeader>
                 <CardTitle>Income vs. Expenses</CardTitle>
-                <CardDescription>A look at your cash flow over the last 6 months.</CardDescription>
+                <CardDescription>A look at your cash flow over the last 6 months (simulated).</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
@@ -94,9 +161,8 @@ export function DashboardOverview() {
                             tickLine={false}
                             tickMargin={10}
                             axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
                         />
-                        <YAxis />
+                        <YAxis tickFormatter={(value) => `₹${value / 1000}k`} />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Bar dataKey="income" fill="var(--color-income)" radius={4} />
                         <Bar dataKey="expenses" fill="var(--color-expenses)" radius={4} />
