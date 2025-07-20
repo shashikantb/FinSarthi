@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import { adviceSessions, users, type NewAdviceSession } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -54,6 +54,7 @@ export async function createAdviceSessionForCurrentUser(
  * @param userId The ID of the user.
  */
 export async function associateSessionWithUser(sessionId: string, userId: string) {
+  // We only want to associate a session that is currently anonymous (userId is null)
   await db.update(adviceSessions)
     .set({ userId })
     .where(eq(adviceSessions.id, sessionId));
