@@ -22,7 +22,6 @@ import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { getLatestAdviceSessionForUser } from "@/services/advice-service";
-import { MOCK_USER_ID } from "@/lib/db/schema";
 import type { AdviceSession } from "@/lib/db/schema";
 
 
@@ -46,8 +45,9 @@ export function DashboardOverview() {
     async function loadDashboardData() {
         setLoading(true);
         try {
-            // In a real app, you would get the current logged-in user's ID
-            const latestSession = await getLatestAdviceSessionForUser(MOCK_USER_ID);
+            // For this prototype, we fetch data for the most recently created user
+            // to simulate a logged-in state.
+            const latestSession = await getLatestAdviceSessionForUser();
             setData(latestSession);
         } catch (error) {
             console.error("Failed to load dashboard data", error);

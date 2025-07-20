@@ -8,7 +8,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Wand2, PlusCircle } from "lucide-react";
 import { getAdviceHistoryForUser } from "@/services/advice-service";
 import type { AdviceSession } from "@/lib/db/schema";
-import { MOCK_USER_ID } from "@/lib/db/schema";
 
 
 export default function AdvicePage() {
@@ -20,8 +19,9 @@ export default function AdvicePage() {
     async function fetchHistory() {
       setIsLoadingHistory(true);
       try {
-        // In a real app, you would get the logged-in user's ID
-        const history = await getAdviceHistoryForUser(MOCK_USER_ID);
+        // For this prototype, we fetch data for the most recently created user
+        // to simulate a logged-in state.
+        const history = await getAdviceHistoryForUser();
         setAdviceHistory(history);
       } catch (error) {
         console.error("Failed to fetch advice history:", error);
