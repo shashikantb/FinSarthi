@@ -75,7 +75,7 @@ Be friendly, empathetic, and encouraging. DO NOT make up product names; only use
 
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
             { role: 'system', content: systemPrompt },
-            ...(input.history || []).map(h => ({ role: h.role, content: h.content })),
+            ...(input.history || []).map(h => ({ role: h.role === 'model' ? 'assistant' : 'user', content: h.content })),
             { role: 'user', content: input.query }
         ];
 
