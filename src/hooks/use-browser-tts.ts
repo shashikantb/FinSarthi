@@ -5,7 +5,27 @@ import { useState, useEffect, useRef } from "react";
 
 export function useBrowserTts() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  useEffect(() => {
+    const handleVoicesChanged = () => {
+      setVoices(window.speechSynthesis.getVoices());
+    };
+    
+    // Initial load
+    handleVoicesChanged();
+
+    // The 'voiceschanged' event is fired when the list of voices is ready
+    window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
+    
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const speak = (text: string, lang = "en-US") => {
     if (typeof window === "undefined" || !window.speechSynthesis) {
@@ -22,35 +42,27 @@ export function useBrowserTts() {
     
     utterance.lang = lang;
     
-    // Find a matching voice
-    const voices = window.speechSynthesis.getVoices();
+    // Find a matching voice from the loaded voices
     const voice = voices.find(v => v.lang === lang);
     if (voice) {
       utterance.voice = voice;
     } else {
-        console.warn(`No voice found for language: ${lang}. Using default.`);
+        console.warn(`No voice found for language: ${lang}. Using browser's default.`);
     }
 
     utterance.onstart = () => setIsPlaying(true);
-    utterance.onend = () => setIsPlaying(false);
+    utterance.onend = () => {
+      setIsPlaying(false);
+      utteranceRef.current = null;
+    };
     utterance.onerror = (e) => {
         console.error("SpeechSynthesis Error", e);
         setIsPlaying(false);
+        utteranceRef.current = null;
     };
 
     window.speechSynthesis.speak(utterance);
   };
-
-  useEffect(() => {
-    // Ensure voices are loaded
-    window.speechSynthesis.getVoices();
-    
-    return () => {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
 
   return { speak, isPlaying };
 }
