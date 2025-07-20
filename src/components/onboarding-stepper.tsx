@@ -1,4 +1,3 @@
-
 // src/components/onboarding-stepper.tsx
 "use client";
 
@@ -56,7 +55,7 @@ import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { useRouter } from "next/navigation";
 import { translations, languages } from "@/lib/translations";
 import type { AdviceSession } from "@/lib/db/schema";
-import { createAdviceSession } from "@/services/advice-service";
+import { createAdviceSessionForCurrentUser } from "@/services/advice-service";
 
 const formSchema = z.object({
   language: z.enum(["en", "hi", "mr"], {
@@ -99,9 +98,10 @@ function AudioPlayer({ text, lang }: { text?: string; lang: string }) {
 interface OnboardingStepperProps {
     onComplete?: (newAdvice: AdviceSession) => void;
     onCancel?: () => void;
+    isLoggedIn?: boolean; // New prop to indicate user state
 }
 
-export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperProps) {
+export function OnboardingStepper({ onComplete, onCancel, isLoggedIn = false }: OnboardingStepperProps) {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -185,10 +185,11 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
         data as GeneratePersonalizedAdviceInput
       );
       
-      const newSession = await createAdviceSession({
+      // Use new service function that handles both logged-in and anonymous users
+      const newSession = await createAdviceSessionForCurrentUser({
         ...data,
         generatedAdvice: adviceResult.advice,
-      });
+      }, isLoggedIn);
 
       setAdviceSession(newSession);
       setProgress(100);
@@ -218,6 +219,13 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
     if (isListening) stopListening();
     else startListening({ lang: getValues("language") });
   };
+  
+  const handleFinish = () => {
+    if (onComplete && adviceSession) {
+        onComplete(adviceSession);
+    }
+  }
+
 
   if (isLoading) {
     return (
@@ -240,7 +248,9 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
       <Card className="w-full">
         <CardHeader>
           <CardTitle>{T.adviceResultTitle}</CardTitle>
-          <CardDescription>To view this on your dashboard later, please create an account.</CardDescription>
+          <CardDescription>
+            {isLoggedIn ? "Your new advice has been generated." : "To view this on your dashboard later, please create an account."}
+          </CardDescription>
         </CardHeader>
         <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
           {error && <p className="text-destructive">{error}</p>}
@@ -252,15 +262,20 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
           )}
         </CardContent>
         <CardFooter className="flex-col items-stretch gap-4">
-          <Button asChild>
-            <Link href={`/signup?sessionId=${adviceSession?.id}`}>{T.createAnAccount}</Link>
-          </Button>
-          { onComplete && adviceSession && (
-              <Button onClick={() => onComplete(adviceSession)}>
+          {isLoggedIn ? (
+            <Button onClick={handleFinish}>
+              Save and Finish
+            </Button>
+          ) : (
+            <>
+              <Button asChild>
+                <Link href={`/signup?sessionId=${adviceSession?.id}`}>{T.createAnAccount}</Link>
+              </Button>
+              <Button onClick={handleFinish}>
                 Continue as Guest
               </Button>
-            )
-          }
+            </>
+          )}
         </CardFooter>
       </Card>
     );
@@ -543,5 +558,3 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
     </Card>
   );
 }
-
-    

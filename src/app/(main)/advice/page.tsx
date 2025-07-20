@@ -55,7 +55,7 @@ export default function AdvicePage() {
 
       {isGenerating ? (
         <div className="mt-6 max-w-4xl mx-auto">
-          <OnboardingStepper onComplete={handleNewAdvice} onCancel={() => setIsGenerating(false)} />
+          <OnboardingStepper onComplete={handleNewAdvice} onCancel={() => setIsGenerating(false)} isLoggedIn={true} />
         </div>
       ) : (
         <Card>

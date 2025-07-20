@@ -7,12 +7,44 @@ import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 /**
- * Creates a new advice session in the database.
+ * Gets the most recent user from the database.
+ * This is a stand-in for a real authentication system.
+ * @returns The most recently created user.
+ */
+async function getMostRecentUser() {
+    const [latestUser] = await db.select().from(users).orderBy(desc(users.createdAt)).limit(1);
+    return latestUser;
+}
+
+/**
+ * Creates a new advice session, linking it to the current user if logged in.
  * @param data The data for the new advice session.
+ * @param isLoggedIn A flag to indicate if we should link to the most recent user.
  * @returns The newly created advice session.
  */
-export async function createAdviceSession(data: Omit<NewAdviceSession, 'id' | 'createdAt'>) {
-  const [newSession] = await db.insert(adviceSessions).values(data).returning();
+export async function createAdviceSessionForCurrentUser(
+  data: Omit<NewAdviceSession, 'id' | 'createdAt' | 'userId'>,
+  isLoggedIn: boolean
+) {
+  let valuesToInsert: NewAdviceSession = {
+    ...data,
+    userId: null,
+  };
+
+  if (isLoggedIn) {
+    const recentUser = await getMostRecentUser();
+    if (recentUser) {
+      valuesToInsert.userId = recentUser.id;
+    }
+  }
+
+  const [newSession] = await db.insert(adviceSessions).values(valuesToInsert).returning();
+  
+  if (isLoggedIn) {
+      revalidatePath('/advice');
+      revalidatePath('/dashboard');
+  }
+
   return newSession;
 }
 
@@ -31,15 +63,6 @@ export async function associateSessionWithUser(sessionId: string, userId: string
   revalidatePath('/advice');
 }
 
-/**
- * Gets the most recent user from the database.
- * This is a stand-in for a real authentication system.
- * @returns The most recently created user.
- */
-async function getMostRecentUser() {
-    const [latestUser] = await db.select().from(users).orderBy(desc(users.createdAt)).limit(1);
-    return latestUser;
-}
 
 /**
  * Fetches the most recent advice session for a given user.
