@@ -25,7 +25,7 @@ const FinancialCoachInputSchema = z.object({
     .enum(['English', 'Hindi', 'Marathi'])
     .describe('The language for the conversation.'),
   history: z.array(z.object({
-    role: z.enum(['user', 'model']),
+    role: z.enum(['user', 'assistant']),
     content: z.string(),
   })).optional().describe('The conversation history.'),
 });
@@ -75,7 +75,7 @@ Be friendly, empathetic, and encouraging. DO NOT make up product names; only use
 
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
             { role: 'system', content: systemPrompt },
-            ...(input.history || []).map(h => ({ role: h.role === 'model' ? 'assistant' : 'user', content: h.content })),
+            ...(input.history || []),
             { role: 'user', content: input.query }
         ];
 

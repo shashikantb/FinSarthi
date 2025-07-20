@@ -43,7 +43,7 @@ import { languages, langToLocale } from "@/lib/translations";
 
 type Message = {
   id: string;
-  role: "user" | "model";
+  role: "user" | "assistant";
   content: string;
 };
 
@@ -58,7 +58,7 @@ type FormValues = z.infer<typeof formSchema>;
 function AudioPlayer({ message, language }: { message: Message, language: string }) {
   const { speak, isPlaying } = useBrowserTts();
   
-  if (message.role !== "model") return null;
+  if (message.role !== "assistant") return null;
 
   const locale = langToLocale[language as keyof typeof langToLocale];
 
@@ -133,12 +133,12 @@ export function FinancialCoach() {
       const input: FinancialCoachInput = {
         query: data.query,
         language: data.language,
-        history: currentMessages.map(({id, ...rest}) => ({...rest, role: rest.role === 'model' ? 'assistant' : 'user'})),
+        history: messages, // Pass the history with user/assistant roles
       };
       
       const result = await financialCoach(input);
       const modelMessage: Message = {
-        role: "model",
+        role: "assistant",
         content: result.response,
         id: crypto.randomUUID(),
       };
@@ -173,7 +173,7 @@ export function FinancialCoach() {
                   message.role === "user" ? "justify-end" : "justify-start"
                 )}
               >
-                {message.role === "model" && (
+                {message.role === "assistant" && (
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>
                       <Bot className="h-5 w-5" />
@@ -190,7 +190,7 @@ export function FinancialCoach() {
                 >
                   <div className="flex items-center gap-2">
                     <p>{message.content}</p>
-                    {message.role === "model" && <AudioPlayer message={message} language={language} />}
+                    {message.role === "assistant" && <AudioPlayer message={message} language={language} />}
                   </div>
                 </div>
                 {message.role === "user" && (
