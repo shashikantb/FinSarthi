@@ -72,10 +72,17 @@ ${productContext}
 
 Converse with the user based on their query and the history of the conversation provided.
 Be friendly, empathetic, and encouraging. DO NOT make up product names; only use the ones provided above.`;
+        
+        // Sanitize the history to remove any extra properties like 'id' that the frontend might use.
+        // The Groq API expects only 'role' and 'content'.
+        const sanitizedHistory = (input.history || []).map(({ role, content }) => ({
+            role,
+            content,
+        }));
 
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
             { role: 'system', content: systemPrompt },
-            ...(input.history || []),
+            ...sanitizedHistory,
             { role: 'user', content: input.query }
         ];
 
