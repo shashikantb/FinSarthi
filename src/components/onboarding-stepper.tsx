@@ -56,9 +56,7 @@ import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { useRouter } from "next/navigation";
 import { translations, languages } from "@/lib/translations";
 import type { AdviceSession } from "@/lib/db/schema";
-import { createAdviceSession, associateSessionWithUser } from "@/services/advice-service";
-import { createUser } from "@/services/user-service";
-import { MOCK_USER_ID } from "@/lib/db/schema";
+import { createAdviceSession } from "@/services/advice-service";
 
 const formSchema = z.object({
   language: z.enum(["en", "hi", "mr"], {
@@ -183,12 +181,10 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
     setProgress(0);
     setError("");
     try {
-      // 1. Generate the advice from the AI
       const adviceResult = await generatePersonalizedAdvice(
         data as GeneratePersonalizedAdviceInput
       );
       
-      // 2. Create the advice session in the database
       const newSession = await createAdviceSession({
         ...data,
         generatedAdvice: adviceResult.advice,
@@ -204,20 +200,6 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
     }
     setIsLoading(false);
   };
-
-  const handleSaveAndContinue = async () => {
-    if (!adviceSession) return;
-    
-    // In a real app, you would associate the session with the *newly created user*.
-    // For this prototype, we'll associate it with the mock user and navigate.
-    await associateSessionWithUser(adviceSession.id, MOCK_USER_ID);
-
-    if(onComplete && adviceSession) {
-      onComplete(adviceSession);
-    } else {
-      router.push('/dashboard');
-    }
-  }
 
   const nextStep = async () => {
     let isValid = false;
@@ -258,7 +240,7 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
       <Card className="w-full">
         <CardHeader>
           <CardTitle>{T.adviceResultTitle}</CardTitle>
-          <CardDescription>{T.adviceResultDescription}</CardDescription>
+          <CardDescription>To view this on your dashboard later, please create an account.</CardDescription>
         </CardHeader>
         <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
           {error && <p className="text-destructive">{error}</p>}
@@ -270,13 +252,15 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
           )}
         </CardContent>
         <CardFooter className="flex-col items-stretch gap-4">
-          <Button onClick={handleSaveAndContinue}>
-            {T.saveAndContinue}
+          <Button asChild>
+            <Link href={`/signup?sessionId=${adviceSession?.id}`}>{T.createAnAccount}</Link>
           </Button>
-          <p className="text-center text-sm text-muted-foreground">To view this on your dashboard later, please sign up.</p>
-          <Button variant="ghost" asChild>
-            <Link href="/signup">{T.createAnAccount}</Link>
-          </Button>
+          { onComplete && adviceSession && (
+              <Button onClick={() => onComplete(adviceSession)}>
+                Continue as Guest
+              </Button>
+            )
+          }
         </CardFooter>
       </Card>
     );
@@ -559,3 +543,5 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
     </Card>
   );
 }
+
+    

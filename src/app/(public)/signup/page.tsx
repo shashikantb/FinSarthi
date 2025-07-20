@@ -1,3 +1,6 @@
+
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,8 +12,68 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { createUser } from "@/services/user-service";
+import { associateSessionWithUser } from "@/services/advice-service";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const signupSchema = z.object({
+  fullName: z.string().min(1, "Full name is required."),
+  email: z.string().email("Invalid email address."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
+});
+
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+  });
+
+  const onSubmit: SubmitHandler<SignupFormValues> = async (data) => {
+    setIsLoading(true);
+    try {
+      // In a real app, the password would be hashed on the server.
+      const newUser = await createUser({
+        fullName: data.fullName,
+        email: data.email,
+        passwordHash: data.password, // This is insecure, for prototype only
+      });
+      
+      const sessionId = searchParams.get('sessionId');
+      if (sessionId && newUser) {
+        // Associate the anonymous session with the newly created user
+        await associateSessionWithUser(sessionId, newUser.id);
+      }
+
+      toast({
+        title: "Account Created!",
+        description: "You have successfully signed up. Redirecting to dashboard...",
+      });
+      
+      // In a real app, you would handle login state management (e.g., JWT, session)
+      router.push("/dashboard");
+
+    } catch (error) {
+      console.error("Signup failed:", error);
+      toast({
+        title: "Signup Failed",
+        description: "An error occurred. The email might already be in use.",
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-12rem)]">
       <Card className="mx-auto max-w-sm">
@@ -21,10 +84,17 @@ export default function SignupPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="first-name">Full name</Label>
-              <Input id="first-name" placeholder="Max" required />
+              <Label htmlFor="full-name">Full name</Label>
+              <Input
+                id="full-name"
+                placeholder="Max Robinson"
+                {...form.register("fullName")}
+              />
+              {form.formState.errors.fullName && (
+                  <p className="text-xs text-destructive">{form.formState.errors.fullName.message}</p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -32,19 +102,23 @@ export default function SignupPage() {
                 id="email"
                 type="email"
                 placeholder="m@example.com"
-                required
+                {...form.register("email")}
               />
+               {form.formState.errors.email && (
+                  <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" />
+              <Input id="password" type="password" {...form.register("password")} />
+               {form.formState.errors.password && (
+                  <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
+              )}
             </div>
-            <Button type="submit" className="w-full" asChild>
-              <Link href="/dashboard">
-                Create an account
-              </Link>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "Create an account"}
             </Button>
-          </div>
+          </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/login" className="underline">
@@ -56,3 +130,5 @@ export default function SignupPage() {
     </div>
   );
 }
+
+    
