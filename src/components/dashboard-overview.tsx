@@ -21,6 +21,10 @@ import { Bar, BarChart as RechartsBarChart, XAxis, YAxis } from "recharts";
 import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { getLatestAdviceSessionForUser } from "@/services/advice-service";
+import { MOCK_USER_ID } from "@/lib/db/schema";
+import type { AdviceSession } from "@/lib/db/schema";
+
 
 const chartConfig = {
   income: {
@@ -33,35 +37,25 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-interface FinancialData {
-  income: number;
-  expenses: number;
-}
 
 export function DashboardOverview() {
-  const [data, setData] = useState<FinancialData | null>(null);
+  const [data, setData] = useState<AdviceSession | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      // Fetch the entire history
-      const savedHistory = localStorage.getItem("finsarthi_advice_history");
-      if (savedHistory) {
-        const history = JSON.parse(savedHistory);
-        // Use the most recent entry for the dashboard
-        if (history.length > 0) {
-            const latestEntry = history[0];
-            setData({
-                income: latestEntry.income || 0,
-                expenses: latestEntry.expenses || 0,
-            });
+    async function loadDashboardData() {
+        setLoading(true);
+        try {
+            // In a real app, you would get the current logged-in user's ID
+            const latestSession = await getLatestAdviceSessionForUser(MOCK_USER_ID);
+            setData(latestSession);
+        } catch (error) {
+            console.error("Failed to load dashboard data", error);
+            setData(null);
         }
-      }
-    } catch (error) {
-        console.error("Failed to load data from localStorage", error);
-        setData(null);
+        setLoading(false);
     }
-    setLoading(false);
+    loadDashboardData();
   }, []);
 
   if (loading) {

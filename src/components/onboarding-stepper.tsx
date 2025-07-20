@@ -55,7 +55,10 @@ import { Progress } from "@/components/ui/progress";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { useRouter } from "next/navigation";
 import { translations, languages } from "@/lib/translations";
-import type { AdviceRecord } from "@/app/(main)/advice/page";
+import type { AdviceSession } from "@/lib/db/schema";
+import { createAdviceSession, associateSessionWithUser } from "@/services/advice-service";
+import { createUser } from "@/services/user-service";
+import { MOCK_USER_ID } from "@/lib/db/schema";
 
 const formSchema = z.object({
   language: z.enum(["en", "hi", "mr"], {
@@ -96,16 +99,16 @@ function AudioPlayer({ text, lang }: { text?: string; lang: string }) {
 }
 
 interface OnboardingStepperProps {
-    onComplete?: (newAdvice: AdviceRecord) => void;
+    onComplete?: (newAdvice: AdviceSession) => void;
     onCancel?: () => void;
 }
 
 export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperProps) {
   const [step, setStep] = useState(1);
-  const [advice, setAdvice] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [progress, setProgress] = useState(0);
+  const [adviceSession, setAdviceSession] = useState<AdviceSession | null>(null);
   const router = useRouter();
 
   const { speak: playQuestionAudio } = useBrowserTts();
@@ -178,31 +181,22 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setProgress(0);
-    setAdvice("");
     setError("");
     try {
-      const result = await generatePersonalizedAdvice(
+      // 1. Generate the advice from the AI
+      const adviceResult = await generatePersonalizedAdvice(
         data as GeneratePersonalizedAdviceInput
       );
-      setAdvice(result.advice);
       
-      const newRecord: AdviceRecord = {
-        id: crypto.randomUUID(),
+      // 2. Create the advice session in the database
+      const newSession = await createAdviceSession({
         ...data,
-        advice: result.advice,
-        timestamp: new Date().toISOString(),
-      };
+        generatedAdvice: adviceResult.advice,
+      });
 
-      if(onComplete) {
-        onComplete(newRecord);
-      } else {
-        // Fallback for standalone usage (e.g. /onboarding page)
-        const history = JSON.parse(localStorage.getItem("finsarthi_advice_history") || "[]");
-        const updatedHistory = [newRecord, ...history];
-        localStorage.setItem("finsarthi_advice_history", JSON.stringify(updatedHistory));
-        setProgress(100);
-        setStep(TOTAL_STEPS + 1); // Move to results step
-      }
+      setAdviceSession(newSession);
+      setProgress(100);
+      setStep(TOTAL_STEPS + 1); // Move to results/signup step
 
     } catch (e) {
       setError(T.error);
@@ -211,37 +205,36 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
     setIsLoading(false);
   };
 
-  const handleViewDashboard = () => {
-    router.push('/dashboard');
+  const handleSaveAndContinue = async () => {
+    if (!adviceSession) return;
+    
+    // In a real app, you would associate the session with the *newly created user*.
+    // For this prototype, we'll associate it with the mock user and navigate.
+    await associateSessionWithUser(adviceSession.id, MOCK_USER_ID);
+
+    if(onComplete && adviceSession) {
+      onComplete(adviceSession);
+    } else {
+      router.push('/dashboard');
+    }
   }
 
   const nextStep = async () => {
     let isValid = false;
-    if (step === 1) {
-      isValid = await trigger("language");
-    } else if (step === 2) {
-      isValid = await trigger("income");
-    } else if (step === 3) {
-      isValid = await trigger("expenses");
-    } else if (step === 4) {
-      isValid = await trigger("financialGoals");
-    } else if (step === 5) {
-      isValid = await trigger("literacyLevel");
-    }
+    if (step === 1) isValid = await trigger("language");
+    else if (step === 2) isValid = await trigger("income");
+    else if (step === 3) isValid = await trigger("expenses");
+    else if (step === 4) isValid = await trigger("financialGoals");
+    else if (step === 5) isValid = await trigger("literacyLevel");
 
-    if (isValid) {
-      setStep((s) => s + 1);
-    }
+    if (isValid) setStep((s) => s + 1);
   };
 
   const prevStep = () => setStep((s) => s - 1);
 
   const handleMicClick = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening({ lang: getValues("language") });
-    }
+    if (isListening) stopListening();
+    else startListening({ lang: getValues("language") });
   };
 
   if (isLoading) {
@@ -269,18 +262,18 @@ export function OnboardingStepper({ onComplete, onCancel }: OnboardingStepperPro
         </CardHeader>
         <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
           {error && <p className="text-destructive">{error}</p>}
-          {!isLoading && !error && !advice && <p>{T.yourAdviceHere}</p>}
-          {advice && (
+          {adviceSession && (
             <div className="flex items-start gap-2">
-              <p>{advice}</p>
-              <AudioPlayer text={advice} lang={selectedLanguage} />
+              <p>{adviceSession.generatedAdvice}</p>
+              <AudioPlayer text={adviceSession.generatedAdvice} lang={selectedLanguage} />
             </div>
           )}
         </CardContent>
         <CardFooter className="flex-col items-stretch gap-4">
-          <Button onClick={handleViewDashboard}>
+          <Button onClick={handleSaveAndContinue}>
             {T.saveAndContinue}
           </Button>
+          <p className="text-center text-sm text-muted-foreground">To view this on your dashboard later, please sign up.</p>
           <Button variant="ghost" asChild>
             <Link href="/signup">{T.createAnAccount}</Link>
           </Button>

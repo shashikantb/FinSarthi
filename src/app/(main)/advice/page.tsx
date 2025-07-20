@@ -6,29 +6,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Wand2, PlusCircle } from "lucide-react";
-import type { FormValues } from "@/components/onboarding-stepper";
+import { getAdviceHistoryForUser } from "@/services/advice-service";
+import type { AdviceSession } from "@/lib/db/schema";
+import { MOCK_USER_ID } from "@/lib/db/schema";
 
-export interface AdviceRecord extends FormValues {
-  id: string;
-  advice: string;
-  timestamp: string;
-}
 
 export default function AdvicePage() {
-  const [adviceHistory, setAdviceHistory] = useState<AdviceRecord[]>([]);
+  const [adviceHistory, setAdviceHistory] = useState<AdviceSession[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
   useEffect(() => {
-    const savedHistory = localStorage.getItem("finsarthi_advice_history");
-    if (savedHistory) {
-      setAdviceHistory(JSON.parse(savedHistory));
+    async function fetchHistory() {
+      setIsLoadingHistory(true);
+      try {
+        // In a real app, you would get the logged-in user's ID
+        const history = await getAdviceHistoryForUser(MOCK_USER_ID);
+        setAdviceHistory(history);
+      } catch (error) {
+        console.error("Failed to fetch advice history:", error);
+      }
+      setIsLoadingHistory(false);
     }
+    fetchHistory();
   }, []);
 
-  const handleNewAdvice = (newAdvice: AdviceRecord) => {
-    const updatedHistory = [newAdvice, ...adviceHistory];
-    setAdviceHistory(updatedHistory);
-    localStorage.setItem("finsarthi_advice_history", JSON.stringify(updatedHistory));
+  const handleNewAdvice = (newAdvice: AdviceSession) => {
+    setAdviceHistory((prev) => [newAdvice, ...prev]);
     setIsGenerating(false);
   };
 
@@ -60,18 +64,20 @@ export default function AdvicePage() {
             <CardDescription>Review your previously generated financial plans.</CardDescription>
           </CardHeader>
           <CardContent>
-            {adviceHistory.length > 0 ? (
+            {isLoadingHistory ? (
+              <p>Loading history...</p>
+            ) : adviceHistory.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
                 {adviceHistory.map((record) => (
                   <AccordionItem value={record.id} key={record.id}>
                     <AccordionTrigger>
                         <div className="flex justify-between w-full pr-4">
                             <span>{record.financialGoals.substring(0, 50)}...</span>
-                            <span className="text-sm text-muted-foreground">{new Date(record.timestamp).toLocaleDateString()}</span>
+                            <span className="text-sm text-muted-foreground">{new Date(record.createdAt).toLocaleDateString()}</span>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
-                      <p>{record.advice}</p>
+                      <p>{record.generatedAdvice}</p>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
