@@ -63,7 +63,7 @@ const translateFinancialTermsFlow = ai.defineFlow(
       Literacy Level: ${input.userLiteracyLevel}
 
       Please provide a simplified explanation of the term in the specified language, tailored to the user's literacy level.
-      Your response MUST be ONLY a valid JSON object with a single key "simplifiedExplanation". Do not add any other text, explanations, or markdown formatting.
+      Your response should contain ONLY the explanation text. Do not add any other text, greetings, or markdown formatting.
       `;
 
       const completion = await groq.chat.completions.create({
@@ -71,7 +71,6 @@ const translateFinancialTermsFlow = ai.defineFlow(
         model: 'llama3-8b-8192',
         temperature: 0.3,
         max_tokens: 1024,
-        response_format: { type: 'json_object' },
       });
 
       const content = completion.choices[0].message.content;
@@ -80,9 +79,9 @@ const translateFinancialTermsFlow = ai.defineFlow(
       }
 
       console.log("AI Response for Term Translation:", content);
-
-      const output = TranslateFinancialTermsOutputSchema.parse(JSON.parse(content));
-      return output;
+      
+      return { simplifiedExplanation: content };
+      
     } catch (error) {
       console.error("Error in translateFinancialTermsFlow:", error);
       return { simplifiedExplanation: "Failed to generate explanation." };
