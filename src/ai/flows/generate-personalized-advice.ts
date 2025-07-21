@@ -52,13 +52,20 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
             throw new Error(`Prompt with key "${promptKey}" not found.`);
         }
 
-        // Dynamically build a string of the user's answers
+        // Dynamically build a string of the user's answers, adding currency context for numeric types.
         const userAnswers = Object.entries(formData)
             .map(([key, value]) => {
                 const questionConfig = promptConfig.questions.find(q => q.key === key);
-                const questionLabel = questionConfig?.label[language as keyof typeof questionConfig.label] || key;
-                return `- ${questionLabel}: ${value}`;
+                if (!questionConfig) return ''; // Skip if question config not found
+
+                const questionLabel = questionConfig.label[language as keyof typeof questionConfig.label] || key;
+                
+                // Add currency symbol for numeric inputs to give AI better context
+                const displayValue = questionConfig.type === 'number' ? `₹${value}` : value;
+                
+                return `- ${questionLabel}: ${displayValue}`;
             })
+            .filter(line => line) // Remove any empty lines
             .join('\n');
 
       const [savings, investments, loans] = await Promise.all([
