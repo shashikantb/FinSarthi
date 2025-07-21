@@ -48,7 +48,7 @@ function AppHeader() {
   return (
     <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
       <div className="flex items-center gap-2">
-        {isMobile && <SidebarTrigger asChild><Button variant="outline" size="icon" className="shrink-0"><Menu className="h-5 w-5"/></Button></SidebarTrigger>}
+        {isMobile && <SidebarTrigger><Menu className="h-5 w-5"/></SidebarTrigger>}
          <div className="hidden md:block">
             <Logo/>
          </div>
