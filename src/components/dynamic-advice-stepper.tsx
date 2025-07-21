@@ -38,10 +38,8 @@ import {
   ArrowLeft,
   X,
 } from "lucide-react";
-import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
-import { useRouter } from "next/navigation";
-import { translations, languages } from "@/lib/translations";
+import { translations } from "@/lib/translations";
 import type { LanguageCode } from "@/lib/translations";
 import type { AdviceSession } from "@/lib/db/schema";
 import { createAdviceSessionForCurrentUser } from "@/services/advice-service";
@@ -58,7 +56,7 @@ type FormValues = {
 };
 
 function QuestionField({ question, lang }: { question: any; lang: LanguageCode }) {
-  const { control } = useFormContext();
+  const { control, register } = useFormContext();
   const label = question.label[lang] || question.label.en;
   const placeholder = question.placeholder ? (question.placeholder[lang] || question.placeholder.en) : "";
 
@@ -89,11 +87,9 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
-  const [adviceSession, setAdviceSession] = useState<AdviceSession | null>(null);
   const [selectedPromptKey, setSelectedPromptKey] = useState<string>("");
   const [language, setLanguage] = useState<LanguageCode>("en");
   
-  const router = useRouter();
   const methods = useForm<FormValues>({ mode: "onChange" });
   
   const { handleSubmit, trigger, formState } = methods;
@@ -132,6 +128,8 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
         language,
       });
 
+      // When used in onboarding, this creates an anonymous session.
+      // When used by a logged-in user, it associates with them.
       const newSession = await createAdviceSessionForCurrentUser({
         promptKey: selectedPromptKey,
         formData,
@@ -139,10 +137,8 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
         generatedAdvice: adviceResult.advice,
       }, isLoggedIn);
       
-      setAdviceSession(newSession);
       setProgress(100);
-      setStep(TOTAL_STEPS); // Go to result view
-      onComplete(newSession);
+      onComplete(newSession); // Pass the completed session up to the parent
     } catch (e) {
       setError(T.error);
       console.error(e);
@@ -179,42 +175,21 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
       </Card>
     );
   }
-
-  if (step === TOTAL_STEPS) { // Result view
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>{T.adviceResultTitle}</CardTitle>
-          <CardDescription>
-            {isLoggedIn ? "Your new advice has been generated and saved." : "Sign up to save this advice to your dashboard."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
-          {error && <p className="text-destructive">{error}</p>}
-          {adviceSession && <p>{adviceSession.generatedAdvice}</p>}
-        </CardContent>
-        <CardFooter>
-          {isLoggedIn ? (
-            <Button onClick={onCancel}>Finish</Button>
-          ) : (
-            <Button asChild>
-              <Link href={`/signup?sessionId=${adviceSession?.id}`}>{T.createAnAccount}</Link>
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
-    );
-  }
   
   return (
     <Card className="w-full">
-      {onCancel && (
+      {onCancel ? (
         <CardHeader className="flex-row items-center justify-between">
           <div>
             <CardTitle>Generate New Advice</CardTitle>
             <CardDescription>Fill out the steps to get a new plan.</CardDescription>
           </div>
           <Button variant="ghost" size="icon" onClick={onCancel}><X className="h-4 w-4" /></Button>
+        </CardHeader>
+      ) : (
+        <CardHeader>
+          <CardTitle>Get Your Financial Plan</CardTitle>
+          <CardDescription>Select a topic and answer a few questions.</CardDescription>
         </CardHeader>
       )}
       <CardContent className="pt-6">
@@ -255,7 +230,7 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
                     {T.next} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={formState.isSubmitting}>
+                  <Button type="submit" disabled={formState.isSubmitting || !selectedPromptKey}>
                     {formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
                     {T.generateAdvice}
                   </Button>

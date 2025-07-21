@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createUser } from "@/services/user-service";
@@ -30,16 +30,13 @@ const signupSchema = z.object({
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 
-interface SignupFormProps {
-    onSignupSuccess?: () => void;
-}
-
-export function SignupForm({ onSignupSuccess }: SignupFormProps) {
+// This component is now only for the dedicated /signup page, not the onboarding flow.
+export function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const form = useForm<SignupFormValues>({
+  const methods = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
   });
 
@@ -59,14 +56,10 @@ export function SignupForm({ onSignupSuccess }: SignupFormProps) {
 
       toast({
         title: "Account Created!",
-        description: "You have successfully signed up.",
+        description: "You can now log in.",
       });
       
-      if (onSignupSuccess) {
-        onSignupSuccess();
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/login");
 
     } catch (error) {
       console.error("Signup failed:", error);
@@ -88,41 +81,43 @@ export function SignupForm({ onSignupSuccess }: SignupFormProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="full-name">Full name</Label>
-            <Input
-              id="full-name"
-              placeholder="Max Robinson"
-              {...form.register("fullName")}
-            />
-            {form.formState.errors.fullName && (
-                <p className="text-xs text-destructive">{form.formState.errors.fullName.message}</p>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              {...form.register("email")}
-            />
-             {form.formState.errors.email && (
-                <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" {...form.register("password")} />
-             {form.formState.errors.password && (
-                <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
-            )}
-          </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? <Loader2 className="animate-spin" /> : "Create an account"}
-          </Button>
-        </form>
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="full-name">Full name</Label>
+              <Input
+                id="full-name"
+                placeholder="Max Robinson"
+                {...methods.register("fullName")}
+              />
+              {methods.formState.errors.fullName && (
+                  <p className="text-xs text-destructive">{methods.formState.errors.fullName.message}</p>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                {...methods.register("email")}
+              />
+              {methods.formState.errors.email && (
+                  <p className="text-xs text-destructive">{methods.formState.errors.email.message}</p>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" {...methods.register("password")} />
+              {methods.formState.errors.password && (
+                  <p className="text-xs text-destructive">{methods.formState.errors.password.message}</p>
+              )}
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "Create an account"}
+            </Button>
+          </form>
+        </FormProvider>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
           <Link href="/login" className="underline">

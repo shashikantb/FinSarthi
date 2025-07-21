@@ -17,18 +17,26 @@ async function getMostRecentUser() {
 }
 
 /**
- * Creates a new advice session, linking it to the current user if logged in.
+ * Creates a new advice session.
+ * If isLoggedIn is false, it creates an anonymous session (userId is null).
+ * If isLoggedIn is true, it associates it with the most recent user.
  * @param data The data for the new advice session.
  * @param isLoggedIn A flag to indicate if we should link to the most recent user.
  * @returns The newly created advice session.
  */
 export async function createAdviceSessionForCurrentUser(
-  data: Omit<NewAdviceSession, 'id' | 'createdAt' | 'userId'>,
+  data: Omit<NewAdviceSession, 'id' | 'createdAt' | 'userId' | 'income' | 'expenses' | 'financialGoals' | 'literacyLevel'>,
   isLoggedIn: boolean
 ) {
   let valuesToInsert: NewAdviceSession = {
     ...data,
     userId: null,
+    // The following fields are deprecated but kept for schema compatibility for now.
+    // They are not used in the new dynamic flow.
+    income: 0,
+    expenses: 0,
+    financialGoals: '',
+    literacyLevel: 'beginner',
   };
 
   if (isLoggedIn) {
