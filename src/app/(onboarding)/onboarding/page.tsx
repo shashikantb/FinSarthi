@@ -166,7 +166,7 @@ export default function OnboardingPage() {
                     <CardDescription>Your plan is ready. Save it to create your account and access your dashboard.</CardDescription>
                 </CardHeader>
                 <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
-                    {adviceSession.generatedAdvice}
+                    <p>{adviceSession.generatedAdvice}</p>
                 </CardContent>
                 <CardFooter>
                     <Button onClick={handleSaveAndFinish} disabled={isLoading} className="ml-auto">

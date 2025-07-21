@@ -1,5 +1,5 @@
 
-import { pgTable, text, timestamp, varchar, real, pgEnum, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, pgEnum, jsonb } from 'drizzle-orm/pg-core';
 import { createId } from '@paralleldrive/cuid2';
 
 export const users = pgTable('users', {

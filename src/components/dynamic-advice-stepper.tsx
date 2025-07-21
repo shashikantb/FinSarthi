@@ -68,9 +68,9 @@ function QuestionField({ question, lang }: { question: any; lang: LanguageCode }
   const placeholder = question.placeholder ? (question.placeholder[lang] || question.placeholder.en) : "";
 
   return (
-    <FormField
-      control={control}
+    <Controller
       name={question.key}
+      control={control}
       rules={{ required: `${label} is required.` }}
       render={({ field, fieldState }) => (
         <FormItem>
@@ -132,9 +132,20 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
     setProgress(0);
     setError("");
     try {
+      // Filter out empty values from formData before sending to AI
+      const relevantFormData = Object.entries(formData)
+        .filter(([key, value]) => {
+          const isKeyInCurrentPrompt = questions.some(q => q.key === key);
+          return isKeyInCurrentPrompt && value !== '';
+        })
+        .reduce((obj, [key, value]) => {
+          obj[key] = value;
+          return obj;
+        }, {} as Record<string, string>);
+
       const adviceResult = await generatePersonalizedAdvice({
         promptKey: selectedPromptKey,
-        formData,
+        formData: relevantFormData,
         language,
       });
 
@@ -142,7 +153,7 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
       // When used by a logged-in user, it associates with them.
       const newSession = await createAdviceSessionForCurrentUser({
         promptKey: selectedPromptKey,
-        formData,
+        formData: relevantFormData,
         language,
         generatedAdvice: adviceResult.advice,
       }, isLoggedIn);
