@@ -1,4 +1,3 @@
-
 // src/components/financial-coach.tsx
 "use client";
 
@@ -40,6 +39,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { languages, langToLocale } from "@/lib/translations";
+import { createId } from "@paralleldrive/cuid2";
 
 type Message = {
   id: string;
@@ -125,22 +125,28 @@ export function FinancialCoach() {
     setIsLoading(true);
     setError("");
 
-    const userMessage: Message = { role: "user", content: data.query, id: crypto.randomUUID() };
+    const userMessage: Message = { role: "user", content: data.query, id: createId() };
     const currentMessages = [...messages, userMessage];
     setMessages(currentMessages);
 
     try {
+      // We pass the history without the *current* user message.
+      const sanitizedHistory = messages.map(({ role, content }) => ({
+        role,
+        content,
+      }));
+
       const input: FinancialCoachInput = {
         query: data.query,
         language: data.language,
-        history: messages, // Pass the history with user/assistant roles
+        history: sanitizedHistory, 
       };
       
       const result = await financialCoach(input);
       const modelMessage: Message = {
         role: "assistant",
         content: result.response,
-        id: crypto.randomUUID(),
+        id: createId(),
       };
       setMessages((prev) => [...prev, modelMessage]);
 
