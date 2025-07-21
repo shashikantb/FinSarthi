@@ -54,12 +54,10 @@ export async function createAdviceSessionForCurrentUser(
  * @param userId The ID of the user.
  */
 export async function associateSessionWithUser(sessionId: string, userId: string) {
-  // We only want to associate a session that is currently anonymous (userId is null)
   await db.update(adviceSessions)
     .set({ userId })
     .where(eq(adviceSessions.id, sessionId));
 
-  // Revalidate paths that show this data to reflect the change immediately.
   revalidatePath('/dashboard');
   revalidatePath('/advice');
 }
@@ -108,5 +106,6 @@ export async function getAdviceHistoryForUser(userId?: string) {
         .where(eq(adviceSessions.userId, targetUserId))
         .orderBy(desc(adviceSessions.createdAt));
     
-    return history;
+    // Quick fix for display: use promptKey as goal
+    return history.map(item => ({...item, financialGoals: item.promptKey}));
 }

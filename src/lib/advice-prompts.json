@@ -1,0 +1,151 @@
+
+[
+    {
+        "key": "budget_setup",
+        "title": {
+            "en": "Setting up your Budget",
+            "hi": "अपना बजट सेट करना",
+            "mr": "तुमचे बजेट सेट करणे"
+        },
+        "description": {
+            "en": "Let's create a basic budget to track your income and expenses.",
+            "hi": "आइए आपकी आय और व्यय को ट्रैक करने के लिए एक मूल बजट बनाएं।",
+            "mr": "तुमचे उत्पन्न आणि खर्च ट्रॅक करण्यासाठी एक मूलभूत बजेट तयार करूया."
+        },
+        "questions": [
+            {
+                "key": "income",
+                "label": {
+                    "en": "What is your total monthly income?",
+                    "hi": "आपकी कुल मासिक आय क्या है?",
+                    "mr": "तुमचे एकूण मासिक उत्पन्न किती आहे?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 50000",
+                    "hi": "उदा., ५००००",
+                    "mr": "उदा., ५००००"
+                }
+            },
+            {
+                "key": "expenses",
+                "label": {
+                    "en": "What are your total monthly expenses?",
+                    "hi": "आपके कुल मासिक व्यय क्या हैं?",
+                    "mr": "तुमचा एकूण मासिक खर्च किती आहे?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 35000",
+                    "hi": "उदा., ३५०००",
+                    "mr": "उदा., ३५०००"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a financial coach. Based on the user's income and expenses, provide a simple budgeting plan. Calculate their monthly savings and suggest the 50/30/20 rule (50% needs, 30% wants, 20% savings). Provide actionable tips.",
+            "hi": "आप एक वित्तीय कोच हैं। उपयोगकर्ता की आय और व्यय के आधार पर, एक सरल बजट योजना प्रदान करें। उनकी मासिक बचत की गणना करें और 50/30/20 नियम (50% ज़रूरतें, 30% चाहत, 20% बचत) सुझाएं। कार्रवाई योग्य सुझाव प्रदान करें।",
+            "mr": "तुम्ही आर्थिक प्रशिक्षक आहात. वापरकर्त्याचे उत्पन्न आणि खर्च यावर आधारित, एक साधी बजेट योजना द्या. त्यांच्या मासिक बचतीची गणना करा आणि 50/30/20 नियम (50% गरजा, 30% इच्छा, 20% बचत) सुचवा. कृती करण्यायोग्य टिपा द्या."
+        }
+    },
+    {
+        "key": "investment_beginner",
+        "title": {
+            "en": "Start Investing (Beginner)",
+            "hi": "निवेश शुरू करें (शुरुआती)",
+            "mr": "गुंतवणूक सुरू करा (नवशिक्या)"
+        },
+        "description": {
+            "en": "Get advice on how to start your investment journey.",
+            "hi": "अपनी निवेश यात्रा कैसे शुरू करें, इस पर सलाह लें।",
+            "mr": "तुमचा गुंतवणूक प्रवास कसा सुरू करायचा याबद्दल सल्ला मिळवा."
+        },
+        "questions": [
+            {
+                "key": "savings",
+                "label": {
+                    "en": "How much can you save per month to invest?",
+                    "hi": "आप प्रति माह निवेश के लिए कितना बचा सकते हैं?",
+                    "mr": "तुम्ही गुंतवणुकीसाठी दरमहा किती बचत करू शकता?"
+                },
+                "type": "number",
+                "placeholder": { "en": "e.g., 5000" }
+            },
+            {
+                "key": "risk_tolerance",
+                "label": {
+                    "en": "On a scale of 1 (low) to 5 (high), what is your risk tolerance?",
+                    "hi": "1 (कम) से 5 (उच्च) के पैमाने पर, आपकी जोखिम सहनशीलता क्या है?",
+                    "mr": "१ (कमी) ते ५ (उच्च) च्या स्केलवर, तुमची जोखीम सहन करण्याची क्षमता किती आहे?"
+                },
+                "type": "number",
+                "placeholder": { "en": "e.g., 3" }
+            },
+            {
+                "key": "goal",
+                "label": {
+                    "en": "What is your primary investment goal?",
+                    "hi": "आपका प्राथमिक निवेश लक्ष्य क्या है?",
+                    "mr": "तुमचे प्राथमिक गुंतवणुकीचे ध्येय काय आहे?"
+                },
+                "type": "textarea",
+                "placeholder": { "en": "e.g., Save for retirement, buy a car, build wealth" }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a financial coach advising a beginner investor. Based on their monthly savings, risk tolerance, and goals, recommend a simple investment strategy. Suggest specific types of products like Mutual Funds or ETFs from the provided list. Explain concepts simply.",
+            "hi": "आप एक शुरुआती निवेशक को सलाह देने वाले वित्तीय कोच हैं। उनकी मासिक बचत, जोखिम सहनशीलता और लक्ष्यों के आधार पर, एक सरल निवेश रणनीति सुझाएं। प्रदान की गई सूची से म्युचुअल फंड या ईटीएफ जैसे विशिष्ट प्रकार के उत्पादों का सुझाव दें। अवधारणाओं को सरल रूप से समझाएं।",
+            "mr": "तुम्ही एका नवशिक्या गुंतवणूकदाराला सल्ला देणारे आर्थिक प्रशिक्षक आहात. त्यांच्या मासिक बचत, जोखीम सहनशीलता आणि ध्येयांच्या आधारावर, एक साधी गुंतवणूक धोरण सुचवा. दिलेल्या यादीतून म्युच्युअल फंड किंवा ईटीएफ सारख्या विशिष्ट प्रकारच्या उत्पादनांची शिफारस करा. संकल्पना सोप्या भाषेत समजावून सांगा."
+        }
+    },
+    {
+        "key": "debt_management",
+        "title": {
+            "en": "Managing your Debt",
+            "hi": "अपने कर्ज का प्रबंधन",
+            "mr": "तुमच्या कर्जाचे व्यवस्थापन"
+        },
+        "description": {
+            "en": "Get a plan to manage and reduce your existing debt.",
+            "hi": "अपने मौजूदा कर्ज को प्रबंधित करने और कम करने की योजना प्राप्त करें।",
+            "mr": "तुमचे विद्यमान कर्ज व्यवस्थापित करण्यासाठी आणि कमी करण्यासाठी योजना मिळवा."
+        },
+        "questions": [
+            {
+                "key": "total_debt",
+                "label": {
+                    "en": "What is your total outstanding debt (excluding home loan)?",
+                    "hi": "आपका कुल बकाया ऋण क्या है (गृह ऋण को छोड़कर)?",
+                    "mr": "तुमचे एकूण थकीत कर्ज किती आहे (गृहकर्ज वगळून)?"
+                },
+                "type": "number",
+                "placeholder": { "en": "e.g., 100000" }
+            },
+            {
+                "key": "debt_types",
+                "label": {
+                    "en": "What types of debt do you have?",
+                    "hi": "आपके पास किस प्रकार के ऋण हैं?",
+                    "mr": "तुमच्याकडे कोणत्या प्रकारचे कर्ज आहे?"
+                },
+                "type": "text",
+                "placeholder": { "en": "e.g., Credit card, personal loan" }
+            },
+            {
+                "key": "monthly_income",
+                "label": {
+                    "en": "What is your total monthly income?",
+                    "hi": "आपकी कुल मासिक आय क्या है?",
+                    "mr": "तुमचे एकूण मासिक उत्पन्न किती आहे?"
+                },
+                "type": "number",
+                "placeholder": { "en": "e.g., 75000" }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a debt management expert. The user wants help managing their debt. Based on their total debt, debt types, and income, create a clear action plan. Suggest a debt repayment strategy like the 'debt snowball' or 'debt avalanche' method. Explain the chosen strategy and provide motivational advice.",
+            "hi": "आप एक ऋण प्रबंधन विशेषज्ञ हैं। उपयोगकर्ता अपने ऋण के प्रबंधन में मदद चाहता है। उनके कुल ऋण, ऋण के प्रकार और आय के आधार पर, एक स्पष्ट कार्य योजना बनाएं। 'डेट स्नोबॉल' या 'डेट एवलांच' विधि जैसी ऋण चुकौती रणनीति सुझाएं। चुनी हुई रणनीति की व्याख्या करें और प्रेरक सलाह प्रदान करें।",
+            "mr": "तुम्ही कर्ज व्यवस्थापन तज्ञ आहात. वापरकर्त्याला त्यांचे कर्ज व्यवस्थापित करण्यास मदत हवी आहे. त्यांचे एकूण कर्ज, कर्जाचे प्रकार आणि उत्पन्न यावर आधारित, एक स्पष्ट कृती योजना तयार करा. 'डेट स्नोबॉल' किंवा 'डेट अॅव्हेलँश' पद्धतीसारखी कर्ज परतफेड धोरण सुचवा. निवडलेल्या धोरणाचे स्पष्टीकरण द्या आणि प्रेरक सल्ला द्या."
+        }
+    }
+]

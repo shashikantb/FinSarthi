@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview Generates personalized financial advice based on user inputs using Groq.
+ * @fileOverview Generates personalized financial advice based on dynamic user inputs using Groq.
  *
  * - generatePersonalizedAdvice - A function that generates personalized financial advice.
  * - GeneratePersonalizedAdviceInput - The input type for the generatePersonalizedAdvice function.
@@ -14,19 +14,17 @@ import { z } from 'zod';
 import OpenAI from 'openai';
 import { getProducts } from '@/services/financial-product-service';
 import { GeneratePersonalizedAdviceOutputSchema } from './generate-personalized-advice-schema';
+import advicePrompts from '@/lib/advice-prompts.json';
 
 const groq = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
   baseURL: 'https://api.groq.com/openai/v1',
 });
 
+// This schema is now dynamic, accepting any key-value pair of strings.
 const GeneratePersonalizedAdviceInputSchema = z.object({
-  income: z.coerce.number().positive({ message: "Income must be positive." }),
-  expenses: z.coerce.number().positive({ message: "Expenses must be positive." }),
-  financialGoals: z
-    .string()
-    .min(10, "Please describe your goals in more detail."),
-  literacyLevel: z.enum(["beginner", "intermediate", "advanced"]),
+  promptKey: z.string().describe("The key of the selected prompt from the JSON config."),
+  formData: z.record(z.string()).describe("The user's answers to the dynamic questions."),
   language: z.enum(["en", "hi", "mr"]),
 });
 
@@ -45,7 +43,24 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      // Proactively fetch all product types to have them ready for the prompt.
+        const { promptKey, formData, language } = input;
+        
+        // Find the selected prompt configuration from the JSON file
+        const promptConfig = advicePrompts.find(p => p.key === promptKey);
+
+        if (!promptConfig) {
+            throw new Error(`Prompt with key "${promptKey}" not found.`);
+        }
+
+        // Dynamically build a string of the user's answers
+        const userAnswers = Object.entries(formData)
+            .map(([key, value]) => {
+                const questionConfig = promptConfig.questions.find(q => q.key === key);
+                const questionLabel = questionConfig?.label[language as keyof typeof questionConfig.label] || key;
+                return `- ${questionLabel}: ${value}`;
+            })
+            .join('\n');
+
       const [savings, investments, loans] = await Promise.all([
         getProducts('savings'),
         getProducts('investment'),
@@ -59,31 +74,28 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       - Loan Products: ${JSON.stringify(loans)}
       `;
 
-      const prompt = `You are FinSarthi, a friendly and expert financial coach. Your goal is to provide clear, empathetic, and highly actionable financial advice.
+      // Use the system prompt from the JSON config
+      const systemPrompt = promptConfig.systemPrompt[language as keyof typeof promptConfig.systemPrompt];
 
-      Analyze the user's financial situation based on the details below and generate a personalized plan. The language for the advice must be ${input.language}.
+      const finalPrompt = `
+      ${systemPrompt}
 
-      **User's Financial Profile:**
-      - **Monthly Income:** ${input.income}
-      - **Monthly Expenses:** ${input.expenses}
-      - **Stated Financial Goals:** "${input.financialGoals}"
-      - **Financial Literacy Level:** ${input.literacyLevel}
-
-      **Available Financial Products for Recommendation:**
+      The user has provided the following information:
+      ${userAnswers}
+      
+      Available Financial Products for Recommendation:
       ${productContext}
 
-      **Your Task:**
-      1.  **Acknowledge and Empathize:** Start by acknowledging their goals in a positive and encouraging tone.
-      2.  **Analyze Cash Flow:** Calculate their monthly savings (income - expenses). Comment on this briefly.
-      3.  **Provide Actionable Steps:** Give 3-5 clear, simple, and prioritized steps the user can take to move toward their goals.
-      4.  **Suggest Products:** For any step that involves a financial product (like a savings account, mutual fund, or loan), you MUST suggest suitable product examples from the list provided above. Integrate these product suggestions naturally into your advice. DO NOT invent or hallucinate product names.
-          - **Example Integration:** "You could consider opening a high-yield savings account, such as '${savings[0]?.name || 'a good savings account'}'."
-      5.  **Structure and Tone:** Use headings or bullet points. Be encouraging and supportive throughout. Your name is FinSarthi.
-      6.  **Output Format**: Your response MUST be ONLY the advice text. Do not include any other text, greetings, explanations, or markdown formatting.
+      Your Task:
+      1.  **Analyze the user's situation** based on the information they provided.
+      2.  **Provide Actionable Steps:** Give 3-5 clear, simple, and prioritized steps.
+      3.  **Suggest Products:** When relevant, suggest suitable products from the list provided. Do not invent products.
+      4.  **Language and Tone:** Your response MUST be in ${language}. Be encouraging, empathetic, and supportive. Your name is FinSarthi.
+      5.  **Output Format**: Your response MUST be ONLY the advice text. Do not include any other text, greetings, explanations, or markdown formatting.
       `;
 
       const completion = await groq.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content: finalPrompt }],
         model: 'llama3-8b-8192',
         temperature: 0.7,
         max_tokens: 2048,
@@ -95,15 +107,13 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       }
 
       console.log("AI Response for Personalized Advice:", adviceText);
-
-      // We wrap the plain text response into the expected JSON structure here.
       return { advice: adviceText };
 
     } catch (error) {
       console.error("Error in generatePersonalizedAdviceFlow:", error);
       return {
         advice:
-          "I'm sorry, I was unable to generate advice at this time. This could be due to a temporary issue or the content triggering safety settings. Please try adjusting your input or try again later.",
+          "I'm sorry, I was unable to generate advice at this time. This could be due to a temporary issue. Please try adjusting your input or try again later.",
       };
     }
   }

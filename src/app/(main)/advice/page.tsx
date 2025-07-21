@@ -1,7 +1,7 @@
 
 "use client";
 import { useState, useEffect } from "react";
-import { OnboardingStepper } from "@/components/onboarding-stepper";
+import { DynamicAdviceStepper } from "@/components/dynamic-advice-stepper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -19,8 +19,6 @@ export default function AdvicePage() {
     async function fetchHistory() {
       setIsLoadingHistory(true);
       try {
-        // For this prototype, we fetch data for the most recently created user
-        // to simulate a logged-in state.
         const history = await getAdviceHistoryForUser();
         setAdviceHistory(history);
       } catch (error) {
@@ -55,7 +53,7 @@ export default function AdvicePage() {
 
       {isGenerating ? (
         <div className="mt-6 max-w-4xl mx-auto">
-          <OnboardingStepper onComplete={handleNewAdvice} onCancel={() => setIsGenerating(false)} isLoggedIn={true} />
+          <DynamicAdviceStepper onComplete={handleNewAdvice} onCancel={() => setIsGenerating(false)} isLoggedIn={true} />
         </div>
       ) : (
         <Card>
