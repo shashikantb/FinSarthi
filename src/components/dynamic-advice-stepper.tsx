@@ -55,8 +55,15 @@ type FormValues = {
   [key: string]: string;
 };
 
+// Generate default values from the JSON config to prevent uncontrolled component errors
+const allQuestionKeys = advicePrompts.flatMap(p => p.questions.map(q => q.key));
+const defaultFormValues = allQuestionKeys.reduce((acc, key) => {
+    acc[key] = '';
+    return acc;
+}, {} as FormValues);
+
 function QuestionField({ question, lang }: { question: any; lang: LanguageCode }) {
-  const { control, register } = useFormContext();
+  const { control } = useFormContext();
   const label = question.label[lang] || question.label.en;
   const placeholder = question.placeholder ? (question.placeholder[lang] || question.placeholder.en) : "";
 
@@ -90,7 +97,10 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
   const [selectedPromptKey, setSelectedPromptKey] = useState<string>("");
   const [language, setLanguage] = useState<LanguageCode>("en");
   
-  const methods = useForm<FormValues>({ mode: "onChange" });
+  const methods = useForm<FormValues>({ 
+    mode: "onChange",
+    defaultValues: defaultFormValues, // Provide default values for all fields
+  });
   
   const { handleSubmit, trigger, formState } = methods;
 
@@ -230,7 +240,7 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
                     {T.next} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={formState.isSubmitting || !selectedPromptKey}>
+                  <Button type="submit" disabled={formState.isSubmitting || !selectedPromptKey || !formState.isValid}>
                     {formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
                     {T.generateAdvice}
                   </Button>

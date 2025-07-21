@@ -2,9 +2,24 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { adviceSessions, users, type NewAdviceSession } from "@/lib/db/schema";
+import { adviceSessions, users, type NewAdviceSession, type AdviceSession } from "@/lib/db/schema";
 import { eq, desc, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
+/**
+ * A helper function to process a raw database session object
+ * into the AdviceSession type used by the application.
+ * It extracts income and expenses from the formData JSON for dashboard compatibility.
+ */
+function processSession(session: typeof adviceSessions.$inferSelect): AdviceSession {
+    const formData = (session.formData as Record<string, any>) || {};
+    return {
+        ...session,
+        formData: formData,
+        income: Number(formData?.income) || 0,
+        expenses: Number(formData?.expenses) || 0,
+    }
+}
 
 /**
  * Gets the most recent user from the database.
@@ -27,7 +42,7 @@ async function getMostRecentUser() {
 export async function createAdviceSessionForCurrentUser(
   data: Omit<NewAdviceSession, 'id' | 'createdAt' | 'userId'>,
   isLoggedIn: boolean
-) {
+): Promise<AdviceSession> {
   let valuesToInsert: NewAdviceSession = {
     ...data,
     userId: null,
@@ -47,14 +62,7 @@ export async function createAdviceSessionForCurrentUser(
       revalidatePath('/dashboard');
   }
 
-  // Add mock income/expenses for dashboard compatibility
-  const formData = newSession.formData as { income?: string, expenses?: string };
-
-  return {
-    ...newSession,
-    income: Number(formData?.income) || 0,
-    expenses: Number(formData?.expenses) || 0,
-  };
+  return processSession(newSession);
 }
 
 /**
@@ -78,7 +86,7 @@ export async function associateSessionWithUser(sessionId: string, userId: string
  * @param userId The ID of the user.
  * @returns The latest advice session, or null if none exists.
  */
-export async function getLatestAdviceSessionForUser(userId?: string) {
+export async function getLatestAdviceSessionForUser(userId?: string): Promise<AdviceSession | null> {
   let targetUserId = userId;
   if (!targetUserId) {
     const recentUser = await getMostRecentUser();
@@ -95,13 +103,7 @@ export async function getLatestAdviceSessionForUser(userId?: string) {
   
   if (!latestSession) return null;
 
-  // Add mock income/expenses for dashboard compatibility
-  const formData = latestSession.formData as { income?: string, expenses?: string };
-  return {
-      ...latestSession,
-      income: Number(formData?.income) || 0,
-      expenses: Number(formData?.expenses) || 0,
-  }
+  return processSession(latestSession);
 }
 
 /**
@@ -110,7 +112,7 @@ export async function getLatestAdviceSessionForUser(userId?: string) {
  * @param userId The ID of the user.
  * @returns An array of advice sessions.
  */
-export async function getAdviceHistoryForUser(userId?: string) {
+export async function getAdviceHistoryForUser(userId?: string): Promise<AdviceSession[]> {
     let targetUserId = userId;
     if (!targetUserId) {
         const recentUser = await getMostRecentUser();
@@ -123,13 +125,5 @@ export async function getAdviceHistoryForUser(userId?: string) {
         .where(eq(adviceSessions.userId, targetUserId))
         .orderBy(desc(adviceSessions.createdAt));
     
-    // Add mock income/expenses for dashboard compatibility
-    return history.map(item => {
-        const formData = item.formData as { income?: string, expenses?: string };
-        return {
-            ...item,
-            income: Number(formData?.income) || 0,
-            expenses: Number(formData?.expenses) || 0,
-        }
-    });
+    return history.map(processSession);
 }

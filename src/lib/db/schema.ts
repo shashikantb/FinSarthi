@@ -24,8 +24,13 @@ export const adviceSessions = pgTable('advice_sessions', {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
-export type AdviceSession = typeof adviceSessions.$inferSelect & {
+
+// This type is used across the app. We simulate the income/expenses fields
+// for dashboard compatibility by extracting them from the formData JSON.
+export type AdviceSession = Omit<typeof adviceSessions.$inferSelect, 'formData'> & {
+  formData: Record<string, any>;
   income: number;
   expenses: number;
 };
+
 export type NewAdviceSession = typeof adviceSessions.$inferInsert;
