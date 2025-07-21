@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, FormProvider, type SubmitHandler } from "react-hook-form";
+import { useForm, FormProvider, type SubmitHandler, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -36,7 +36,7 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 function SignupStep({ onNext }: { onNext: () => void }) {
-  const { formState: { isValid } } = useFormContext<SignupFormValues>();
+  const { formState: { isValid }, register, formState: { errors } } = useFormContext<SignupFormValues>();
   return (
     <Card>
       <CardHeader>
@@ -46,18 +46,18 @@ function SignupStep({ onNext }: { onNext: () => void }) {
       <CardContent className="space-y-4">
         <div className="grid gap-2">
             <Label htmlFor="full-name">Full name</Label>
-            <Input id="full-name" placeholder="Max Robinson" {...useFormContext<SignupFormValues>().register("fullName")} />
-            {useFormContext<SignupFormValues>().formState.errors.fullName && <p className="text-xs text-destructive">{useFormContext<SignupFormValues>().formState.errors.fullName?.message}</p>}
+            <Input id="full-name" placeholder="Max Robinson" {...register("fullName")} />
+            {errors.fullName && <p className="text-xs text-destructive">{errors.fullName?.message}</p>}
         </div>
         <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" {...useFormContext<SignupFormValues>().register("email")} />
-            {useFormContext<SignupFormValues>().formState.errors.email && <p className="text-xs text-destructive">{useFormContext<SignupFormValues>().formState.errors.email?.message}</p>}
+            <Input id="email" type="email" placeholder="m@example.com" {...register("email")} />
+            {errors.email && <p className="text-xs text-destructive">{errors.email?.message}</p>}
         </div>
         <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" {...useFormContext<SignupFormValues>().register("password")} />
-            {useFormContext<SignupFormValues>().formState.errors.password && <p className="text-xs text-destructive">{useFormContext<SignupFormValues>().formState.errors.password?.message}</p>}
+            <Input id="password" type="password" {...register("password")} />
+            {errors.password && <p className="text-xs text-destructive">{errors.password?.message}</p>}
         </div>
       </CardContent>
       <CardFooter>
