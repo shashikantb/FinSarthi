@@ -19,15 +19,13 @@ export const adviceSessions = pgTable('advice_sessions', {
   formData: jsonb('form_data').notNull(),
   language: languageEnum('language').notNull(),
   generatedAdvice: text('generated_advice').notNull(),
-  // Deprecated fields, will be removed later. Keep for compatibility for now.
-  income: real('income').default(0),
-  expenses: real('expenses').default(0),
-  financialGoals: text('financial_goals').default(''),
-  literacyLevel: text('literacy_level').default('beginner'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
-export type AdviceSession = typeof adviceSessions.$inferSelect;
+export type AdviceSession = typeof adviceSessions.$inferSelect & {
+  income: number;
+  expenses: number;
+};
 export type NewAdviceSession = typeof adviceSessions.$inferInsert;

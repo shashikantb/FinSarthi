@@ -25,18 +25,12 @@ async function getMostRecentUser() {
  * @returns The newly created advice session.
  */
 export async function createAdviceSessionForCurrentUser(
-  data: Omit<NewAdviceSession, 'id' | 'createdAt' | 'userId' | 'income' | 'expenses' | 'financialGoals' | 'literacyLevel'>,
+  data: Omit<NewAdviceSession, 'id' | 'createdAt' | 'userId'>,
   isLoggedIn: boolean
 ) {
   let valuesToInsert: NewAdviceSession = {
     ...data,
     userId: null,
-    // The following fields are deprecated but kept for schema compatibility for now.
-    // They are not used in the new dynamic flow.
-    income: 0,
-    expenses: 0,
-    financialGoals: '',
-    literacyLevel: 'beginner',
   };
 
   if (isLoggedIn) {
@@ -53,7 +47,14 @@ export async function createAdviceSessionForCurrentUser(
       revalidatePath('/dashboard');
   }
 
-  return newSession;
+  // Add mock income/expenses for dashboard compatibility
+  const formData = newSession.formData as { income?: string, expenses?: string };
+
+  return {
+    ...newSession,
+    income: Number(formData?.income) || 0,
+    expenses: Number(formData?.expenses) || 0,
+  };
 }
 
 /**
@@ -92,7 +93,15 @@ export async function getLatestAdviceSessionForUser(userId?: string) {
     .orderBy(desc(adviceSessions.createdAt))
     .limit(1);
   
-  return latestSession ?? null;
+  if (!latestSession) return null;
+
+  // Add mock income/expenses for dashboard compatibility
+  const formData = latestSession.formData as { income?: string, expenses?: string };
+  return {
+      ...latestSession,
+      income: Number(formData?.income) || 0,
+      expenses: Number(formData?.expenses) || 0,
+  }
 }
 
 /**
@@ -114,6 +123,13 @@ export async function getAdviceHistoryForUser(userId?: string) {
         .where(eq(adviceSessions.userId, targetUserId))
         .orderBy(desc(adviceSessions.createdAt));
     
-    // Quick fix for display: use promptKey as goal
-    return history.map(item => ({...item, financialGoals: item.promptKey}));
+    // Add mock income/expenses for dashboard compatibility
+    return history.map(item => {
+        const formData = item.formData as { income?: string, expenses?: string };
+        return {
+            ...item,
+            income: Number(formData?.income) || 0,
+            expenses: Number(formData?.expenses) || 0,
+        }
+    });
 }
