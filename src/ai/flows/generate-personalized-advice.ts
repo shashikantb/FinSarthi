@@ -79,7 +79,7 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       4.  **Suggest Products:** For any step that involves a financial product (like a savings account, mutual fund, or loan), you MUST suggest suitable product examples from the list provided above. Integrate these product suggestions naturally into your advice. DO NOT invent or hallucinate product names.
           - **Example Integration:** "You could consider opening a high-yield savings account, such as '${savings[0]?.name || 'a good savings account'}'."
       5.  **Structure and Tone:** Use headings or bullet points. Be encouraging and supportive throughout. Your name is FinSarthi.
-      6.  **Output Format**: Your response MUST be ONLY a valid JSON object with a single 'advice' field containing your full response as a string. Do not include any other text, explanations, or markdown formatting like \`\`\`json. Example: { "advice": "Here is your advice..." }
+      6.  **Output Format**: Your response MUST be ONLY the advice text. Do not include any other text, greetings, explanations, or markdown formatting.
       `;
 
       const completion = await groq.chat.completions.create({
@@ -87,18 +87,17 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
         model: 'llama3-8b-8192',
         temperature: 0.7,
         max_tokens: 2048,
-        response_format: { type: 'json_object' },
       });
 
-      const content = completion.choices[0].message.content;
-      if (!content) {
+      const adviceText = completion.choices[0].message.content;
+      if (!adviceText) {
         throw new Error("The AI model returned an empty response.");
       }
 
-      console.log("AI Response for Personalized Advice:", content);
+      console.log("AI Response for Personalized Advice:", adviceText);
 
-      const output = GeneratePersonalizedAdviceOutputSchema.parse(JSON.parse(content));
-      return output;
+      // We wrap the plain text response into the expected JSON structure here.
+      return { advice: adviceText };
 
     } catch (error) {
       console.error("Error in generatePersonalizedAdviceFlow:", error);
