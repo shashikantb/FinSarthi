@@ -21,11 +21,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DynamicAdviceStepper } from "@/components/dynamic-advice-stepper";
 import { createUser } from "@/services/user-service";
-import { associateSessionWithUser, createAdviceSessionForCurrentUser } from "@/services/advice-service";
-import type { AdviceSession, NewUser } from "@/lib/db/schema";
+import { associateSessionWithUser } from "@/services/advice-service";
+import type { AdviceSession } from "@/lib/db/schema";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 type OnboardingStep = "language" | "signup" | "advice";
 
@@ -79,6 +80,7 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { t, languageCode } = useAppTranslations();
+  const { login } = useAuth();
 
   const methods = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -102,30 +104,42 @@ export default function OnboardingPage() {
         return;
     }
     
+    const signupData = methods.getValues();
+    
     try {
-        const signupData = methods.getValues();
         const newUser = await createUser({
             fullName: signupData.fullName,
             email: signupData.email,
             passwordHash: signupData.password, // This is insecure, for prototype only
         });
 
-        if (newUser) {
-            await associateSessionWithUser(adviceSession.id, newUser.id);
-            toast({ title: "Account Created!", description: "Welcome to FinSarthi!" });
-            router.push("/login");
-        } else {
+        if (!newUser) {
              throw new Error("User creation failed.");
         }
+        
+        await associateSessionWithUser(adviceSession.id, newUser.id);
+        
+        const loginSuccess = await login(signupData.email, signupData.password);
+        
+        if (loginSuccess) {
+            toast({ title: "Account Created!", description: "Welcome to FinSarthi!" });
+            router.push("/dashboard");
+        } else {
+            throw new Error("Automatic login failed. Please log in manually.");
+        }
 
-    } catch(error) {
+    } catch(error: any) {
         console.error("Onboarding completion failed:", error);
         toast({
             title: "An Error Occurred",
-            description: "Could not complete the setup. The email might already be in use.",
+            description: error.message || "Could not complete the setup. The email might already be in use.",
             variant: "destructive"
         });
         setIsLoading(false);
+        // If login fails, send user to login page as a fallback
+        if (error.message.includes("login failed")) {
+            router.push('/login');
+        }
     }
   }
 
