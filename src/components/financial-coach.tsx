@@ -128,10 +128,11 @@ export function FinancialCoach() {
     const userMessage: Message = { role: "user", content: data.query, id: createId() };
     const currentMessages = [...messages, userMessage];
     setMessages(currentMessages);
+    form.reset({ query: "", language: data.language });
 
     try {
-      // We pass the history without the *current* user message.
-      const sanitizedHistory = messages.map(({ role, content }) => ({
+      // The history should include the new user message.
+      const sanitizedHistory = currentMessages.map(({ role, content }) => ({
         role,
         content,
       }));
@@ -150,7 +151,6 @@ export function FinancialCoach() {
       };
       setMessages((prev) => [...prev, modelMessage]);
 
-      form.reset({ query: "", language: data.language });
     } catch (e) {
       setError("Failed to get response. Please try again.");
       console.error(e);
