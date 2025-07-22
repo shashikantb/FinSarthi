@@ -50,14 +50,30 @@ export async function getChatRequestsForCoach(coachId: string) {
 }
 
 /**
+ * Fetches all chat requests initiated by a specific customer.
+ * @param customerId The ID of the customer.
+ * @returns An array of chat requests.
+ */
+export async function getChatRequestsForCustomer(customerId: string) {
+    const requests = await db
+        .select()
+        .from(chatRequests)
+        .where(eq(chatRequests.customerId, customerId))
+        .orderBy(desc(chatRequests.createdAt));
+    return requests;
+}
+
+
+/**
  * Updates the status of a chat request.
  * @param requestId The ID of the chat request to update.
  * @param status The new status ('accepted' or 'declined').
  */
 export async function updateChatRequestStatus(requestId: string, status: 'accepted' | 'declined') {
     await db.update(chatRequests)
-        .set({ status })
+        .set({ status, updatedAt: new Date() })
         .where(eq(chatRequests.id, requestId));
     
     revalidatePath('/coach-dashboard');
+    // No need to revalidate the customer path here as they will be polling.
 }

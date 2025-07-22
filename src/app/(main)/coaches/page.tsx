@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getAvailableCoaches } from "@/services/user-service";
-import { createChatRequest } from "@/services/chat-service";
+import { createChatRequest, getChatRequestsForCustomer, type ChatRequest } from "@/services/chat-service";
 import type { User } from "@/lib/db/schema";
 import {
   Card,
@@ -16,35 +16,112 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Wifi, Loader2, UserX, CheckCircle } from "lucide-react";
+import { Wifi, Loader2, UserX, CheckCircle, MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+
+type RequestStatus = "idle" | "pending" | "accepted" | "declined";
 
 export default function CoachesPage() {
   const [coaches, setCoaches] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestingCoachId, setRequestingCoachId] = useState<string | null>(null);
-  const [requestedCoachIds, setRequestedCoachIds] = useState<Set<string>>(new Set());
+  // Store the status of requests per coach ID
+  const [requestStatuses, setRequestStatuses] = useState<Record<string, RequestStatus>>({});
   const { user } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
+  
+  // Ref to hold the interval ID
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Fetch initial coach list and any existing requests
   useEffect(() => {
-    async function fetchCoaches() {
+    async function fetchInitialData() {
+      if (!user) return;
       setLoading(true);
       try {
-        const availableCoaches = await getAvailableCoaches();
-        // Filter out the current user if they are a coach
+        const [availableCoaches, existingRequests] = await Promise.all([
+          getAvailableCoaches(),
+          getChatRequestsForCustomer(user.id)
+        ]);
+        
         const filteredCoaches = availableCoaches.filter(coach => coach.id !== user?.id);
         setCoaches(filteredCoaches);
+
+        // Set initial status for each coach
+        const initialStatuses: Record<string, RequestStatus> = {};
+        for (const coach of filteredCoaches) {
+            const request = existingRequests.find(r => r.coachId === coach.id && r.status !== 'declined');
+            if (request) {
+                initialStatuses[coach.id] = request.status as RequestStatus;
+            }
+        }
+        setRequestStatuses(initialStatuses);
+
       } catch (error) {
-        console.error("Failed to fetch coaches:", error);
+        console.error("Failed to fetch initial data:", error);
+        toast({ title: "Error", description: "Could not load coaches.", variant: "destructive" });
       }
       setLoading(false);
     }
-    if(user) {
-        fetchCoaches();
+    if (user) {
+      fetchInitialData();
     }
-  }, [user]);
+  }, [user, toast]);
+
+  // Polling mechanism
+  useEffect(() => {
+    const poll = async () => {
+        if (!user || Object.values(requestStatuses).every(s => s !== 'pending')) {
+            // Stop polling if no user or no pending requests
+            if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+            }
+            return;
+        }
+
+        try {
+            const requests = await getChatRequestsForCustomer(user.id);
+            setRequestStatuses(prev => {
+                const newStatuses = { ...prev };
+                let changed = false;
+                for (const req of requests) {
+                    if (newStatuses[req.coachId] !== req.status) {
+                        newStatuses[req.coachId] = req.status as RequestStatus;
+                        changed = true;
+                        if (req.status === 'accepted') {
+                           toast({ title: "Request Accepted!", description: `You can now chat with your coach.` });
+                        } else if (req.status === 'declined') {
+                           toast({ title: "Request Declined", description: `Your chat request was declined.`, variant: "destructive" });
+                        }
+                    }
+                }
+                return changed ? newStatuses : prev;
+            });
+        } catch(e) {
+            console.error("Polling failed", e);
+        }
+    }
+    
+    // Start polling if there are pending requests
+    if (Object.values(requestStatuses).some(s => s === 'pending')) {
+        if (!pollIntervalRef.current) {
+            pollIntervalRef.current = setInterval(poll, 5000); // Poll every 5 seconds
+        }
+    }
+
+    // Cleanup on unmount
+    return () => {
+        if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+        }
+    };
+
+  }, [user, requestStatuses, toast]);
+
 
   const handleRequestChat = async (coachId: string) => {
     if (!user) {
@@ -55,12 +132,26 @@ export default function CoachesPage() {
     try {
         await createChatRequest(user.id, coachId);
         toast({ title: "Success", description: "Chat request sent successfully!" });
-        setRequestedCoachIds(prev => new Set(prev).add(coachId));
+        setRequestStatuses(prev => ({ ...prev, [coachId]: 'pending' }));
     } catch (error) {
         console.error("Failed to send chat request:", error);
         toast({ title: "Error", description: "Failed to send chat request. Please try again.", variant: "destructive" });
     }
     setRequestingCoachId(null);
+  }
+
+  const getButtonState = (coachId: string) => {
+      const status = requestStatuses[coachId];
+      if (status === 'accepted') {
+          return { text: 'Start Chat', icon: <MessageSquare className="mr-2 h-4 w-4" />, disabled: false, onClick: () => router.push('/coach') };
+      }
+      if (status === 'pending') {
+          return { text: 'Request Sent', icon: <CheckCircle className="mr-2 h-4 w-4" />, disabled: true };
+      }
+      if (requestingCoachId === coachId) {
+          return { text: '', icon: <Loader2 className="mr-2 h-4 w-4 animate-spin" />, disabled: true };
+      }
+      return { text: 'Request Chat', icon: null, disabled: false, onClick: () => handleRequestChat(coachId) };
   }
 
   return (
@@ -84,42 +175,41 @@ export default function CoachesPage() {
             </div>
           ) : coaches.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {coaches.map((coach) => (
-                <Card key={coach.id} className="flex flex-col">
-                  <CardHeader className="flex flex-row items-center gap-4">
-                     <Avatar className="h-12 w-12">
-                        <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="profile picture" alt={coach.fullName ?? 'Coach'} />
-                        <AvatarFallback>{coach.fullName?.[0]?.toUpperCase() ?? 'C'}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <CardTitle className="text-lg">{coach.fullName}</CardTitle>
-                        <CardDescription>Financial Coach</CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                     <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline" className="text-green-600 border-green-600">
-                            <Wifi className="mr-2 h-3 w-3" />
-                            Available
-                        </Badge>
-                     </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button 
-                        className="w-full"
-                        onClick={() => handleRequestChat(coach.id)}
-                        disabled={requestingCoachId === coach.id || requestedCoachIds.has(coach.id)}
-                    >
-                        {requestingCoachId === coach.id ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : requestedCoachIds.has(coach.id) ? (
-                           <CheckCircle className="mr-2 h-4 w-4" />
-                        ) : null}
-                        {requestedCoachIds.has(coach.id) ? "Request Sent" : "Request Chat"}
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+              {coaches.map((coach) => {
+                const buttonState = getButtonState(coach.id);
+                return (
+                    <Card key={coach.id} className="flex flex-col">
+                        <CardHeader className="flex flex-row items-center gap-4">
+                            <Avatar className="h-12 w-12">
+                                <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="profile picture" alt={coach.fullName ?? 'Coach'} />
+                                <AvatarFallback>{coach.fullName?.[0]?.toUpperCase() ?? 'C'}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <CardTitle className="text-lg">{coach.fullName}</CardTitle>
+                                <CardDescription>Financial Coach</CardDescription>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="flex-grow">
+                            <div className="flex flex-wrap gap-2">
+                                <Badge variant="outline" className="text-green-600 border-green-600">
+                                    <Wifi className="mr-2 h-3 w-3" />
+                                    Available
+                                </Badge>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button
+                                className="w-full"
+                                onClick={buttonState.onClick}
+                                disabled={buttonState.disabled}
+                            >
+                                {buttonState.icon}
+                                {buttonState.text}
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                );
+            })}
             </div>
           ) : (
             <div className="text-center py-10">
