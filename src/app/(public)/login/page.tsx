@@ -34,7 +34,7 @@ import { roleEnum } from "@/lib/db/schema";
 const loginSchema = z.object({
   email: z.string().email("Invalid email address."),
   password: z.string().min(1, "Password cannot be empty."),
-  role: roleEnum.enum,
+  role: z.enum(roleEnum.enumValues),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
