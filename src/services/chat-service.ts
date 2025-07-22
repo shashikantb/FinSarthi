@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import { chatRequests, chatMessages, type NewChatRequest, users, type User } from "@/lib/db/schema";
-import { and, eq, desc, or, ne } from "drizzle-orm";
+import { and, eq, desc, or, ne, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -109,7 +109,8 @@ export async function sendMessage(chatRequestId: string, senderId: string, conte
     const [newMessage] = await db.insert(chatMessages).values({
         chatRequestId,
         senderId,
-        content
+        content,
+        isRead: false,
     }).returning();
     
     // Revalidate the chat page for both users.
@@ -157,4 +158,52 @@ export async function getActiveChatSession(userId: string): Promise<{ session: t
     }
     
     return { session, partner };
+}
+
+/**
+ * Marks messages in a chat as read for a specific recipient.
+ * @param chatRequestId The ID of the chat request.
+ * @param recipientId The ID of the user for whom messages should be marked as read.
+ */
+export async function markMessagesAsRead(chatRequestId: string, recipientId: string) {
+    await db.update(chatMessages)
+        .set({ isRead: true })
+        .where(and(
+            eq(chatMessages.chatRequestId, chatRequestId),
+            ne(chatMessages.senderId, recipientId), // Only mark messages sent by the other person as read
+            eq(chatMessages.isRead, false)
+        ));
+    
+    revalidatePath('/(main)/layout'); // To update the badge
+}
+
+/**
+ * Gets the count of all unread messages for a user across all their chats.
+ * @param userId The ID of the user.
+ * @returns The total number of unread messages.
+ */
+export async function getUnreadMessageCountForUser(userId: string): Promise<number> {
+    const activeChats = await db.select({ id: chatRequests.id })
+        .from(chatRequests)
+        .where(and(
+            or(eq(chatRequests.customerId, userId), eq(chatRequests.coachId, userId)),
+            eq(chatRequests.status, 'accepted')
+        ));
+    
+    if (activeChats.length === 0) {
+        return 0;
+    }
+
+    const chatIds = activeChats.map(c => c.id);
+
+    const [result] = await db.select({
+        value: count()
+    }).from(chatMessages)
+    .where(and(
+        or(...chatIds.map(id => eq(chatMessages.chatRequestId, id))),
+        ne(chatMessages.senderId, userId),
+        eq(chatMessages.isRead, false)
+    ));
+    
+    return result.value;
 }

@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -30,6 +30,7 @@ import {
   SidebarInset,
   SidebarTrigger,
   useSidebar,
+  SidebarMenuBadge,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +47,7 @@ import { Separator } from "@/components/ui/separator";
 import { Logo } from "@/components/logo";
 import { useAuth } from "@/hooks/use-auth";
 import { useAppTranslations } from "@/hooks/use-app-translations";
+import { getUnreadMessageCountForUser } from "@/services/chat-service";
 
 function AppHeader() {
   const isMobile = useIsMobile();
@@ -100,9 +102,29 @@ function AppHeader() {
 function MainSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useAppTranslations();
   const router = useRouter();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchCount = async () => {
+      try {
+        const count = await getUnreadMessageCountForUser(user.id);
+        setUnreadCount(count);
+      } catch (error) {
+        console.error("Failed to fetch unread message count", error);
+      }
+    };
+    
+    fetchCount();
+    const interval = setInterval(fetchCount, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [user, pathname]); // Re-check when user changes or path changes
+
 
   const handleLogout = () => {
     logout();
@@ -111,7 +133,7 @@ function MainSidebar() {
   
   const menuItems = [
     { href: "/dashboard", label: t.nav.dashboard, icon: LayoutGrid },
-    { href: "/coach", label: t.nav.coach, icon: MessageCircle },
+    { href: "/coach", label: t.nav.coach, icon: MessageCircle, badge: unreadCount > 0 ? String(unreadCount) : undefined },
     { href: "/summarizer", label: t.nav.summarizer, icon: FileText },
     { href: "/translator", label: t.nav.translator, icon: Languages },
     { href: "/advice", label: t.nav.advice, icon: Lightbulb },
@@ -137,6 +159,7 @@ function MainSidebar() {
                 <Link href={item.href}>
                   <item.icon />
                   <span>{item.label}</span>
+                  {item.badge && <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

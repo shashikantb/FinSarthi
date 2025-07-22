@@ -13,6 +13,7 @@ import {
   sendMessage,
   getMessagesForChat,
   updateChatRequestStatus,
+  markMessagesAsRead
 } from "@/services/chat-service";
 import type { ChatMessage, ChatRequest, User } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
@@ -125,11 +126,14 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   useEffect(() => {
     if (isHumanChat) {
+      // Mark messages as read when the chat is opened
+      markMessagesAsRead(chatSession!.id, currentUser.id);
+
       fetchHumanMessages();
       const interval = setInterval(fetchHumanMessages, 5000); // Poll every 5 seconds
       return () => clearInterval(interval);
     }
-  }, [isHumanChat, fetchHumanMessages]);
+  }, [isHumanChat, fetchHumanMessages, chatSession, currentUser.id]);
 
   useEffect(() => {
     const langName = languages[languageCode as keyof typeof languages]?.name;

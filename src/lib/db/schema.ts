@@ -41,6 +41,7 @@ export const chatMessages = pgTable('chat_messages', {
     chatRequestId: text('chat_request_id').notNull().references(() => chatRequests.id, { onDelete: 'cascade' }),
     senderId: text('sender_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
     content: text('content').notNull(),
+    isRead: boolean('is_read').default(false).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

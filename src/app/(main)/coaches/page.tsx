@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useReducer } from "react";
 import { getAvailableCoaches } from "@/services/user-service";
 import { createChatRequest, getChatRequestsForCustomer, type ChatRequest } from "@/services/chat-service";
 import type { User } from "@/lib/db/schema";
@@ -27,16 +27,13 @@ export default function CoachesPage() {
   const [coaches, setCoaches] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestingCoachId, setRequestingCoachId] = useState<string | null>(null);
-  // Store the status of requests per coach ID
   const [requestStatuses, setRequestStatuses] = useState<Record<string, RequestStatus>>({});
   const { user } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   
-  // Ref to hold the interval ID
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch initial coach list and any existing requests
   useEffect(() => {
     async function fetchInitialData() {
       if (!user) return;
@@ -50,7 +47,6 @@ export default function CoachesPage() {
         const filteredCoaches = availableCoaches.filter(coach => coach.id !== user?.id);
         setCoaches(filteredCoaches);
 
-        // Set initial status for each coach
         const initialStatuses: Record<string, RequestStatus> = {};
         for (const coach of filteredCoaches) {
             const request = existingRequests.find(r => r.coachId === coach.id && r.status !== 'declined');
@@ -70,12 +66,29 @@ export default function CoachesPage() {
       fetchInitialData();
     }
   }, [user, toast]);
+  
+  // This separate useEffect handles showing toasts when statuses change.
+  // This prevents the "Cannot update a component while rendering a different component" error.
+  const [previousStatuses, setPreviousStatuses] = useState<Record<string, RequestStatus>>({});
+  useEffect(() => {
+    for (const coachId in requestStatuses) {
+      const currentStatus = requestStatuses[coachId];
+      const previousStatus = previousStatuses[coachId];
+      if (currentStatus !== previousStatus) {
+        if (currentStatus === 'accepted') {
+          toast({ title: "Request Accepted!", description: `You can now chat with your coach.` });
+        } else if (currentStatus === 'declined') {
+          toast({ title: "Request Declined", description: `Your chat request was declined.`, variant: "destructive" });
+        }
+      }
+    }
+    setPreviousStatuses(requestStatuses);
+  }, [requestStatuses, previousStatuses, toast]);
 
-  // Polling mechanism
+
   useEffect(() => {
     const poll = async () => {
         if (!user || Object.values(requestStatuses).every(s => s !== 'pending')) {
-            // Stop polling if no user or no pending requests
             if (pollIntervalRef.current) {
                 clearInterval(pollIntervalRef.current);
                 pollIntervalRef.current = null;
@@ -92,11 +105,6 @@ export default function CoachesPage() {
                     if (newStatuses[req.coachId] !== req.status) {
                         newStatuses[req.coachId] = req.status as RequestStatus;
                         changed = true;
-                        if (req.status === 'accepted') {
-                           toast({ title: "Request Accepted!", description: `You can now chat with your coach.` });
-                        } else if (req.status === 'declined') {
-                           toast({ title: "Request Declined", description: `Your chat request was declined.`, variant: "destructive" });
-                        }
                     }
                 }
                 return changed ? newStatuses : prev;
@@ -106,14 +114,12 @@ export default function CoachesPage() {
         }
     }
     
-    // Start polling if there are pending requests
     if (Object.values(requestStatuses).some(s => s === 'pending')) {
         if (!pollIntervalRef.current) {
-            pollIntervalRef.current = setInterval(poll, 5000); // Poll every 5 seconds
+            pollIntervalRef.current = setInterval(poll, 5000);
         }
     }
 
-    // Cleanup on unmount
     return () => {
         if (pollIntervalRef.current) {
             clearInterval(pollIntervalRef.current);
