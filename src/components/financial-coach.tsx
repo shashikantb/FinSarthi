@@ -127,18 +127,17 @@ export function FinancialCoach() {
     setError('');
   
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
-  
-    // Create the history for the AI *before* updating the state.
-    // This captures the state as it is right now, plus the new user message.
-    const historyForAI = [...messages, userMessage];
+
+    // This is the key change: create the new message list first.
+    const newMessages = [...messages, userMessage];
     
-    // Optimistically update the UI with the user's message.
-    setMessages(historyForAI);
+    // Update the UI immediately with the user's message.
+    setMessages(newMessages);
     form.reset({ query: '', language: data.language });
   
     try {
-      // The history passed to the AI must include the new user message.
-      const sanitizedHistory = historyForAI.map(({ id, ...rest }) => rest);
+      // Pass the complete, correct history to the AI.
+      const sanitizedHistory = newMessages.map(({ id, ...rest }) => rest);
   
       const input: FinancialCoachInput = {
         language: data.language,
@@ -157,8 +156,7 @@ export function FinancialCoach() {
         id: createId(),
       };
       
-      // Append the assistant's message to the state using a functional update
-      // to ensure it builds on the most recent state.
+      // Append the assistant's message to the state using the reliable functional update.
       setMessages(currentMessages => [...currentMessages, modelMessage]);
   
     } catch (e: any) {
