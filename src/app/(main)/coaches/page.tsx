@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { getAvailableCoaches } from "@/services/user-service";
+import { createChatRequest } from "@/services/chat-service";
 import type { User } from "@/lib/db/schema";
 import {
   Card,
@@ -15,11 +16,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Wifi, Loader2, UserX } from "lucide-react";
+import { Wifi, Loader2, UserX, CheckCircle } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CoachesPage() {
   const [coaches, setCoaches] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [requestingCoachId, setRequestingCoachId] = useState<string | null>(null);
+  const [requestedCoachIds, setRequestedCoachIds] = useState<Set<string>>(new Set());
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchCoaches() {
@@ -34,6 +41,23 @@ export default function CoachesPage() {
     }
     fetchCoaches();
   }, []);
+
+  const handleRequestChat = async (coachId: string) => {
+    if (!user) {
+        toast({ title: "Please login to request a chat.", variant: "destructive"});
+        return;
+    }
+    setRequestingCoachId(coachId);
+    try {
+        await createChatRequest(user.id, coachId);
+        toast({ title: "Success", description: "Chat request sent successfully!" });
+        setRequestedCoachIds(prev => new Set(prev).add(coachId));
+    } catch (error) {
+        console.error("Failed to send chat request:", error);
+        toast({ title: "Error", description: "Failed to send chat request. Please try again.", variant: "destructive" });
+    }
+    setRequestingCoachId(null);
+  }
 
   return (
     <div className="space-y-6">
@@ -75,7 +99,18 @@ export default function CoachesPage() {
                      </Badge>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full">Request Chat</Button>
+                    <Button 
+                        className="w-full"
+                        onClick={() => handleRequestChat(coach.id)}
+                        disabled={requestingCoachId === coach.id || requestedCoachIds.has(coach.id)}
+                    >
+                        {requestingCoachId === coach.id ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : requestedCoachIds.has(coach.id) ? (
+                           <CheckCircle className="mr-2 h-4 w-4" />
+                        ) : null}
+                        {requestedCoachIds.has(coach.id) ? "Request Sent" : "Request Chat"}
+                    </Button>
                   </CardFooter>
                 </Card>
               ))}

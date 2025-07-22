@@ -3,6 +3,7 @@ import { pgTable, text, timestamp, pgEnum, jsonb, boolean } from 'drizzle-orm/pg
 import { createId } from '@paralleldrive/cuid2';
 
 export const roleEnum = pgEnum('role', ['customer', 'coach']);
+export const chatRequestStatusEnum = pgEnum('chat_request_status', ['pending', 'accepted', 'declined']);
 
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => createId()),
@@ -26,6 +27,16 @@ export const adviceSessions = pgTable('advice_sessions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export const chatRequests = pgTable('chat_requests', {
+    id: text('id').primaryKey().$defaultFn(() => createId()),
+    customerId: text('customer_id').notNull().references(() => users.id),
+    coachId: text('coach_id').notNull().references(() => users.id),
+    status: chatRequestStatusEnum('status').default('pending').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+});
+
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
@@ -38,3 +49,6 @@ export type AdviceSession = Omit<typeof adviceSessions.$inferSelect, 'formData'>
 };
 
 export type NewAdviceSession = typeof adviceSessions.$inferInsert;
+
+export type ChatRequest = typeof chatRequests.$inferSelect;
+export type NewChatRequest = typeof chatRequests.$inferInsert;
