@@ -116,40 +116,46 @@ export function FinancialCoach() {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
-    const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
-    setError('');
-    form.reset({ query: '', language: data.language });
-  
-    try {
-      const input: FinancialCoachInput = {
-        language: data.language,
-        history: historyForAI,
-      };
-      
-      const result = await financialCoach(input);
-  
-      if (!result || !result.response) {
-        throw new Error("AI returned an invalid response.");
-      }
-      
-      const modelMessage: Message = {
-        role: 'assistant',
-        content: result.response,
-        id: createId(),
-      };
-      
-      setMessages(currentMessages => [...currentMessages, modelMessage]);
-  
-    } catch (e: any) {
-      console.error("An error occurred during the chat flow:", e);
-      setError(`Failed to get response. ${e.message || ''}`.trim());
-      setMessages(currentMessages => currentMessages.filter(m => m.id !== userMessage.id)); 
-    } finally {
-        setIsLoading(false);
-    }
+    setMessages((prev) => {
+      const updatedMessages = [...prev, userMessage];
+      const historyForAI = updatedMessages.map(({ role, content }) => ({ role, content }));
+
+      (async () => {
+        setIsLoading(true);
+        setError('');
+        form.reset({ query: '', language: data.language });
+
+        try {
+          const input: FinancialCoachInput = {
+            language: data.language,
+            history: historyForAI,
+          };
+          
+          const result = await financialCoach(input);
+          
+          if (!result || !result.response) throw new Error("AI returned an invalid response.");
+
+          const modelMessage: Message = {
+            role: 'assistant',
+            content: result.response,
+            id: createId(),
+          };
+
+          setMessages(current => [...current, modelMessage]);
+
+        } catch (e: any) {
+          console.error("Chat error:", e);
+          setError(`Failed to get response. ${e.message}`);
+          // Revert the optimistic UI update on failure
+          setMessages(current => current.filter(m => m.id !== userMessage.id));
+        } finally {
+          setIsLoading(false);
+        }
+      })();
+
+      return updatedMessages;
+    });
   };
 
   return (
