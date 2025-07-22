@@ -234,7 +234,7 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
                   </Select>
                 </FormItem>
               ) : (
-                 questions[step - 1] && <QuestionField question={questions[step - 1]} lang={language} />
+                 questions[step - 1] && <QuestionField key={questions[step - 1].key} question={questions[step - 1]} lang={language} />
               )}
             </div>
 

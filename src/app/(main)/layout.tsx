@@ -1,9 +1,9 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   FileText,
   LayoutGrid,
@@ -14,6 +14,8 @@ import {
   PanelLeft,
   MessageCircle,
   Settings,
+  Loader2,
+  LogOut,
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,10 +43,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Logo } from "@/components/logo";
+import { useAuth } from "@/hooks/use-auth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function AppHeader() {
   const isMobile = useIsMobile();
-  
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
   return (
     <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
       <div className="flex items-center gap-2">
@@ -61,8 +72,8 @@ function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src="https://placehold.co/100x100" alt="User" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarImage src="https://placehold.co/100x100" alt={user?.fullName ?? 'User'} />
+                <AvatarFallback>{user?.fullName?.[0]?.toUpperCase() ?? 'U'}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
@@ -73,7 +84,10 @@ function AppHeader() {
             <DropdownMenuItem asChild><Link href="/settings">Settings</Link></DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild><Link href="/">Logout</Link></DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -84,6 +98,13 @@ function AppHeader() {
 function MainSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
   
   const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
@@ -91,7 +112,6 @@ function MainSidebar() {
     { href: "/summarizer", label: "News Summarizer", icon: FileText },
     { href: "/translator", label: "Term Translator", icon: Languages },
     { href: "/advice", label: "Personalized Advice", icon: Lightbulb },
-    { href: "/settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -119,33 +139,68 @@ function MainSidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter className="group-data-[collapsible=icon]:hidden">
+      <SidebarFooter>
         <Separator className="mb-2"/>
-        <div className="p-2 flex items-center gap-2">
-            <Avatar>
-                <AvatarImage src="https://placehold.co/100x100" alt="User" />
-                <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-                <span className="text-sm font-semibold">User</span>
-                <span className="text-xs text-muted-foreground">user@email.com</span>
-            </div>
-        </div>
+        <SidebarMenu>
+            <SidebarMenuItem>
+                 <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith("/settings")}
+                    tooltip={{ children: "Settings", hidden: state === 'expanded' }}
+                >
+                    <Link href="/settings">
+                        <Settings />
+                        <span>Settings</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+                 <SidebarMenuButton
+                    onClick={handleLogout}
+                    tooltip={{ children: "Logout", hidden: state === 'expanded' }}
+                >
+                    <LogOut />
+                    <span>Logout</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );
 }
 
+function ProtectedLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <SidebarProvider>
+            <div className="flex min-h-screen w-full bg-background">
+                <MainSidebar />
+                <div className="flex flex-1 flex-col sm:gap-4 sm:py-4 md:pl-[var(--sidebar-width-icon)] group-data-[state=expanded]/sidebar-wrapper:md:pl-[var(--sidebar-width)] transition-[padding-left] duration-200">
+                    <AppHeader/>
+                    <main className="flex-1 p-4 sm:px-6 sm:py-0">{children}</main>
+                </div>
+            </div>
+        </SidebarProvider>
+    );
+}
+
+
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <MainSidebar />
-        <div className="flex flex-1 flex-col sm:gap-4 sm:py-4 md:pl-[var(--sidebar-width-icon)] group-data-[state=expanded]/sidebar-wrapper:md:pl-[var(--sidebar-width)] transition-[padding-left] duration-200">
-           <AppHeader/>
-           <main className="flex-1 p-4 sm:px-6 sm:py-0">{children}</main>
-        </div>
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    </SidebarProvider>
-  );
+    );
+  }
+
+  return <ProtectedLayout>{children}</ProtectedLayout>;
 }
