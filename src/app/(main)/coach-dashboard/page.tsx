@@ -14,16 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-
-
-async function updateUserAvailability(userId: string, isAvailable: boolean) {
-    "use server";
-    await db.update(users).set({ isAvailable }).where(eq(users.id, userId));
-    // In a real app, you'd revalidate paths here to update other users' views.
-}
+import { updateUserAvailability } from "@/services/user-service";
 
 
 export default function CoachDashboardPage() {
@@ -49,7 +40,13 @@ export default function CoachDashboardPage() {
         if (!user) return;
         setIsUpdating(true);
         setIsAvailable(checked);
-        await updateUserAvailability(user.id, checked);
+        try {
+            await updateUserAvailability(user.id, checked);
+        } catch (error) {
+            console.error("Failed to update availability:", error);
+            // Optionally, revert the switch and show a toast message
+            setIsAvailable(!checked);
+        }
         setIsUpdating(false);
     }
 
@@ -94,4 +91,3 @@ export default function CoachDashboardPage() {
         </div>
     )
 }
-

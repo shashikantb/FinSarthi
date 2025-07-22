@@ -4,6 +4,7 @@
 import { db } from "@/lib/db";
 import { users, type NewUser } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 /**
  * Creates a new user in the database.
@@ -67,4 +68,15 @@ export async function getAvailableCoaches() {
         )
         .orderBy(users.fullName);
     return availableCoaches;
+}
+
+/**
+ * Updates the availability status of a user (typically a coach).
+ * @param userId The ID of the user to update.
+ * @param isAvailable The new availability status.
+ */
+export async function updateUserAvailability(userId: string, isAvailable: boolean) {
+    await db.update(users).set({ isAvailable }).where(eq(users.id, userId));
+    // This ensures that anyone viewing the list of coaches will see the updated status.
+    revalidatePath('/coaches');
 }
