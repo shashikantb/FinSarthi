@@ -3,7 +3,7 @@ import { pgTable, text, timestamp, pgEnum, jsonb, boolean } from 'drizzle-orm/pg
 import { createId } from '@paralleldrive/cuid2';
 
 export const roleEnum = pgEnum('role', ['customer', 'coach']);
-export const chatRequestStatusEnum = pgEnum('chat_request_status', ['pending', 'accepted', 'declined']);
+export const chatRequestStatusEnum = pgEnum('chat_request_status', ['pending', 'accepted', 'declined', 'closed']);
 
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => createId()),
@@ -29,11 +29,19 @@ export const adviceSessions = pgTable('advice_sessions', {
 
 export const chatRequests = pgTable('chat_requests', {
     id: text('id').primaryKey().$defaultFn(() => createId()),
-    customerId: text('customer_id').notNull().references(() => users.id),
-    coachId: text('coach_id').notNull().references(() => users.id),
+    customerId: text('customer_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    coachId: text('coach_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
     status: chatRequestStatusEnum('status').default('pending').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+});
+
+export const chatMessages = pgTable('chat_messages', {
+    id: text('id').primaryKey().$defaultFn(() => createId()),
+    chatRequestId: text('chat_request_id').notNull().references(() => chatRequests.id, { onDelete: 'cascade' }),
+    senderId: text('sender_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 
@@ -52,3 +60,6 @@ export type NewAdviceSession = typeof adviceSessions.$inferInsert;
 
 export type ChatRequest = typeof chatRequests.$inferSelect;
 export type NewChatRequest = typeof chatRequests.$inferInsert;
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type NewChatMessage = typeof chatMessages.$inferInsert;

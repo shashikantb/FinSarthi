@@ -2,8 +2,8 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { chatRequests, type NewChatRequest, users } from "@/lib/db/schema";
-import { and, eq, desc } from "drizzle-orm";
+import { chatRequests, chatMessages, type NewChatRequest, users, type User } from "@/lib/db/schema";
+import { and, eq, desc, or, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -13,6 +13,21 @@ import { revalidatePath } from "next/cache";
  * @returns The newly created chat request object.
  */
 export async function createChatRequest(customerId: string, coachId: string) {
+  // Check if an active request already exists
+  const existingRequest = await db.query.chatRequests.findFirst({
+    where: and(
+      eq(chatRequests.customerId, customerId),
+      eq(chatRequests.coachId, coachId),
+      ne(chatRequests.status, 'declined'),
+      ne(chatRequests.status, 'closed')
+    ),
+  });
+
+  if (existingRequest) {
+    console.log("An active chat request already exists for this pair.");
+    return existingRequest;
+  }
+
   const newRequest: NewChatRequest = {
     customerId,
     coachId,
@@ -69,11 +84,77 @@ export async function getChatRequestsForCustomer(customerId: string) {
  * @param requestId The ID of the chat request to update.
  * @param status The new status ('accepted' or 'declined').
  */
-export async function updateChatRequestStatus(requestId: string, status: 'accepted' | 'declined') {
-    await db.update(chatRequests)
+export async function updateChatRequestStatus(requestId: string, status: 'accepted' | 'declined' | 'closed') {
+    const [updatedRequest] = await db.update(chatRequests)
         .set({ status, updatedAt: new Date() })
-        .where(eq(chatRequests.id, requestId));
+        .where(eq(chatRequests.id, requestId))
+        .returning();
     
     revalidatePath('/coach-dashboard');
-    // No need to revalidate the customer path here as they will be polling.
+    revalidatePath('/coaches');
+    revalidatePath('/coach');
+
+    return updatedRequest;
+}
+
+
+/**
+ * Sends a message from one user to another within a chat request context.
+ * @param chatRequestId The ID of the chat request.
+ * @param senderId The ID of the user sending the message.
+ * @param content The text content of the message.
+ * @returns The newly created message object.
+ */
+export async function sendMessage(chatRequestId: string, senderId: string, content: string) {
+    const [newMessage] = await db.insert(chatMessages).values({
+        chatRequestId,
+        senderId,
+        content
+    }).returning();
+    
+    // Revalidate the chat page for both users.
+    revalidatePath('/coach');
+
+    return newMessage;
+}
+
+/**
+ * Fetches all messages for a given chat request.
+ * @param chatRequestId The ID of the chat request.
+ * @returns An array of message objects, ordered by creation date.
+ */
+export async function getMessagesForChat(chatRequestId: string) {
+    return await db.query.chatMessages.findMany({
+        where: eq(chatMessages.chatRequestId, chatRequestId),
+        orderBy: desc(chatMessages.createdAt)
+    });
+}
+
+/**
+ * Finds the currently active chat session for a given user (customer or coach).
+ * An active session is one that is 'accepted'.
+ * @param userId The ID of the user.
+ * @returns The chat request and the chat partner, or null if no active chat is found.
+ */
+export async function getActiveChatSession(userId: string): Promise<{ session: typeof chatRequests.$inferSelect, partner: User } | null> {
+    const session = await db.query.chatRequests.findFirst({
+        where: and(
+            or(eq(chatRequests.customerId, userId), eq(chatRequests.coachId, userId)),
+            eq(chatRequests.status, 'accepted')
+        ),
+        orderBy: desc(chatRequests.updatedAt)
+    });
+
+    if (!session) {
+        return null;
+    }
+
+    const partnerId = session.coachId === userId ? session.customerId : session.coachId;
+    const partner = await db.query.users.findFirst({ where: eq(users.id, partnerId) });
+
+    if (!partner) {
+        return null;
+    }
+    
+    return { session, partner };
 }

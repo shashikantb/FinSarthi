@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,6 +9,12 @@ import {
   financialCoach,
   type FinancialCoachInput,
 } from "@/ai/flows/financial-coach";
+import {
+  sendMessage,
+  getMessagesForChat,
+  updateChatRequestStatus,
+} from "@/services/chat-service";
+import type { ChatMessage, ChatRequest, User } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,14 +39,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Send, Bot, User, Volume2, Play } from "lucide-react";
+import { Loader2, Send, Bot, User as UserIcon, Volume2, Play, LogOut } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { languages, langToLocale } from "@/lib/translations";
 import { createId } from "@paralleldrive/cuid2";
 import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useToast } from "./ui/use-toast";
 
 type Message = {
   id: string;
@@ -53,6 +61,12 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+interface FinancialCoachProps {
+  currentUser: User;
+  chatSession?: ChatRequest;
+  chatPartner?: User;
+}
 
 
 function AudioPlayer({ message, language }: { message: Message, language: string }) {
@@ -79,12 +93,14 @@ function AudioPlayer({ message, language }: { message: Message, language: string
   );
 }
 
-export function FinancialCoach() {
+export function FinancialCoach({ currentUser, chatSession, chatPartner }: FinancialCoachProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { t, languageCode } = useAppTranslations();
+  const { toast } = useToast();
+  const isHumanChat = !!(chatSession && chatPartner);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -96,8 +112,26 @@ export function FinancialCoach() {
 
   const language = form.watch("language");
 
+  const fetchHumanMessages = useCallback(async () => {
+    if (!chatSession) return;
+    const dbMessages = await getMessagesForChat(chatSession.id);
+    const formattedMessages = dbMessages.map((msg: ChatMessage) => ({
+      id: msg.id,
+      role: msg.senderId === currentUser.id ? 'user' : 'assistant',
+      content: msg.content
+    })).reverse(); // Reverse to show oldest first
+    setMessages(formattedMessages);
+  }, [chatSession, currentUser.id]);
+
   useEffect(() => {
-    // Sync the form's language with the global language from the hook
+    if (isHumanChat) {
+      fetchHumanMessages();
+      const interval = setInterval(fetchHumanMessages, 5000); // Poll every 5 seconds
+      return () => clearInterval(interval);
+    }
+  }, [isHumanChat, fetchHumanMessages]);
+
+  useEffect(() => {
     const langName = languages[languageCode as keyof typeof languages]?.name;
     if (langName) {
       form.setValue("language", langName as "English" | "Hindi" | "Marathi");
@@ -113,35 +147,42 @@ export function FinancialCoach() {
     }
   }, [messages]);
 
+  const handleCloseChat = async () => {
+    if (!chatSession) return;
+    await updateChatRequestStatus(chatSession.id, 'closed');
+    toast({ title: "Chat Closed", description: "The chat session has been ended."});
+    window.location.reload(); // Force reload to reflect the change
+  }
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
-    const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
-
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     setError('');
     form.reset({ query: '', language: data.language });
   
     try {
-      const input: FinancialCoachInput = {
-        language: data.language,
-        history: historyForAI,
-      };
-      
-      const result = await financialCoach(input);
-  
-      if (!result || !result.response) {
-        throw new Error("AI returned an invalid response.");
+      if (isHumanChat) {
+        // Human-to-human chat logic
+        await sendMessage(chatSession.id, currentUser.id, data.query);
+        // Optimistically show message, polling will confirm
+      } else {
+        // AI chat logic
+        const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
+        const input: FinancialCoachInput = {
+          language: data.language,
+          history: historyForAI,
+        };
+        const result = await financialCoach(input);
+        if (!result || !result.response) throw new Error("AI returned an invalid response.");
+        
+        const modelMessage: Message = {
+          role: 'assistant',
+          content: result.response,
+          id: createId(),
+        };
+        setMessages(currentMessages => [...currentMessages, modelMessage]);
       }
-      
-      const modelMessage: Message = {
-        role: 'assistant',
-        content: result.response,
-        id: createId(),
-      };
-      
-      setMessages(currentMessages => [...currentMessages, modelMessage]);
-  
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
       setError(`Failed to get response. ${e.message || ''}`.trim());
@@ -151,13 +192,22 @@ export function FinancialCoach() {
     }
   };
 
+  const cardTitle = isHumanChat ? `Chat with ${chatPartner.fullName}` : t.coach.chat_title;
+  const cardDescription = isHumanChat ? `You are now chatting directly with a user.` : t.coach.chat_description;
+
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>{t.coach.chat_title}</CardTitle>
-        <CardDescription>
-          {t.coach.chat_description}
-        </CardDescription>
+      <CardHeader className="flex flex-row justify-between items-center">
+        <div>
+            <CardTitle>{cardTitle}</CardTitle>
+            <CardDescription>{cardDescription}</CardDescription>
+        </div>
+        {isHumanChat && currentUser.role === 'coach' && (
+            <Button variant="outline" size="sm" onClick={handleCloseChat}>
+                <LogOut className="mr-2 h-4 w-4"/>
+                Close Chat
+            </Button>
+        )}
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[400px] w-full pr-4" ref={scrollAreaRef}>
@@ -172,8 +222,9 @@ export function FinancialCoach() {
               >
                 {message.role === "assistant" && (
                   <Avatar className="h-8 w-8">
+                     <AvatarImage src={isHumanChat ? `https://placehold.co/100x100.png` : undefined} data-ai-hint="profile picture" alt={chatPartner?.fullName ?? 'Bot'} />
                     <AvatarFallback>
-                      <Bot className="h-5 w-5" />
+                      {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
                     </AvatarFallback>
                   </Avatar>
                 )}
@@ -187,13 +238,14 @@ export function FinancialCoach() {
                 >
                   <div className="flex items-center gap-2">
                     <p className="whitespace-pre-wrap">{message.content}</p>
-                    {message.role === "assistant" && <AudioPlayer message={message} language={language} />}
+                    {message.role === "assistant" && !isHumanChat && <AudioPlayer message={message} language={language} />}
                   </div>
                 </div>
                 {message.role === "user" && (
                   <Avatar className="h-8 w-8">
+                    <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="profile picture" alt={currentUser.fullName ?? 'User'} />
                     <AvatarFallback>
-                      <User className="h-5 w-5" />
+                      <UserIcon className="h-5 w-5" />
                     </AvatarFallback>
                   </Avatar>
                 )}
@@ -203,7 +255,7 @@ export function FinancialCoach() {
               <div className="flex items-start gap-3 justify-start">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback>
-                    <Bot className="h-5 w-5" />
+                     {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
                   </AvatarFallback>
                 </Avatar>
                 <div className="max-w-xs rounded-lg p-3 text-sm md:max-w-md bg-muted">
@@ -221,7 +273,7 @@ export function FinancialCoach() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex w-full items-start gap-4"
           >
-             <FormField
+             {!isHumanChat && <FormField
               control={form.control}
               name="language"
               render={({ field }) => (
@@ -246,7 +298,7 @@ export function FinancialCoach() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            />}
             <FormField
               control={form.control}
               name="query"
