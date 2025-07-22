@@ -207,7 +207,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }
   
   // Redirect coach to their specific dashboard
-  if (user && user.role === 'coach' && !window.location.pathname.startsWith('/coach-dashboard')) {
+  if (user && user.role === 'coach' && typeof window !== 'undefined' && !window.location.pathname.startsWith('/coach-dashboard')) {
       router.replace('/coach-dashboard');
       return (
           <div className="flex min-h-screen w-full items-center justify-center bg-background">
