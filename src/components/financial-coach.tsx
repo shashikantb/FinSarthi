@@ -127,16 +127,16 @@ export function FinancialCoach() {
     setError('');
 
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
-    console.log(`ECHO: User typed this message in chat: "${userMessage.content}"`);
+    
+    // Use a functional update to guarantee we're building on the latest state.
+    setMessages(currentMessages => [...currentMessages, userMessage]);
     
     const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
 
     form.reset({ query: '', language: data.language });
 
     try {
       const sanitizedHistory = newMessages.map(({ id, ...rest }) => rest);
-      console.log('ECHO: Sending this full message history to the AI:', sanitizedHistory);
 
       const input: FinancialCoachInput = {
         language: data.language,
@@ -144,7 +144,6 @@ export function FinancialCoach() {
       };
       
       const result = await financialCoach(input);
-      console.log('ECHO: Received this reply object from the AI:', result);
 
       if (!result || !result.response) {
         throw new Error("AI returned an invalid response.");
@@ -156,10 +155,11 @@ export function FinancialCoach() {
         id: createId(),
       };
       
+      // Use a functional update again for the assistant's message.
       setMessages((currentMessages) => [...currentMessages, modelMessage]);
 
     } catch (e: any) {
-      console.error("ECHO: An error occurred during the chat flow:", e);
+      console.error("An error occurred during the chat flow:", e);
       setError(`Failed to get response. ${e.message || ''}`.trim());
       // Revert the optimistic UI update on failure
       setMessages((prev) => prev.filter(m => m.id !== userMessage.id)); 
