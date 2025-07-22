@@ -83,9 +83,9 @@ export default function AdvicePage() {
                               <span className="text-sm text-muted-foreground">{new Date(record.createdAt).toLocaleDateString()}</span>
                           </div>
                       </AccordionTrigger>
-                      <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body pt-4">
+                      <AccordionContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body pt-4">
                         <p>{record.generatedAdvice}</p>
-                      </CardContent>
+                      </AccordionContent>
                     </AccordionItem>
                   );
                 })}
