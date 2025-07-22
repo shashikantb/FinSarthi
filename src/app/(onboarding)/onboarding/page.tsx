@@ -27,20 +27,19 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { roleEnum } from "@/lib/db/schema";
 
 type OnboardingStep = "language" | "signup" | "advice";
 
+// Schema for this flow only includes customer fields.
 const signupSchema = z.object({
   fullName: z.string().min(1, "Full name is required."),
   email: z.string().email("Invalid email address."),
   password: z.string().min(6, "Password must be at least 6 characters."),
-  role: roleEnum.enum,
 });
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 function SignupStep({ onNext }: { onNext: () => void }) {
-  const { formState: { isValid }, register, formState: { errors }, setValue } = useFormContext<SignupFormValues>();
+  const { formState: { isValid }, register, formState: { errors } } = useFormContext<SignupFormValues>();
   const { t } = useAppTranslations();
   
   return (
@@ -50,19 +49,6 @@ function SignupStep({ onNext }: { onNext: () => void }) {
         <CardDescription>{t.onboarding.signup_desc}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-         <div className="grid gap-2">
-            <Label htmlFor="role">I am a...</Label>
-            <Select onValueChange={(value) => setValue('role', value as 'customer' | 'coach', { shouldValidate: true })} defaultValue="customer">
-              <SelectTrigger id="role">
-                <SelectValue placeholder="Select a role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="coach">Coach</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.role && <p className="text-xs text-destructive">{errors.role?.message}</p>}
-        </div>
         <div className="grid gap-2">
             <Label htmlFor="full-name">{t.onboarding.full_name}</Label>
             <Input id="full-name" placeholder="Max Robinson" {...register("fullName")} />
@@ -102,9 +88,6 @@ export default function OnboardingPage() {
   const methods = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     mode: 'onChange',
-    defaultValues: {
-        role: 'customer',
-    }
   });
 
   const handleLanguageContinue = () => {
@@ -136,7 +119,7 @@ export default function OnboardingPage() {
             fullName: signupData.fullName,
             email: signupData.email,
             passwordHash: signupData.password, // This is insecure, for prototype only
-            role: signupData.role,
+            role: 'customer', // Onboarding is always for customers
         });
 
         if (!newUser) {
@@ -145,15 +128,11 @@ export default function OnboardingPage() {
         
         await associateSessionWithUser(adviceSession.id, newUser.id);
         
-        const loggedInUser = await login(signupData.email, signupData.password);
+        const loggedInUser = await login(signupData.email, signupData.password, 'customer');
         
         if (loggedInUser) {
             toast({ title: "Account Created!", description: "Welcome to FinSarthi!" });
-            if (loggedInUser.role === 'coach') {
-                router.push("/coach-dashboard");
-            } else {
-                router.push("/dashboard");
-            }
+            router.push("/dashboard");
         } else {
             throw new Error("Automatic login failed. Please log in manually.");
         }

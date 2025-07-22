@@ -37,10 +37,10 @@ export function useAuth() {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password_hash: string): Promise<User | null> => {
+  const login = async (email: string, password_hash: string, role: 'customer' | 'coach'): Promise<User | null> => {
     setIsLoading(true);
     try {
-      const loggedInUser = await getUserByCredentials(email, password_hash);
+      const loggedInUser = await getUserByCredentials(email, password_hash, role);
       if (loggedInUser) {
         localStorage.setItem(SESSION_KEY, loggedInUser.id);
         setUser(loggedInUser);

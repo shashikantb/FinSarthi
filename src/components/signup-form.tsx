@@ -21,11 +21,20 @@ import { associateSessionWithUser } from "@/services/advice-service";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { roleEnum } from "@/lib/db/schema";
 
 const signupSchema = z.object({
   fullName: z.string().min(1, "Full name is required."),
   email: z.string().email("Invalid email address."),
   password: z.string().min(6, "Password must be at least 6 characters."),
+  role: roleEnum.enum,
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -38,6 +47,9 @@ export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
+    defaultValues: {
+      role: 'customer',
+    }
   });
 
   const onSubmit: SubmitHandler<SignupFormValues> = async (data) => {
@@ -47,6 +59,7 @@ export function SignupForm() {
         fullName: data.fullName,
         email: data.email,
         passwordHash: data.password, // This is insecure, for prototype only
+        role: data.role,
       });
       
       const sessionId = searchParams.get('sessionId');
@@ -83,6 +96,21 @@ export function SignupForm() {
       <CardContent>
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)} className="grid gap-4">
+            <div className="grid gap-2">
+                <Label htmlFor="role">I am a...</Label>
+                <Select onValueChange={(value) => methods.setValue('role', value as 'customer' | 'coach')} defaultValue="customer">
+                  <SelectTrigger id="role">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="customer">Customer</SelectItem>
+                    <SelectItem value="coach">Coach</SelectItem>
+                  </SelectContent>
+                </Select>
+                 {methods.formState.errors.role && (
+                  <p className="text-xs text-destructive">{methods.formState.errors.role.message}</p>
+                )}
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="full-name">Full name</Label>
               <Input

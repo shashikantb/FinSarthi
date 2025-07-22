@@ -56,7 +56,7 @@ export default function LoginPage() {
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
     setIsLoading(true);
-    const loggedInUser = await login(data.email, data.password);
+    const loggedInUser = await login(data.email, data.password, data.role);
     if (loggedInUser) {
         if (loggedInUser.role === 'coach') {
             router.push("/coach-dashboard");

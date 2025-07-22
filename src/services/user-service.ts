@@ -31,15 +31,17 @@ export async function getUserById(id: string) {
  * A real application should use a secure authentication provider or a robust password hashing and comparison strategy.
  * @param email The user's email.
  * @param passwordHash The user's plain text password (for this prototype).
+ * @param role The user's role.
  * @returns The user object or null if not found or if the password doesn't match.
  */
-export async function getUserByCredentials(email: string, passwordHash: string) {
+export async function getUserByCredentials(email: string, passwordHash: string, role: 'customer' | 'coach') {
   const [user] = await db.select()
     .from(users)
     .where(
       and(
         eq(users.email, email),
-        eq(users.passwordHash, passwordHash) // Direct password comparison (INSECURE)
+        eq(users.passwordHash, passwordHash), // Direct password comparison (INSECURE)
+        eq(users.role, role)
       )
     )
     .limit(1);
