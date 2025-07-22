@@ -132,7 +132,7 @@ export default function LoginPage() {
           </form>
           <div className="mt-4 text-center text-sm">
             {t.login_page.no_account}{" "}
-            <Link href="/onboarding" className="underline">
+            <Link href="/signup" className="underline">
               {t.login_page.signup}
             </Link>
           </div>
