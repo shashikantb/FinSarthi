@@ -1,4 +1,3 @@
-
 // src/components/financial-coach.tsx
 "use client";
 
@@ -127,6 +126,8 @@ export function FinancialCoach() {
     setError("");
 
     const userMessage: Message = { role: "user", content: data.query, id: createId() };
+    console.log("[Frontend] User message created:", userMessage);
+    
     const currentMessages = [...messages, userMessage];
     setMessages(currentMessages);
     form.reset({ query: "", language: data.language });
@@ -141,8 +142,12 @@ export function FinancialCoach() {
         language: data.language,
         history: sanitizedHistory, 
       };
+
+      console.log("[Frontend] Sending to AI flow:", JSON.stringify(input, null, 2));
       
       const result = await financialCoach(input);
+      console.log("[Frontend] Received from AI flow:", result);
+      
       const modelMessage: Message = {
         role: "assistant",
         content: result.response,
@@ -153,8 +158,7 @@ export function FinancialCoach() {
     } catch (e) {
       setError("Failed to get response. Please try again.");
       console.error(e);
-      // remove the user message if the call fails
-      setMessages((prev) => prev.slice(0, -1));
+      setMessages((prev) => prev.slice(0, -1)); // remove the user message if the call fails
     }
     setIsLoading(false);
   };

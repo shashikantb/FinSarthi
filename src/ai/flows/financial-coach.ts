@@ -48,6 +48,7 @@ const financialCoachFlow = ai.defineFlow(
     outputSchema: FinancialCoachOutputSchema,
   },
   async (input) => {
+    console.log("[Backend] Received input in financialCoachFlow:", JSON.stringify(input, null, 2));
     try {
         // Proactively fetch all product types to have them ready for the prompt.
         const [savings, investments, loans] = await Promise.all([
@@ -78,6 +79,9 @@ Be friendly, empathetic, and encouraging. DO NOT make up product names; only use
             ...input.history,
         ];
 
+        console.log("[Backend] Sending payload to Groq API:", JSON.stringify({ model: 'llama3-8b-8192', messages }, null, 2));
+
+
         const completion = await groq.chat.completions.create({
             messages,
             model: 'llama3-8b-8192',
@@ -86,6 +90,8 @@ Be friendly, empathetic, and encouraging. DO NOT make up product names; only use
         });
 
         const responseText = completion.choices[0].message.content;
+        console.log("[Backend] Received response from Groq API:", responseText);
+
         if (!responseText) {
             return { response: "I'm sorry, I couldn't generate a response. Please try again." };
         }
