@@ -1,4 +1,3 @@
-
 // src/components/financial-coach.tsx
 "use client";
 
@@ -128,15 +127,15 @@ export function FinancialCoach() {
 
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
     
-    // Use a functional update to guarantee we're building on the latest state.
+    // Add user message to the state using a functional update to ensure we have the latest state.
     setMessages(currentMessages => [...currentMessages, userMessage]);
-    
-    const newMessages = [...messages, userMessage];
-
     form.reset({ query: '', language: data.language });
 
     try {
-      const sanitizedHistory = newMessages.map(({ id, ...rest }) => rest);
+      // The history passed to the AI must include the new user message.
+      // We create it by combining the *previous* state with the new user message.
+      const historyForAI = [...messages, userMessage];
+      const sanitizedHistory = historyForAI.map(({ id, ...rest }) => rest);
 
       const input: FinancialCoachInput = {
         language: data.language,
@@ -155,14 +154,14 @@ export function FinancialCoach() {
         id: createId(),
       };
       
-      // Use a functional update again for the assistant's message.
-      setMessages((currentMessages) => [...currentMessages, modelMessage]);
+      // Add the assistant's message using another functional update.
+      setMessages(currentMessages => [...currentMessages, modelMessage]);
 
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
       setError(`Failed to get response. ${e.message || ''}`.trim());
-      // Revert the optimistic UI update on failure
-      setMessages((prev) => prev.filter(m => m.id !== userMessage.id)); 
+      // Revert the optimistic UI update on failure by removing the user message we added.
+      setMessages(currentMessages => currentMessages.filter(m => m.id !== userMessage.id)); 
     }
     setIsLoading(false);
   };
