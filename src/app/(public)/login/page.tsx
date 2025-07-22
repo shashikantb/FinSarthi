@@ -60,7 +60,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-12rem)]">
-      <Card className="mx-auto max-w-sm">
+      <Card className="mx-auto max-w-sm w-full">
         <CardHeader>
           <CardTitle className="text-2xl">{t.login_page.title}</CardTitle>
           <CardDescription>
@@ -106,6 +106,11 @@ export default function LoginPage() {
             </Link>
           </div>
         </CardContent>
+        <div className="pb-4 text-center text-sm">
+            <Link href="/home" className="underline text-muted-foreground">
+              Back to Home
+            </Link>
+        </div>
       </Card>
     </div>
   );

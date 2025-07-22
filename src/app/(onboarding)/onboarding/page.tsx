@@ -76,20 +76,27 @@ export default function OnboardingPage() {
   const [step, setStep] = useState<OnboardingStep>("language");
   const [adviceSession, setAdviceSession] = useState<AdviceSession | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
   const router = useRouter();
   const { toast } = useToast();
   const { t, languageCode } = useAppTranslations();
   const { login } = useAuth();
+  
+  // Local state for the language selection to avoid conflicts with global state
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(languageCode);
 
   const methods = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     mode: 'onChange'
   });
 
-  const handleLanguageSelect = (langCode: string) => {
-    localStorage.setItem("finsarthi_language", langCode);
-    window.location.reload(); // Reload to apply the new language everywhere
+  const handleLanguageContinue = () => {
+    localStorage.setItem("finsarthi_language", selectedLanguage);
+    // Reload only if the language has actually changed
+    if (selectedLanguage !== languageCode) {
+        window.location.reload();
+    } else {
+        setStep("signup");
+    }
   };
   
   const handleAdviceComplete = (session: AdviceSession) => {
@@ -153,7 +160,7 @@ export default function OnboardingPage() {
               <CardDescription>{t.onboarding.language_desc}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              <Select onValueChange={handleLanguageSelect} defaultValue={languageCode}>
+              <Select onValueChange={(val) => setSelectedLanguage(val as LanguageCode)} value={selectedLanguage}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a language" />
                 </SelectTrigger>
@@ -165,7 +172,7 @@ export default function OnboardingPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={() => setStep("signup")} className="self-end">
+              <Button onClick={handleLanguageContinue} className="self-end">
                 {t.common.next}
               </Button>
             </CardContent>
