@@ -12,12 +12,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useForm, type SubmitHandler, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createUser } from "@/services/user-service";
-import { associateSessionWithUser } from "@/services/advice-service";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -42,7 +41,6 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 // This component is now only for the dedicated /signup page, not the onboarding flow.
 export function SignupForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm<SignupFormValues>({
@@ -55,18 +53,14 @@ export function SignupForm() {
   const onSubmit: SubmitHandler<SignupFormValues> = async (data) => {
     setIsLoading(true);
     try {
-      const newUser = await createUser({
+      await createUser({
         fullName: data.fullName,
         email: data.email,
         passwordHash: data.password, // This is insecure, for prototype only
         role: data.role,
+        isAvailable: data.role === 'coach' ? false : undefined, // Default coach to not available
       });
       
-      const sessionId = searchParams.get('sessionId');
-      if (sessionId && newUser) {
-        await associateSessionWithUser(sessionId, newUser.id);
-      }
-
       toast({
         title: "Account Created!",
         description: "You can now log in.",

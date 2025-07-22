@@ -10,8 +10,12 @@ import { eq, and } from "drizzle-orm";
  * @param data The data for the new user.
  * @returns The newly created user.
  */
-export async function createUser(data: NewUser) {
-    const [newUser] = await db.insert(users).values(data).returning();
+export async function createUser(data: Omit<NewUser, 'id' | 'createdAt'>) {
+    const valuesToInsert: NewUser = {
+      ...data,
+      passwordHash: data.passwordHash, // In a real app, this should be a secure hash
+    };
+    const [newUser] = await db.insert(users).values(valuesToInsert).returning();
     return newUser;
 }
 
