@@ -124,38 +124,43 @@ export function FinancialCoach() {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
-    setError("");
+    setError('');
 
-    const userMessage: Message = { role: "user", content: data.query, id: createId() };
-    const newMessages = [...messages, userMessage];
+    const userMessage: Message = { role: 'user', content: data.query, id: createId() };
+    console.log(`ECHO: User typed this message in chat: "${userMessage.content}"`);
     
+    const newMessages = [...messages, userMessage];
     setMessages(newMessages);
-    form.reset({ query: "", language: data.language });
+
+    form.reset({ query: '', language: data.language });
 
     try {
-      const sanitizedHistory = newMessages.map(({ role, content }) => ({
-        role,
-        content,
-      }));
+      const sanitizedHistory = newMessages.map(({ id, ...rest }) => rest);
+      console.log('ECHO: Sending this full message history to the AI:', sanitizedHistory);
 
       const input: FinancialCoachInput = {
         language: data.language,
-        history: sanitizedHistory, 
+        history: sanitizedHistory,
       };
       
       const result = await financialCoach(input);
+      console.log('ECHO: Received this reply object from the AI:', result);
+
+      if (!result || !result.response) {
+        throw new Error("AI returned an invalid response.");
+      }
       
       const modelMessage: Message = {
-        role: "assistant",
+        role: 'assistant',
         content: result.response,
         id: createId(),
       };
       
-      setMessages((prevMessages) => [...prevMessages, modelMessage]);
+      setMessages((currentMessages) => [...currentMessages, modelMessage]);
 
-    } catch (e) {
-      setError("Failed to get response. Please try again.");
-      console.error(e);
+    } catch (e: any) {
+      console.error("ECHO: An error occurred during the chat flow:", e);
+      setError(`Failed to get response. ${e.message || ''}`.trim());
       // Revert the optimistic UI update on failure
       setMessages((prev) => prev.filter(m => m.id !== userMessage.id)); 
     }

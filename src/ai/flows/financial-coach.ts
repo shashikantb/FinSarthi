@@ -48,8 +48,8 @@ const financialCoachFlow = ai.defineFlow(
     outputSchema: FinancialCoachOutputSchema,
   },
   async (input) => {
+    console.log('ECHO [Backend]: Received this input in financialCoachFlow:', JSON.stringify(input, null, 2));
     try {
-        // Proactively fetch all product types to have them ready for the prompt.
         const [savings, investments, loans] = await Promise.all([
             getProducts('savings'),
             getProducts('investment'),
@@ -72,11 +72,12 @@ ${productContext}
 Converse with the user based on the history of the conversation provided.
 Be friendly, empathetic, and encouraging. DO NOT make up product names; only use the ones provided above.`;
         
-        // The history from the client is the source of truth.
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
             { role: 'system', content: systemPrompt },
             ...input.history,
         ];
+        
+        console.log('ECHO [Backend]: Sending this payload to the Groq API:', JSON.stringify({ model: 'llama3-8b-8192', messages }, null, 2));
 
         const completion = await groq.chat.completions.create({
             messages,
@@ -86,6 +87,7 @@ Be friendly, empathetic, and encouraging. DO NOT make up product names; only use
         });
 
         const responseText = completion.choices[0].message.content;
+        console.log(`ECHO [Backend]: Received this text reply from the Groq API: "${responseText}"`);
 
         if (!responseText) {
             return { response: "I'm sorry, I couldn't generate a response. Please try again." };
@@ -93,7 +95,7 @@ Be friendly, empathetic, and encouraging. DO NOT make up product names; only use
         return { response: responseText };
 
     } catch (error) {
-      console.error("Error in financialCoachFlow:", error);
+      console.error("ECHO [Backend]: Error in financialCoachFlow:", error);
       return { response: "I'm sorry, there was an error processing your request." };
     }
   }
