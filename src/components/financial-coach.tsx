@@ -126,14 +126,12 @@ export function FinancialCoach() {
     setError("");
 
     const userMessage: Message = { role: "user", content: data.query, id: createId() };
-    console.log("[Frontend] User message created:", userMessage);
-    
-    const currentMessages = [...messages, userMessage];
-    setMessages(currentMessages);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     form.reset({ query: "", language: data.language });
 
     try {
-      const sanitizedHistory = currentMessages.map(({ role, content }) => ({
+      const sanitizedHistory = newMessages.map(({ role, content }) => ({
         role,
         content,
       }));
@@ -142,11 +140,8 @@ export function FinancialCoach() {
         language: data.language,
         history: sanitizedHistory, 
       };
-
-      console.log("[Frontend] Sending to AI flow:", JSON.stringify(input, null, 2));
       
       const result = await financialCoach(input);
-      console.log("[Frontend] Received from AI flow:", result);
       
       const modelMessage: Message = {
         role: "assistant",
@@ -158,7 +153,8 @@ export function FinancialCoach() {
     } catch (e) {
       setError("Failed to get response. Please try again.");
       console.error(e);
-      setMessages((prev) => prev.slice(0, -1)); // remove the user message if the call fails
+      // Revert the optimistic UI update on failure
+      setMessages((prev) => prev.filter(m => m.id !== userMessage.id)); 
     }
     setIsLoading(false);
   };
