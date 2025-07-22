@@ -21,11 +21,20 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAppTranslations } from "@/hooks/use-app-translations";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { roleEnum } from "@/lib/db/schema";
 
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address."),
   password: z.string().min(1, "Password cannot be empty."),
+  role: roleEnum.enum,
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -40,17 +49,24 @@ export default function LoginPage() {
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      role: 'customer'
+    }
   });
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
     setIsLoading(true);
-    const success = await login(data.email, data.password);
-    if (success) {
-      router.push("/dashboard");
+    const loggedInUser = await login(data.email, data.password);
+    if (loggedInUser) {
+        if (loggedInUser.role === 'coach') {
+            router.push("/coach-dashboard");
+        } else {
+            router.push("/dashboard");
+        }
     } else {
       toast({
         title: "Login Failed",
-        description: "Invalid email or password. Please try again.",
+        description: "Invalid credentials or role. Please try again.",
         variant: "destructive",
       });
       setIsLoading(false);
@@ -70,6 +86,21 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid gap-4">
+               <div className="grid gap-2">
+                <Label htmlFor="role">Role</Label>
+                <Select
+                  onValueChange={(value) => form.setValue('role', value as 'customer' | 'coach')}
+                  defaultValue={form.getValues('role')}
+                >
+                  <SelectTrigger id="role">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="customer">Customer</SelectItem>
+                    <SelectItem value="coach">Coach</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">{t.onboarding.email}</Label>
                 <Input

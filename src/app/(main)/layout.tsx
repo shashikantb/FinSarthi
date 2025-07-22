@@ -16,6 +16,7 @@ import {
   Settings,
   Loader2,
   LogOut,
+  Users,
 } from "lucide-react";
 import {
   Sidebar,
@@ -114,6 +115,7 @@ function MainSidebar() {
     { href: "/summarizer", label: t.nav.summarizer, icon: FileText },
     { href: "/translator", label: t.nav.translator, icon: Languages },
     { href: "/advice", label: t.nav.advice, icon: Lightbulb },
+    { href: "/coaches", label: "Regional Coaches", icon: Users },
   ];
 
   return (
@@ -187,7 +189,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -202,6 +204,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
+  }
+  
+  // Redirect coach to their specific dashboard
+  if (user && user.role === 'coach' && !window.location.pathname.startsWith('/coach-dashboard')) {
+      router.replace('/coach-dashboard');
+      return (
+          <div className="flex min-h-screen w-full items-center justify-center bg-background">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+      );
   }
 
   return <ProtectedLayout>{children}</ProtectedLayout>;

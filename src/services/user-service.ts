@@ -45,3 +45,20 @@ export async function getUserByCredentials(email: string, passwordHash: string) 
     .limit(1);
   return user ?? null;
 }
+
+/**
+ * Fetches all coaches who are currently available.
+ * @returns An array of available coach user objects.
+ */
+export async function getAvailableCoaches() {
+    const availableCoaches = await db.select()
+        .from(users)
+        .where(
+            and(
+                eq(users.role, 'coach'),
+                eq(users.isAvailable, true)
+            )
+        )
+        .orderBy(users.fullName);
+    return availableCoaches;
+}

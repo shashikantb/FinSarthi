@@ -1,12 +1,16 @@
 
-import { pgTable, text, timestamp, pgEnum, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, pgEnum, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { createId } from '@paralleldrive/cuid2';
+
+export const roleEnum = pgEnum('role', ['customer', 'coach']);
 
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => createId()),
   fullName: text('full_name'),
   email: text('email').notNull().unique(),
-  passwordHash: text('password_hash'), 
+  passwordHash: text('password_hash'),
+  role: roleEnum('role').default('customer').notNull(),
+  isAvailable: boolean('is_available').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

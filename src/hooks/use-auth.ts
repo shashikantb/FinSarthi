@@ -37,22 +37,21 @@ export function useAuth() {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password_hash: string): Promise<boolean> => {
+  const login = async (email: string, password_hash: string): Promise<User | null> => {
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call that returns a user and a token
       const loggedInUser = await getUserByCredentials(email, password_hash);
       if (loggedInUser) {
         localStorage.setItem(SESSION_KEY, loggedInUser.id);
         setUser(loggedInUser);
         setIsLoading(false);
-        return true;
+        return loggedInUser;
       }
     } catch (error) {
       console.error("Login failed:", error);
     }
     setIsLoading(false);
-    return false;
+    return null;
   };
 
   const logout = () => {
