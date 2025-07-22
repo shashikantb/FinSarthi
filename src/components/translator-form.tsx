@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Wand2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
+import { useAppTranslations } from "@/hooks/use-app-translations";
 import { languages } from "@/lib/translations";
 
 const formSchema = z.object({
@@ -49,11 +50,7 @@ export function TranslatorForm() {
   const [explanation, setExplanation] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const { t, languageCode } = useAppTranslations();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -65,16 +62,11 @@ export function TranslatorForm() {
   });
 
   useEffect(() => {
-    if (isClient) {
-      const savedLangCode = localStorage.getItem("finsarthi_language") as keyof typeof languages | null;
-      if (savedLangCode) {
-        const langName = languages[savedLangCode]?.name;
-        if(langName) {
-            form.setValue("language", langName as "English" | "Hindi" | "Marathi");
-        }
-      }
+    const langName = languages[languageCode as keyof typeof languages]?.name;
+    if(langName) {
+        form.setValue("language", langName as "English" | "Hindi" | "Marathi");
     }
-  }, [form, isClient]);
+  }, [languageCode, form]);
 
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
@@ -95,9 +87,9 @@ export function TranslatorForm() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Financial Term</CardTitle>
+          <CardTitle>{t.translator.card_title}</CardTitle>
           <CardDescription>
-            Enter a term you want explained in simple language.
+            {t.translator.card_description}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -108,9 +100,9 @@ export function TranslatorForm() {
                 name="term"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Term/Concept</FormLabel>
+                    <FormLabel>{t.translator.term_label}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Inflation, ETF" {...field} />
+                      <Input placeholder={t.translator.term_placeholder} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -122,20 +114,20 @@ export function TranslatorForm() {
                   name="userLiteracyLevel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>My Understanding</FormLabel>
+                      <FormLabel>{t.translator.understanding_label}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select your level" />
+                            <SelectValue placeholder={t.translator.understanding_placeholder} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="beginner">Beginner</SelectItem>
-                          <SelectItem value="intermediate">Intermediate</SelectItem>
-                          <SelectItem value="advanced">Advanced</SelectItem>
+                          <SelectItem value="beginner">{t.translator.level_beginner}</SelectItem>
+                          <SelectItem value="intermediate">{t.translator.level_intermediate}</SelectItem>
+                          <SelectItem value="advanced">{t.translator.level_advanced}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -147,7 +139,7 @@ export function TranslatorForm() {
                   name="language"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Language</FormLabel>
+                      <FormLabel>{t.translator.language_label}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
@@ -155,7 +147,7 @@ export function TranslatorForm() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a language" />
+                            <SelectValue placeholder={t.translator.language_placeholder} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -173,12 +165,12 @@ export function TranslatorForm() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Translating...
+                    {t.translator.translating_button}
                   </>
                 ) : (
                    <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Explain Term
+                    {t.translator.explain_button}
                   </>
                 )}
               </Button>
@@ -189,9 +181,9 @@ export function TranslatorForm() {
 
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Simplified Explanation</CardTitle>
+          <CardTitle>{t.translator.explanation_card_title}</CardTitle>
           <CardDescription>
-            Here is the term explained in a way that's easy to understand.
+            {t.translator.explanation_card_description}
           </CardDescription>
         </CardHeader>
         <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
@@ -205,7 +197,7 @@ export function TranslatorForm() {
             </div>
           )}
           {error && <p className="text-destructive">{error}</p>}
-          {!isLoading && !error && !explanation && <p>Your explanation will appear here.</p>}
+          {!isLoading && !error && !explanation && <p>{t.translator.explanation_placeholder}</p>}
           {explanation && <p>{explanation}</p>}
         </CardContent>
       </Card>

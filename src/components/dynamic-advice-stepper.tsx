@@ -39,7 +39,7 @@ import {
   X,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { translations } from "@/lib/translations";
+import { useAppTranslations } from "@/hooks/use-app-translations";
 import type { LanguageCode } from "@/lib/translations";
 import type { AdviceSession } from "@/lib/db/schema";
 import { createAdviceSessionForCurrentUser } from "@/services/advice-service";
@@ -95,21 +95,14 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
   const [selectedPromptKey, setSelectedPromptKey] = useState<string>("");
-  const [language, setLanguage] = useState<LanguageCode>("en");
+  const { t, languageCode } = useAppTranslations();
   
   const methods = useForm<FormValues>({ 
     mode: "onChange",
-    defaultValues: defaultFormValues, // Provide default values for all fields
+    defaultValues: defaultFormValues,
   });
   
   const { handleSubmit, trigger, formState } = methods;
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem("finsarthi_language") as LanguageCode | null;
-    if (savedLang) setLanguage(savedLang);
-  }, []);
-
-  const T = translations[language];
 
   const selectedPrompt = useMemo(() => {
     return advicePrompts.find(p => p.key === selectedPromptKey);
@@ -132,7 +125,6 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
     setProgress(0);
     setError("");
     try {
-      // Filter out empty values from formData before sending to AI
       const relevantFormData = Object.entries(formData)
         .filter(([key, value]) => {
           const isKeyInCurrentPrompt = questions.some(q => q.key === key);
@@ -146,22 +138,20 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
       const adviceResult = await generatePersonalizedAdvice({
         promptKey: selectedPromptKey,
         formData: relevantFormData,
-        language,
+        language: languageCode,
       });
 
-      // When used in onboarding, this creates an anonymous session.
-      // When used by a logged-in user, it associates with them.
       const newSession = await createAdviceSessionForCurrentUser({
         promptKey: selectedPromptKey,
         formData: relevantFormData,
-        language,
+        language: languageCode,
         generatedAdvice: adviceResult.advice,
       }, isLoggedIn);
       
       setProgress(100);
-      onComplete(newSession); // Pass the completed session up to the parent
+      onComplete(newSession);
     } catch (e) {
-      setError(T.error);
+      setError(t.onboarding.error);
       console.error(e);
       setIsLoading(false);
     }
@@ -185,13 +175,13 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>{T.generatingAdviceTitle}</CardTitle>
-          <CardDescription>{T.generatingAdviceDescription}</CardDescription>
+          <CardTitle>{t.onboarding.generating_title}</CardTitle>
+          <CardDescription>{t.onboarding.generating_desc}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center space-y-4 pt-8 pb-12">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <Progress value={progress} className="w-full" />
-          <p className="text-sm text-muted-foreground">{T.generating}</p>
+          <p className="text-sm text-muted-foreground">{t.onboarding.generating}</p>
         </CardContent>
       </Card>
     );
@@ -202,15 +192,15 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
       {onCancel ? (
         <CardHeader className="flex-row items-center justify-between">
           <div>
-            <CardTitle>Generate New Advice</CardTitle>
-            <CardDescription>Fill out the steps to get a new plan.</CardDescription>
+            <CardTitle>{t.advice.stepper_title}</CardTitle>
+            <CardDescription>{t.advice.stepper_description}</CardDescription>
           </div>
           <Button variant="ghost" size="icon" onClick={onCancel}><X className="h-4 w-4" /></Button>
         </CardHeader>
       ) : (
         <CardHeader>
-          <CardTitle>Get Your Financial Plan</CardTitle>
-          <CardDescription>Select a topic and answer a few questions.</CardDescription>
+          <CardTitle>{t.advice.stepper_onboarding_title}</CardTitle>
+          <CardDescription>{t.advice.stepper_onboarding_description}</CardDescription>
         </CardHeader>
       )}
       <CardContent className="pt-6">
@@ -219,41 +209,41 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
             <div className="min-h-[150px]">
               {step === 0 ? (
                 <FormItem>
-                  <FormLabel>What do you need advice on?</FormLabel>
+                  <FormLabel>{t.advice.topic_label}</FormLabel>
                   <Select onValueChange={setSelectedPromptKey} value={selectedPromptKey}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a topic..." />
+                        <SelectValue placeholder={t.advice.topic_placeholder} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {advicePrompts.map(p => (
-                        <SelectItem key={p.key} value={p.key}>{p.title[language]}</SelectItem>
+                        <SelectItem key={p.key} value={p.key}>{p.title[languageCode]}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </FormItem>
               ) : (
-                 questions[step - 1] && <QuestionField key={questions[step - 1].key} question={questions[step - 1]} lang={language} />
+                 questions[step - 1] && <QuestionField key={questions[step - 1].key} question={questions[step - 1]} lang={languageCode} />
               )}
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Step {step + 1} of {TOTAL_STEPS}</span>
+              <span className="text-sm text-muted-foreground">{t.advice.step_of.replace('{current}', String(step + 1)).replace('{total}', String(TOTAL_STEPS))}</span>
               <div className="flex gap-2">
                 {step > 0 && (
                   <Button type="button" variant="outline" onClick={prevStep}>
-                    <ArrowLeft className="mr-2 h-4 w-4" /> {T.back}
+                    <ArrowLeft className="mr-2 h-4 w-4" /> {t.common.back}
                   </Button>
                 )}
                 {step < TOTAL_STEPS - 1 ? (
                   <Button type="button" onClick={nextStep}>
-                    {T.next} <ArrowRight className="ml-2 h-4 w-4" />
+                    {t.common.next} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
                   <Button type="submit" disabled={formState.isSubmitting || !selectedPromptKey || !formState.isValid}>
                     {formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                    {T.generateAdvice}
+                    {t.advice.generate_button}
                   </Button>
                 )}
               </div>

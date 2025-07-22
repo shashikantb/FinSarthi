@@ -1,5 +1,4 @@
 
-// src/components/financial-coach.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -41,6 +40,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { languages, langToLocale } from "@/lib/translations";
 import { createId } from "@paralleldrive/cuid2";
+import { useAppTranslations } from "@/hooks/use-app-translations";
 
 type Message = {
   id: string;
@@ -85,11 +85,7 @@ export function FinancialCoach() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const { t, languageCode } = useAppTranslations();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -102,16 +98,12 @@ export function FinancialCoach() {
   const language = form.watch("language");
 
   useEffect(() => {
-    if (isClient) {
-      const savedLangCode = localStorage.getItem("finsarthi_language") as keyof typeof languages | null;
-      if (savedLangCode) {
-        const langName = languages[savedLangCode]?.name;
-        if(langName) {
-            form.setValue("language", langName as "English" | "Hindi" | "Marathi");
-        }
-      }
+    // Sync the form's language with the global language from the hook
+    const langName = languages[languageCode as keyof typeof languages]?.name;
+    if (langName) {
+      form.setValue("language", langName as "English" | "Hindi" | "Marathi");
     }
-  }, [form, isClient]);
+  }, [languageCode, form]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -123,25 +115,18 @@ export function FinancialCoach() {
   }, [messages]);
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    const userMessage: Message = { role: 'user', content: data.query, id: createId() };
+    const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
+
+    setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     setError('');
-  
-    const userMessage: Message = { role: 'user', content: data.query, id: createId() };
-
-    // This is the key change: create the new message list first.
-    const newMessages = [...messages, userMessage];
-    
-    // Update the UI immediately with the user's message.
-    setMessages(newMessages);
     form.reset({ query: '', language: data.language });
   
     try {
-      // Pass the complete, correct history to the AI.
-      const sanitizedHistory = newMessages.map(({ id, ...rest }) => rest);
-  
       const input: FinancialCoachInput = {
         language: data.language,
-        history: sanitizedHistory,
+        history: historyForAI,
       };
       
       const result = await financialCoach(input);
@@ -156,24 +141,23 @@ export function FinancialCoach() {
         id: createId(),
       };
       
-      // Append the assistant's message to the state using the reliable functional update.
       setMessages(currentMessages => [...currentMessages, modelMessage]);
   
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
       setError(`Failed to get response. ${e.message || ''}`.trim());
-      // Revert the optimistic UI update on failure by removing the user message we added.
       setMessages(currentMessages => currentMessages.filter(m => m.id !== userMessage.id)); 
+    } finally {
+        setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Chat with FinSarthi</CardTitle>
+        <CardTitle>{t.coach.chat_title}</CardTitle>
         <CardDescription>
-          Ask questions about budgeting, saving, investing, loans, and more.
+          {t.coach.chat_description}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -271,7 +255,7 @@ export function FinancialCoach() {
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      placeholder="Type your message here..."
+                      placeholder={t.coach.placeholder}
                       {...field}
                       disabled={isLoading}
                       autoComplete="off"
@@ -292,7 +276,7 @@ export function FinancialCoach() {
               ) : (
                 <Send className="h-5 w-5" />
               )}
-              <span className="sr-only">Send</span>
+              <span className="sr-only">{t.coach.send}</span>
             </Button>
           </form>
         </Form>

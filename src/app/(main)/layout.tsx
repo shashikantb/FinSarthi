@@ -44,11 +44,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Logo } from "@/components/logo";
 import { useAuth } from "@/hooks/use-auth";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useAppTranslations } from "@/hooks/use-app-translations";
 
 function AppHeader() {
   const isMobile = useIsMobile();
   const { user, logout } = useAuth();
+  const { t } = useAppTranslations();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -79,14 +80,14 @@ function AppHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{t.common.my_account}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild><Link href="/settings">Settings</Link></DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem asChild><Link href="/settings">{t.common.settings}</Link></DropdownMenuItem>
+            <DropdownMenuItem>{t.common.support}</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Logout</span>
+              <span>{t.common.logout}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -98,7 +99,8 @@ function AppHeader() {
 function MainSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const { t } = useAppTranslations();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -107,11 +109,11 @@ function MainSidebar() {
   };
   
   const menuItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-    { href: "/coach", label: "FinSarthi Coach", icon: MessageCircle },
-    { href: "/summarizer", label: "News Summarizer", icon: FileText },
-    { href: "/translator", label: "Term Translator", icon: Languages },
-    { href: "/advice", label: "Personalized Advice", icon: Lightbulb },
+    { href: "/dashboard", label: t.nav.dashboard, icon: LayoutGrid },
+    { href: "/coach", label: t.nav.coach, icon: MessageCircle },
+    { href: "/summarizer", label: t.nav.summarizer, icon: FileText },
+    { href: "/translator", label: t.nav.translator, icon: Languages },
+    { href: "/advice", label: t.nav.advice, icon: Lightbulb },
   ];
 
   return (
@@ -146,21 +148,21 @@ function MainSidebar() {
                  <SidebarMenuButton
                     asChild
                     isActive={pathname.startsWith("/settings")}
-                    tooltip={{ children: "Settings", hidden: state === 'expanded' }}
+                    tooltip={{ children: t.common.settings, hidden: state === 'expanded' }}
                 >
                     <Link href="/settings">
                         <Settings />
-                        <span>Settings</span>
+                        <span>{t.common.settings}</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
                  <SidebarMenuButton
                     onClick={handleLogout}
-                    tooltip={{ children: "Logout", hidden: state === 'expanded' }}
+                    tooltip={{ children: t.common.logout, hidden: state === 'expanded' }}
                 >
                     <LogOut />
-                    <span>Logout</span>
+                    <span>{t.common.logout}</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>

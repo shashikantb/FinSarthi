@@ -30,16 +30,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { languages } from "@/lib/translations";
+import { allLanguages } from "@/lib/all-languages";
+import { useAppTranslations } from "@/hooks/use-app-translations";
+import type { LanguageCode } from "@/lib/translations";
 
 const settingsSchema = z.object({
-  language: z.enum(["en", "hi", "mr"]),
+  language: z.string(), // Allow any string, will be validated by the available languages
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const { t, languageCode } = useAppTranslations();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -55,36 +58,35 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (isClient) {
-      const savedLang = localStorage.getItem("finsarthi_language") as "en" | "hi" | "mr" | null;
-      if (savedLang) {
-        form.setValue("language", savedLang);
-      }
+      form.setValue("language", languageCode);
     }
-  }, [form, isClient]);
+  }, [form, isClient, languageCode]);
 
   const onSubmit: SubmitHandler<SettingsFormValues> = (data) => {
     localStorage.setItem("finsarthi_language", data.language);
     toast({
-      title: "Settings Saved",
-      description: "Your language preference has been updated.",
+      title: t.settings.toast_title,
+      description: t.settings.toast_description,
     });
+    // Force a reload to ensure all components get the new language
+    window.location.reload();
   };
 
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <h1 className="text-2xl font-headline font-bold md:text-3xl">Settings</h1>
+        <h1 className="text-2xl font-headline font-bold md:text-3xl">{t.settings.title}</h1>
         <p className="text-muted-foreground">
-          Manage your account settings and preferences.
+          {t.settings.description}
         </p>
       </div>
       <Card>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardHeader>
-              <CardTitle>Language Preference</CardTitle>
+              <CardTitle>{t.settings.language_title}</CardTitle>
               <CardDescription>
-                Choose the primary language for the application and AI interactions.
+                {t.settings.language_description}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -93,10 +95,9 @@ export default function SettingsPage() {
                 name="language"
                 render={({ field }) => (
                   <FormItem className="max-w-xs">
-                    <FormLabel>Primary Language</FormLabel>
+                    <FormLabel>{t.settings.language_label}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
                       value={field.value}
                     >
                       <FormControl>
@@ -105,8 +106,8 @@ export default function SettingsPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {Object.entries(languages).map(([code, lang]) => (
-                            <SelectItem key={code} value={code}>{lang.name}</SelectItem>
+                        {allLanguages.map((lang) => (
+                            <SelectItem key={lang.code} value={lang.code}>{lang.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -116,7 +117,7 @@ export default function SettingsPage() {
               />
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-                <Button type="submit">Save Changes</Button>
+                <Button type="submit">{t.common.save_changes}</Button>
             </CardFooter>
           </form>
         </Form>

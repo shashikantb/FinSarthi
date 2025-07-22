@@ -9,19 +9,14 @@ import { Wand2, PlusCircle } from "lucide-react";
 import { getAdviceHistoryForUser } from "@/services/advice-service";
 import type { AdviceSession } from "@/lib/db/schema";
 import advicePrompts from "@/lib/advice-prompts.json";
-import { languages } from "@/lib/translations";
+import { useAppTranslations } from "@/hooks/use-app-translations";
 import type { LanguageCode } from "@/lib/translations";
 
 export default function AdvicePage() {
   const [adviceHistory, setAdviceHistory] = useState<AdviceSession[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
-  const [language, setLanguage] = useState<LanguageCode>("en");
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem("finsarthi_language") as LanguageCode | null;
-    if (savedLang) setLanguage(savedLang);
-  }, []);
+  const { t, languageCode } = useAppTranslations();
 
   useEffect(() => {
     async function fetchHistory() {
@@ -38,9 +33,8 @@ export default function AdvicePage() {
   }, []);
 
   const handleNewAdvice = (newAdvice: AdviceSession) => {
-    // Add the prompt title to the history item for display
     const promptConfig = advicePrompts.find(p => p.key === newAdvice.promptKey);
-    const displayTitle = promptConfig?.title[language] || newAdvice.promptKey;
+    const displayTitle = promptConfig?.title[languageCode] || newAdvice.promptKey;
 
     setAdviceHistory((prev) => [{ ...newAdvice, promptKey: displayTitle }, ...prev]);
     setIsGenerating(false);
@@ -50,15 +44,15 @@ export default function AdvicePage() {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div className="space-y-1">
-          <h1 className="text-2xl font-headline font-bold md:text-3xl">Personalized Advice</h1>
+          <h1 className="text-2xl font-headline font-bold md:text-3xl">{t.advice.title}</h1>
           <p className="text-muted-foreground">
-            Generate new AI-powered financial advice or review your past sessions.
+            {t.advice.description}
           </p>
         </div>
         {!isGenerating && (
           <Button onClick={() => setIsGenerating(true)}>
             <PlusCircle className="mr-2" />
-            New Advice
+            {t.common.new_advice}
           </Button>
         )}
       </div>
@@ -70,17 +64,17 @@ export default function AdvicePage() {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>Advice History</CardTitle>
-            <CardDescription>Review your previously generated financial plans.</CardDescription>
+            <CardTitle>{t.advice.history_title}</CardTitle>
+            <CardDescription>{t.advice.history_description}</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoadingHistory ? (
-              <p>Loading history...</p>
+              <p>{t.advice.loading_history}</p>
             ) : adviceHistory.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
                 {adviceHistory.map((record) => {
                   const promptConfig = advicePrompts.find(p => p.key === record.promptKey);
-                  const displayTitle = promptConfig ? promptConfig.title[language as keyof typeof promptConfig.title] : record.promptKey;
+                  const displayTitle = promptConfig ? promptConfig.title[languageCode as keyof typeof promptConfig.title] : record.promptKey;
                   return (
                     <AccordionItem value={record.id} key={record.id}>
                       <AccordionTrigger>
@@ -99,8 +93,8 @@ export default function AdvicePage() {
             ) : (
               <div className="text-center py-10">
                 <Wand2 className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No advice generated yet</h3>
-                <p className="mt-1 text-sm text-muted-foreground">Click "New Advice" to get your first personalized plan.</p>
+                <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">{t.advice.no_history_title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{t.advice.no_history_description}</p>
               </div>
             )}
           </CardContent>

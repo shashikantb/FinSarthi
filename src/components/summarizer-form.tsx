@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,6 +35,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Wand2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
+import { useAppTranslations } from "@/hooks/use-app-translations";
+import { languages } from "@/lib/translations";
 
 const formSchema = z.object({
   articleContent: z.string().min(50, "Article content must be at least 50 characters."),
@@ -46,6 +49,7 @@ export function SummarizerForm() {
   const [summary, setSummary] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const { t, languageCode } = useAppTranslations();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -54,6 +58,13 @@ export function SummarizerForm() {
       language: "English",
     },
   });
+
+  useEffect(() => {
+    const langName = languages[languageCode as keyof typeof languages]?.name;
+    if (langName) {
+      form.setValue("language", langName as "English" | "Hindi" | "Marathi");
+    }
+  }, [languageCode, form]);
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
@@ -73,9 +84,9 @@ export function SummarizerForm() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Article to Summarize</CardTitle>
+          <CardTitle>{t.summarizer.card_title}</CardTitle>
           <CardDescription>
-            Paste the content of a financial news article below.
+            {t.summarizer.card_description}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -86,10 +97,10 @@ export function SummarizerForm() {
                 name="articleContent"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Article Content</FormLabel>
+                    <FormLabel>{t.summarizer.article_content_label}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Paste your article here..."
+                        placeholder={t.summarizer.article_content_placeholder}
                         className="resize-y min-h-[200px]"
                         {...field}
                       />
@@ -103,9 +114,10 @@ export function SummarizerForm() {
                 name="language"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Summary Language</FormLabel>
+                    <FormLabel>{t.summarizer.language_label}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
+                      value={field.value}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -127,12 +139,12 @@ export function SummarizerForm() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Summarizing...
+                    {t.summarizer.summarizing_button}
                   </>
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Summarize
+                    {t.summarizer.summarize_button}
                   </>
                 )}
               </Button>
@@ -143,9 +155,9 @@ export function SummarizerForm() {
 
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Summary</CardTitle>
+          <CardTitle>{t.summarizer.summary_card_title}</CardTitle>
           <CardDescription>
-            The AI-generated summary of the article will appear below.
+            {t.summarizer.summary_card_description}
           </CardDescription>
         </CardHeader>
         <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
@@ -159,7 +171,7 @@ export function SummarizerForm() {
             </div>
           )}
           {error && <p className="text-destructive">{error}</p>}
-          {!isLoading && !error && !summary && <p>Your summary will appear here.</p>}
+          {!isLoading && !error && !summary && <p>{t.summarizer.summary_placeholder}</p>}
           {summary && <p>{summary}</p>}
         </CardContent>
       </Card>

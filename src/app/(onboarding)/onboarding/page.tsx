@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { languages, translations } from "@/lib/translations";
+import { allLanguages } from "@/lib/all-languages";
+import { useAppTranslations } from "@/hooks/use-app-translations";
 import type { LanguageCode } from "@/lib/translations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,31 +38,33 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 function SignupStep({ onNext }: { onNext: () => void }) {
   const { formState: { isValid }, register, formState: { errors } } = useFormContext<SignupFormValues>();
+  const { t } = useAppTranslations();
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create Your Account</CardTitle>
-        <CardDescription>Enter your information to get started.</CardDescription>
+        <CardTitle>{t.onboarding.signup_title}</CardTitle>
+        <CardDescription>{t.onboarding.signup_desc}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-2">
-            <Label htmlFor="full-name">Full name</Label>
+            <Label htmlFor="full-name">{t.onboarding.full_name}</Label>
             <Input id="full-name" placeholder="Max Robinson" {...register("fullName")} />
             {errors.fullName && <p className="text-xs text-destructive">{errors.fullName?.message}</p>}
         </div>
         <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t.onboarding.email}</Label>
             <Input id="email" type="email" placeholder="m@example.com" {...register("email")} />
             {errors.email && <p className="text-xs text-destructive">{errors.email?.message}</p>}
         </div>
         <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t.onboarding.password}</Label>
             <Input id="password" type="password" {...register("password")} />
             {errors.password && <p className="text-xs text-destructive">{errors.password?.message}</p>}
         </div>
       </CardContent>
       <CardFooter>
-          <Button onClick={onNext} disabled={!isValid} className="ml-auto">Next</Button>
+          <Button onClick={onNext} disabled={!isValid} className="ml-auto">{t.common.next}</Button>
       </CardFooter>
     </Card>
   );
@@ -70,23 +73,21 @@ function SignupStep({ onNext }: { onNext: () => void }) {
 
 export default function OnboardingPage() {
   const [step, setStep] = useState<OnboardingStep>("language");
-  const [language, setLanguage] = useState<LanguageCode>("en");
   const [adviceSession, setAdviceSession] = useState<AdviceSession | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
   const router = useRouter();
   const { toast } = useToast();
+  const { t, languageCode } = useAppTranslations();
 
   const methods = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     mode: 'onChange'
   });
 
-  const T = translations[language];
-
   const handleLanguageSelect = (langCode: string) => {
-    setLanguage(langCode as LanguageCode);
     localStorage.setItem("finsarthi_language", langCode);
+    window.location.reload(); // Reload to apply the new language everywhere
   };
   
   const handleAdviceComplete = (session: AdviceSession) => {
@@ -112,7 +113,7 @@ export default function OnboardingPage() {
         if (newUser) {
             await associateSessionWithUser(adviceSession.id, newUser.id);
             toast({ title: "Account Created!", description: "Welcome to FinSarthi!" });
-            router.push("/dashboard");
+            router.push("/login");
         } else {
              throw new Error("User creation failed.");
         }
@@ -134,24 +135,24 @@ export default function OnboardingPage() {
         return (
           <Card>
             <CardHeader>
-              <CardTitle>{T.language}</CardTitle>
-              <CardDescription>Please select your preferred language to continue.</CardDescription>
+              <CardTitle>{t.onboarding.language_title}</CardTitle>
+              <CardDescription>{t.onboarding.language_desc}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              <Select onValueChange={handleLanguageSelect} defaultValue={language}>
+              <Select onValueChange={handleLanguageSelect} defaultValue={languageCode}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a language" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(languages).map(([code, lang]) => (
-                    <SelectItem key={code} value={code}>
+                  {allLanguages.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code}>
                       {lang.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <Button onClick={() => setStep("signup")} className="self-end">
-                {T.next}
+                {t.common.next}
               </Button>
             </CardContent>
           </Card>
@@ -162,15 +163,15 @@ export default function OnboardingPage() {
         return adviceSession ? (
              <Card>
                 <CardHeader>
-                    <CardTitle>{T.adviceResultTitle}</CardTitle>
-                    <CardDescription>Your plan is ready. Save it to create your account and access your dashboard.</CardDescription>
+                    <CardTitle>{t.onboarding.advice_result_title}</CardTitle>
+                    <CardDescription>{t.onboarding.advice_result_desc}</CardDescription>
                 </CardHeader>
                 <CardContent className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap font-body">
                     <p>{adviceSession.generatedAdvice}</p>
                 </CardContent>
                 <CardFooter>
                     <Button onClick={handleSaveAndFinish} disabled={isLoading} className="ml-auto">
-                        {isLoading ? <Loader2 className="animate-spin" /> : "Save and Go to Dashboard"}
+                        {isLoading ? <Loader2 className="animate-spin" /> : t.onboarding.save_and_finish}
                     </Button>
                 </CardFooter>
             </Card>
@@ -185,9 +186,9 @@ export default function OnboardingPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
        <div className="space-y-1 text-center">
-        <h1 className="text-2xl font-headline font-bold md:text-3xl">Welcome to FinSarthi</h1>
+        <h1 className="text-2xl font-headline font-bold md:text-3xl">{t.onboarding.welcome}</h1>
         <p className="text-muted-foreground max-w-xl mx-auto">
-          Just a few steps to create your personalized financial plan and get started.
+          {t.onboarding.intro}
         </p>
       </div>
       <FormProvider {...methods}>

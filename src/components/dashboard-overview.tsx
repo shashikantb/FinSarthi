@@ -1,5 +1,4 @@
 
-// src/components/dashboard-overview.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -23,7 +22,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { getLatestAdviceSessionForUser } from "@/services/advice-service";
 import type { AdviceSession } from "@/lib/db/schema";
-
+import { useAppTranslations } from "@/hooks/use-app-translations";
 
 const chartConfig = {
   income: {
@@ -40,6 +39,7 @@ const chartConfig = {
 export function DashboardOverview() {
   const [data, setData] = useState<AdviceSession | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useAppTranslations();
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -76,15 +76,15 @@ export function DashboardOverview() {
           <div className="mx-auto bg-muted rounded-full p-3 w-fit">
             <AlertTriangle className="h-8 w-8 text-muted-foreground" />
           </div>
-          <CardTitle>No Financial Data Found</CardTitle>
+          <CardTitle>{t.dashboard.no_data_title}</CardTitle>
           <CardDescription>
-            You haven't generated any personalized advice yet.
+            {t.dashboard.no_data_desc}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="mb-4 text-sm text-muted-foreground">Get started by answering a few questions to create your financial snapshot.</p>
+          <p className="mb-4 text-sm text-muted-foreground">{t.dashboard.no_data_cta_text}</p>
           <Button asChild>
-            <Link href="/advice">Generate My Advice</Link>
+            <Link href="/advice">{t.dashboard.no_data_cta_button}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -107,49 +107,49 @@ export function DashboardOverview() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
+                    <CardTitle className="text-sm font-medium">{t.dashboard.monthly_savings}</CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">₹{monthlySavings.toLocaleString()}</div>
-                    <p className="text-xs text-muted-foreground">Based on your latest input</p>
+                    <p className="text-xs text-muted-foreground">{t.dashboard.based_on_input}</p>
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Investment Growth</CardTitle>
+                    <CardTitle className="text-sm font-medium">{t.dashboard.investment_growth}</CardTitle>
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">+8.1%</div>
-                    <p className="text-xs text-muted-foreground">Total portfolio value $12,430</p>
+                    <p className="text-xs text-muted-foreground">{t.dashboard.total_portfolio}</p>
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Credit Score</CardTitle>
+                    <CardTitle className="text-sm font-medium">{t.dashboard.credit_score}</CardTitle>
                     <CreditCard className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">750</div>
-                    <p className="text-xs text-muted-foreground">+10 points from last check</p>
+                    <p className="text-xs text-muted-foreground">{t.dashboard.from_last_check}</p>
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Budget Adherence</CardTitle>
+                    <CardTitle className="text-sm font-medium">{t.dashboard.budget_adherence}</CardTitle>
                     <BarChart className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">95%</div>
-                    <p className="text-xs text-muted-foreground">You are doing great this month!</p>
+                    <p className="text-xs text-muted-foreground">{t.dashboard.doing_great}</p>
                 </CardContent>
             </Card>
         </div>
         <Card>
             <CardHeader>
-                <CardTitle>Income vs. Expenses</CardTitle>
-                <CardDescription>A look at your cash flow over the last 6 months (simulated).</CardDescription>
+                <CardTitle>{t.dashboard.income_vs_expenses}</CardTitle>
+                <CardDescription>{t.dashboard.cash_flow_desc}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
