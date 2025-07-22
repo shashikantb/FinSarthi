@@ -187,10 +187,58 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
     );
 }
 
+function CoachLayout({ children }: { children: React.ReactNode }) {
+  const { logout, user } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
+  return (
+    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+        <Logo />
+        <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+           <Link
+            href="/coach-dashboard"
+            className="text-foreground transition-colors hover:text-foreground"
+          >
+            Dashboard
+          </Link>
+        </nav>
+        <div className="ml-auto flex items-center gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Avatar>
+                  <AvatarImage src="https://placehold.co/100x100" alt={user?.fullName ?? 'Coach'} />
+                  <AvatarFallback>{user?.fullName?.[0]?.toUpperCase() ?? 'C'}</AvatarFallback>
+                </Avatar>
+                <span className="sr-only">Toggle user menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+        {children}
+      </main>
+    </div>
+  )
+}
+
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -206,15 +254,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     );
   }
   
-  // Redirect coach to their specific dashboard
-  if (user && user.role === 'coach' && typeof window !== 'undefined' && !window.location.pathname.startsWith('/coach-dashboard')) {
+  if (user.role === 'coach') {
+    // If user is a coach and not on their dashboard, redirect them.
+    if (pathname !== '/coach-dashboard') {
       router.replace('/coach-dashboard');
+      // Show a loading spinner while redirecting
       return (
-          <div className="flex min-h-screen w-full items-center justify-center bg-background">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+        <div className="flex min-h-screen w-full items-center justify-center bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       );
+    }
+    // Render the dedicated layout for coaches
+    return <CoachLayout>{children}</CoachLayout>;
   }
 
+  // Render the standard protected layout for customers
   return <ProtectedLayout>{children}</ProtectedLayout>;
 }
