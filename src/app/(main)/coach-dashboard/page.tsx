@@ -19,6 +19,7 @@ import type { ChatRequest, User } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
 
 type ChatRequestWithCustomer = {
     request: ChatRequest;
@@ -32,6 +33,7 @@ export default function CoachDashboardPage() {
     const [requests, setRequests] = useState<ChatRequestWithCustomer[]>([]);
     const [isLoadingRequests, setIsLoadingRequests] = useState(true);
     const { toast } = useToast();
+    const router = useRouter();
 
     useEffect(() => {
         if (user) {
@@ -83,6 +85,9 @@ export default function CoachDashboardPage() {
         try {
             await updateChatRequestStatus(requestId, status);
             toast({ title: "Request Updated", description: `The chat request has been ${status}.`});
+            if (status === 'accepted') {
+                router.push('/coach');
+            }
         } catch (error) {
             console.error("Failed to update chat request:", error);
             toast({ title: "Update Failed", description: "Could not update the request. It may have been cancelled.", variant: "destructive" });

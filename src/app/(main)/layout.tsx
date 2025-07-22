@@ -190,23 +190,32 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 function CoachLayout({ children }: { children: React.ReactNode }) {
   const { logout, user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     logout();
     router.push('/login');
   };
 
+  const navItems = [
+    { href: '/coach-dashboard', label: 'Requests' },
+    { href: '/coach', label: 'Chat' },
+  ]
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
        <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
         <Logo />
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-           <Link
-            href="/coach-dashboard"
-            className="text-foreground transition-colors hover:text-foreground"
-          >
-            Dashboard
-          </Link>
+           {navItems.map(item => (
+             <Link
+                key={item.href}
+                href={item.href}
+                className={`transition-colors hover:text-foreground ${pathname === item.href ? 'text-foreground' : 'text-muted-foreground'}`}
+            >
+                {item.label}
+            </Link>
+           ))}
         </nav>
         <div className="ml-auto flex items-center gap-4">
           <DropdownMenu>
@@ -255,8 +264,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }
   
   if (user.role === 'coach') {
-    // If user is a coach and not on their dashboard, redirect them.
-    if (pathname !== '/coach-dashboard') {
+    const allowedCoachRoutes = ['/coach-dashboard', '/coach'];
+    // If user is a coach and not on an allowed coach page, redirect them.
+    if (!allowedCoachRoutes.includes(pathname)) {
       router.replace('/coach-dashboard');
       // Show a loading spinner while redirecting
       return (
@@ -267,6 +277,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     }
     // Render the dedicated layout for coaches
     return <CoachLayout>{children}</CoachLayout>;
+  }
+
+  // If a customer tries to access a coach route, redirect them to their dashboard
+  if (user.role === 'customer' && (pathname === '/coach-dashboard')) {
+      router.replace('/dashboard');
+      return (
+        <div className="flex min-h-screen w-full items-center justify-center bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      );
   }
 
   // Render the standard protected layout for customers
