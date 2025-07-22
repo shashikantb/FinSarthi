@@ -94,7 +94,7 @@ function AudioPlayer({ message, language }: { message: Message, language: string
 }
 
 export function FinancialCoach({ currentUser, chatSession, chatPartner }: FinancialCoachProps) {
-  const [messages, setMessages] = useState<Message[]>([]]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
