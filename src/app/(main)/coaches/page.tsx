@@ -33,14 +33,18 @@ export default function CoachesPage() {
       setLoading(true);
       try {
         const availableCoaches = await getAvailableCoaches();
-        setCoaches(availableCoaches);
+        // Filter out the current user if they are a coach
+        const filteredCoaches = availableCoaches.filter(coach => coach.id !== user?.id);
+        setCoaches(filteredCoaches);
       } catch (error) {
         console.error("Failed to fetch coaches:", error);
       }
       setLoading(false);
     }
-    fetchCoaches();
-  }, []);
+    if(user) {
+        fetchCoaches();
+    }
+  }, [user]);
 
   const handleRequestChat = async (coachId: string) => {
     if (!user) {
@@ -93,10 +97,12 @@ export default function CoachesPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                     <Badge variant="outline" className="text-green-600 border-green-600">
-                        <Wifi className="mr-2 h-3 w-3" />
-                        Available
-                     </Badge>
+                     <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline" className="text-green-600 border-green-600">
+                            <Wifi className="mr-2 h-3 w-3" />
+                            Available
+                        </Badge>
+                     </div>
                   </CardContent>
                   <CardFooter>
                     <Button 

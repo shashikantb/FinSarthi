@@ -45,7 +45,7 @@ export default function CoachDashboardPage() {
         setIsLoadingRequests(true);
         try {
             const fetchedRequests = await getChatRequestsForCoach(user.id);
-            setRequests(fetchedRequests);
+            setRequests(fetchedRequests.filter(r => r.request.status === 'pending'));
         } catch (error) {
             console.error("Failed to fetch chat requests:", error);
             toast({ title: "Error", description: "Could not load chat requests.", variant: "destructive"});
