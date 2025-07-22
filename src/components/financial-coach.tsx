@@ -1,3 +1,4 @@
+
 // src/components/financial-coach.tsx
 "use client";
 
@@ -124,26 +125,28 @@ export function FinancialCoach() {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setError('');
-
+  
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
+  
+    // Create the history for the AI *before* updating the state.
+    // This captures the state as it is right now, plus the new user message.
+    const historyForAI = [...messages, userMessage];
     
-    // Add user message to the state using a functional update to ensure we have the latest state.
-    setMessages(currentMessages => [...currentMessages, userMessage]);
+    // Optimistically update the UI with the user's message.
+    setMessages(historyForAI);
     form.reset({ query: '', language: data.language });
-
+  
     try {
       // The history passed to the AI must include the new user message.
-      // We create it by combining the *previous* state with the new user message.
-      const historyForAI = [...messages, userMessage];
       const sanitizedHistory = historyForAI.map(({ id, ...rest }) => rest);
-
+  
       const input: FinancialCoachInput = {
         language: data.language,
         history: sanitizedHistory,
       };
       
       const result = await financialCoach(input);
-
+  
       if (!result || !result.response) {
         throw new Error("AI returned an invalid response.");
       }
@@ -154,9 +157,10 @@ export function FinancialCoach() {
         id: createId(),
       };
       
-      // Add the assistant's message using another functional update.
+      // Append the assistant's message to the state using a functional update
+      // to ensure it builds on the most recent state.
       setMessages(currentMessages => [...currentMessages, modelMessage]);
-
+  
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
       setError(`Failed to get response. ${e.message || ''}`.trim());
