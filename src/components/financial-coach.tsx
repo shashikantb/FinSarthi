@@ -1,3 +1,4 @@
+
 // src/components/financial-coach.tsx
 "use client";
 
@@ -131,14 +132,12 @@ export function FinancialCoach() {
     form.reset({ query: "", language: data.language });
 
     try {
-      // The history should include the new user message.
       const sanitizedHistory = currentMessages.map(({ role, content }) => ({
         role,
         content,
       }));
 
       const input: FinancialCoachInput = {
-        query: data.query,
         language: data.language,
         history: sanitizedHistory, 
       };
@@ -195,7 +194,7 @@ export function FinancialCoach() {
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <p>{message.content}</p>
+                    <p className="whitespace-pre-wrap">{message.content}</p>
                     {message.role === "assistant" && <AudioPlayer message={message} language={language} />}
                   </div>
                 </div>

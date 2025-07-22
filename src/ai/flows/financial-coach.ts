@@ -20,14 +20,13 @@ const groq = new OpenAI({
 });
 
 const FinancialCoachInputSchema = z.object({
-  query: z.string().describe('The user\'s question or message to the financial coach.'),
   language: z
     .enum(['English', 'Hindi', 'Marathi'])
     .describe('The language for the conversation.'),
   history: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
-  })).optional().describe('The conversation history.'),
+  })).describe('The entire conversation history, including the latest user message.'),
 });
 export type FinancialCoachInput = z.infer<typeof FinancialCoachInputSchema>;
 
@@ -70,20 +69,13 @@ The user is conversing with you in ${input.language}. Your response MUST be in t
 
 ${productContext}
 
-Converse with the user based on their query and the history of the conversation provided.
+Converse with the user based on the history of the conversation provided.
 Be friendly, empathetic, and encouraging. DO NOT make up product names; only use the ones provided above.`;
         
-        // Sanitize the history to remove any extra properties like 'id' that the frontend might use.
-        // The Groq API expects only 'role' and 'content'.
-        const sanitizedHistory = (input.history || []).map(({ role, content }) => ({
-            role,
-            content,
-        }));
-
+        // The history from the client is the source of truth.
         const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
             { role: 'system', content: systemPrompt },
-            ...sanitizedHistory,
-            { role: 'user', content: input.query }
+            ...input.history,
         ];
 
         const completion = await groq.chat.completions.create({
