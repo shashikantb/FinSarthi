@@ -1,3 +1,4 @@
+
 // src/components/financial-coach.tsx
 "use client";
 
@@ -127,6 +128,7 @@ export function FinancialCoach() {
 
     const userMessage: Message = { role: "user", content: data.query, id: createId() };
     const newMessages = [...messages, userMessage];
+    
     setMessages(newMessages);
     form.reset({ query: "", language: data.language });
 
@@ -148,7 +150,8 @@ export function FinancialCoach() {
         content: result.response,
         id: createId(),
       };
-      setMessages((prev) => [...prev, modelMessage]);
+      
+      setMessages((prevMessages) => [...prevMessages, modelMessage]);
 
     } catch (e) {
       setError("Failed to get response. Please try again.");
