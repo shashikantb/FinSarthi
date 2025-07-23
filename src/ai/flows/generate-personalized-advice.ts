@@ -31,6 +31,15 @@ export async function generatePersonalizedAdvice(input: GeneratePersonalizedAdvi
   return generatePersonalizedAdviceFlow(input);
 }
 
+const getCurrencySymbol = (language: LanguageCode) => {
+    switch (language) {
+        case 'de':
+            return '€';
+        default:
+            return '₹';
+    }
+}
+
 const generatePersonalizedAdviceFlow = ai.defineFlow(
   {
     name: 'generatePersonalizedAdviceFlow',
@@ -56,6 +65,8 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
         if (!promptConfig) {
             throw new Error(`Prompt with key "${promptKey}" not found.`);
         }
+        
+        const currencySymbol = getCurrencySymbol(language);
 
         // Dynamically build a string of the user's answers, adding currency context for numeric types.
         const userAnswers = Object.entries(formData)
@@ -66,7 +77,7 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
                 const questionLabel = questionConfig.label[language as LanguageCode] || key;
                 
                 // Add currency symbol for numeric inputs to give AI better context
-                const displayValue = questionConfig.type === 'number' ? `₹${value}` : value;
+                const displayValue = questionConfig.type === 'number' ? `${currencySymbol}${value}` : value;
                 
                 return `- ${questionLabel}: ${displayValue}`;
             })
