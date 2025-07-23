@@ -91,7 +91,7 @@ export default function OnboardingPage() {
   });
 
   const handleLanguageContinue = () => {
-    localStorage.setItem("finsarthi_language", selectedLanguage);
+    localStorage.setItem("finmate_language", selectedLanguage);
     // Reload only if the language has actually changed
     if (selectedLanguage !== languageCode) {
         window.location.reload();
@@ -131,7 +131,7 @@ export default function OnboardingPage() {
         const loggedInUser = await login(signupData.email, signupData.password, 'customer');
         
         if (loggedInUser) {
-            toast({ title: "Account Created!", description: "Welcome to FinSarthi!" });
+            toast({ title: "Account Created!", description: "Welcome to FINmate!" });
             router.push("/coach");
         } else {
             throw new Error("Automatic login failed. Please log in manually.");

@@ -98,7 +98,7 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       1.  **Analyze the user's situation** based on the information they provided.
       2.  **Provide Actionable Steps:** Give 3-5 clear, simple, and prioritized steps. Your response should be well-structured, easy to read, and use markdown for formatting (like lists and bold text).
       3.  **Suggest Products:** When relevant, suggest suitable products from the list provided. Do not invent products.
-      4.  **Language and Tone:** Your response MUST be in ${language}. Be encouraging, empathetic, and supportive. Your name is FinSarthi.
+      4.  **Language and Tone:** Your response MUST be in ${language}. Be encouraging, empathetic, and supportive. Your name is FINmate.
       5.  **Output Format**: Your response MUST be ONLY the advice text. Do not include any other text, greetings, or explanations.
       `;
 
@@ -126,5 +126,3 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
     }
   }
 );
-
-    

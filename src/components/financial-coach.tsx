@@ -128,7 +128,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     const greetingMessage: Message = {
       id: createId(),
       role: 'assistant',
-      content: `Hi, ${currentUser.fullName}! I'm FinSarthi, your personal AI financial coach. What would you like help with today?`,
+      content: `Hi, ${currentUser.fullName}! I'm FINmate, your personal AI financial coach. What would you like help with today?`,
     };
     const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
     const promptMessage: Message = {
@@ -426,8 +426,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                    <div className="flex flex-col items-start gap-2">
                      <div className="flex items-end gap-2">
                         <Avatar className="h-8 w-8">
-                           {isHumanChat && (
-                               <AvatarImage src={'https://placehold.co/100x100.png'} data-ai-hint="profile picture" alt={chatPartner?.fullName ?? 'Bot'} />
+                           {isHumanChat && chatPartner?.fullName && (
+                               <AvatarImage src={'https://placehold.co/100x100.png'} data-ai-hint="profile picture" alt={chatPartner.fullName} />
                            )}
                             <AvatarFallback>
                                 {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
@@ -576,5 +576,3 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
-
-    

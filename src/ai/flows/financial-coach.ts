@@ -73,7 +73,7 @@ const financialCoachFlow = ai.defineFlow(
         }
 
 
-        const systemPrompt = `You are FinSarthi, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
+        const systemPrompt = `You are FINmate, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
 You are an expert on topics like budgeting, saving, investing, and loans.
 The user is conversing with you in ${input.language}. Your response MUST be in the same language.
 

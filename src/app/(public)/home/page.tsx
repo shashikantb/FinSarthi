@@ -49,7 +49,7 @@ export default function HomePage() {
                   Your Personal AI Financial Coach
                 </h1>
                 <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                  FinSarthi provides personalized financial advice to help you
+                  FINmate provides personalized financial advice to help you
                   achieve your goals. Get guidance on budgeting, saving,
                   investing, and more.
                 </p>
@@ -73,7 +73,7 @@ export default function HomePage() {
                 <div className="space-y-2">
                     <h2 className="text-3xl font-bold font-headline tracking-tighter sm:text-4xl">All-in-One Financial Toolkit</h2>
                     <p className="max-w-[900px] text-muted-foreground md:text-lg lg:text-base xl:text-lg">
-                        From asking simple questions to generating complex financial plans, FinSarthi has the tools you need to succeed.
+                        From asking simple questions to generating complex financial plans, FINmate has the tools you need to succeed.
                     </p>
                 </div>
             </div>

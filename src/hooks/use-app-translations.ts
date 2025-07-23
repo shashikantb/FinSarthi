@@ -11,14 +11,14 @@ export function useAppTranslations() {
 
   useEffect(() => {
     // This effect runs on the client after hydration
-    const savedLang = localStorage.getItem("finsarthi_language") as LanguageCode | null;
+    const savedLang = localStorage.getItem("finmate_language") as LanguageCode | null;
     if (savedLang && translations[savedLang]) {
       setLanguageCode(savedLang);
     }
 
     // Optional: Add a listener to update translations if the language changes in another tab
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === "finsarthi_language" && event.newValue && translations[event.newValue as LanguageCode]) {
+      if (event.key === "finmate_language" && event.newValue && translations[event.newValue as LanguageCode]) {
         setLanguageCode(event.newValue as LanguageCode);
       }
     };

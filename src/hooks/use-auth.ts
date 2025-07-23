@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { getUserById, findUserByEmailOrPhone } from "@/services/user-service";
 import type { User } from "@/lib/db/schema";
 
-const SESSION_KEY = "finsarthi_session_userId";
+const SESSION_KEY = "finmate_session_userId";
 // This is a placeholder for a real hashing mechanism
 const FAKE_PASSWORD_SALT = "somesalt";
 
