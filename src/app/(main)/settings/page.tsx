@@ -31,8 +31,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { allLanguages } from "@/lib/all-languages";
-import { useAppTranslations } from "@/hooks/use-app-translations";
-import type { LanguageCode } from "@/lib/translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 
 const settingsSchema = z.object({
   language: z.string(), // Allow any string, will be validated by the available languages
@@ -42,34 +41,25 @@ type SettingsFormValues = z.infer<typeof settingsSchema>;
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const { t, languageCode } = useAppTranslations();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const { t, languageCode, setLanguage } = useAppTranslations();
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
-      language: "en",
+      language: languageCode,
     },
   });
 
   useEffect(() => {
-    if (isClient) {
-      form.setValue("language", languageCode);
-    }
-  }, [form, isClient, languageCode]);
+    form.setValue("language", languageCode);
+  }, [form, languageCode]);
 
   const onSubmit: SubmitHandler<SettingsFormValues> = (data) => {
-    localStorage.setItem("finsarthi_language", data.language);
+    setLanguage(data.language as any);
     toast({
       title: t.settings.toast_title,
       description: t.settings.toast_description,
     });
-    // Force a reload to ensure all components get the new language
-    window.location.reload();
   };
 
   return (

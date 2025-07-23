@@ -2,7 +2,7 @@
 "use client";
 
 import { TranslatorForm } from "@/components/translator-form";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 
 export default function TranslatorPage() {
   const { t } = useAppTranslations();

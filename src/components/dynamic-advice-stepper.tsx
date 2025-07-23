@@ -39,7 +39,7 @@ import {
   X,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 import type { LanguageCode } from "@/lib/translations";
 import type { AdviceSession } from "@/lib/db/schema";
 import { createAdviceSessionForCurrentUser } from "@/services/advice-service";

@@ -2,7 +2,7 @@
 "use client";
 
 import { FinancialCoach } from "@/components/financial-coach";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useState } from "react";
 import { getActiveChatSession } from "@/services/chat-service";

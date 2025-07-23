@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { allLanguages } from "@/lib/all-languages";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 import type { LanguageCode } from "@/lib/translations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -79,24 +79,19 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const { t, languageCode } = useAppTranslations();
+  const { t, languageCode, setLanguage } = useAppTranslations();
   const { login } = useAuth();
   
-  // Local state for the language selection to avoid conflicts with global state
-  const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(languageCode);
-
   const methods = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     mode: 'onChange',
   });
 
   const handleLanguageContinue = () => {
-    localStorage.setItem("finmate_language", selectedLanguage);
-    // Reload only if the language has actually changed
-    if (selectedLanguage !== languageCode) {
-        window.location.reload();
-    } else {
-        setStep("signup");
+    const selectedLanguage = methods.getValues("language" as any) || languageCode;
+    setLanguage(selectedLanguage);
+    if (selectedLanguage === languageCode) {
+      setStep("signup");
     }
   };
   
@@ -162,7 +157,7 @@ export default function OnboardingPage() {
               <CardDescription>{t.onboarding.language_desc}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              <Select onValueChange={(val) => setSelectedLanguage(val as LanguageCode)} value={selectedLanguage}>
+              <Select onValueChange={(val) => methods.setValue("language" as any, val as LanguageCode)} defaultValue={languageCode}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a language" />
                 </SelectTrigger>

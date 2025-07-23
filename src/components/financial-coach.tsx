@@ -49,7 +49,7 @@ import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { languages, langToLocale, type LanguageCode } from "@/lib/translations";
 import { createId } from "@paralleldrive/cuid2";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 import { useToast } from "@/hooks/use-toast";
 import advicePrompts from "@/lib/advice-prompts.json";
 import { createAdviceSessionForCurrentUser } from "@/services/advice-service";
@@ -429,12 +429,12 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                    <div className="flex flex-col items-start gap-2">
                      <div className="flex items-end gap-2">
                         <Avatar className="h-8 w-8">
-                           {isHumanChat && chatPartner?.fullName && (
-                               <AvatarImage src={'https://placehold.co/100x100.png'} data-ai-hint="profile picture" alt={chatPartner.fullName} />
-                           )}
                             <AvatarFallback>
                                 {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
                             </AvatarFallback>
+                           {isHumanChat && chatPartner?.fullName && (
+                               <AvatarImage src={'https://placehold.co/100x100.png'} data-ai-hint="profile picture" alt={chatPartner.fullName} />
+                           )}
                         </Avatar>
                         <div
                           className={cn(

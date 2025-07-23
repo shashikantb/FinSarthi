@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Wand2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 import { languages } from "@/lib/translations";
 
 const formSchema = z.object({

@@ -2,7 +2,7 @@
 "use client";
 
 import { SummarizerForm } from "@/components/summarizer-form";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 
 export default function SummarizerPage() {
   const { t } = useAppTranslations();

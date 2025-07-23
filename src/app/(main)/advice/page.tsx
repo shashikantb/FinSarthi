@@ -9,7 +9,7 @@ import { History, PlusCircle } from "lucide-react";
 import { getAdviceHistoryForUser } from "@/services/advice-service";
 import type { AdviceSession } from "@/lib/db/schema";
 import advicePrompts from "@/lib/advice-prompts.json";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 import type { LanguageCode } from "@/lib/translations";
 
 export default function AdvicePage() {

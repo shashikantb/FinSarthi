@@ -47,7 +47,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Logo } from "@/components/logo";
 import { useAuth } from "@/hooks/use-auth";
-import { useAppTranslations } from "@/hooks/use-app-translations";
+import { useAppTranslations } from "@/providers/translations-provider";
 import { getUnreadMessageCountForUser } from "@/services/chat-service";
 
 function AppHeader() {
