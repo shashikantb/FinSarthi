@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function Logo() {
     return (
-        <Link href="/advice" className="flex items-center gap-2 font-headline font-bold text-lg">
+        <Link href="/coach" className="flex items-center gap-2 font-headline font-bold text-lg">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

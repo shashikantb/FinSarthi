@@ -133,8 +133,8 @@ function MainSidebar() {
   };
   
   const menuItems = [
-    { href: "/advice", label: t.nav.advice, icon: History },
     { href: "/coach", label: t.nav.coach, icon: MessageCircle, badge: unreadCount > 0 ? String(unreadCount) : undefined },
+    { href: "/advice", label: t.nav.advice, icon: History },
     { href: "/summarizer", label: t.nav.summarizer, icon: FileText },
     { href: "/translator", label: t.nav.translator, icon: Languages },
     { href: "/coaches", label: "Regional Coaches", icon: Users },
@@ -304,7 +304,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   // If a customer tries to access a coach route, redirect them to their main page
   if (user.role === 'customer' && (pathname === '/coach-dashboard')) {
-      router.replace('/advice');
+      router.replace('/coach');
       return (
         <div className="flex min-h-screen w-full items-center justify-center bg-background">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
