@@ -40,7 +40,7 @@ import { languages } from "@/lib/translations";
 
 const formSchema = z.object({
   articleContent: z.string().min(50, "Article content must be at least 50 characters."),
-  language: z.enum(["English", "Hindi", "Marathi"]),
+  language: z.enum(["English", "Hindi", "Marathi", "German"]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -62,7 +62,7 @@ export function SummarizerForm() {
   useEffect(() => {
     const langName = languages[languageCode as keyof typeof languages]?.name;
     if (langName) {
-      form.setValue("language", langName as "English" | "Hindi" | "Marathi");
+      form.setValue("language", langName as "English" | "Hindi" | "Marathi" | "German");
     }
   }, [languageCode, form]);
 
@@ -129,6 +129,7 @@ export function SummarizerForm() {
                         <SelectItem value="English">English</SelectItem>
                         <SelectItem value="Hindi">Hindi</SelectItem>
                         <SelectItem value="Marathi">Marathi</SelectItem>
+                        <SelectItem value="German">German</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

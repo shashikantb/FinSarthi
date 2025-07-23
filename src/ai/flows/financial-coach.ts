@@ -21,7 +21,7 @@ const groq = new OpenAI({
 
 const FinancialCoachInputSchema = z.object({
   language: z
-    .enum(['English', 'Hindi', 'Marathi'])
+    .enum(['English', 'Hindi', 'Marathi', 'German'])
     .describe('The language for the conversation.'),
   history: z.array(z.object({
     role: z.enum(['user', 'assistant']),

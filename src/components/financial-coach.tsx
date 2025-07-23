@@ -66,7 +66,7 @@ type Message = {
 
 const formSchema = z.object({
   query: z.string().min(1, "Message cannot be empty."),
-  language: z.enum(["English", "Hindi", "Marathi"]),
+  language: z.enum(["English", "Hindi", "Marathi", "German"]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -288,7 +288,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   useEffect(() => {
     const langName = languages[languageCode as keyof typeof languages]?.name;
     if (langName) {
-      form.setValue("language", langName as "English" | "Hindi" | "Marathi");
+      form.setValue("language", langName as "English" | "Hindi" | "Marathi" | "German");
     }
   }, [languageCode, form]);
 
@@ -384,7 +384,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         <div className="flex items-center gap-2">
             {!isHumanChat && (
               <Select
-                onValueChange={(value) => form.setValue("language", value as "English" | "Hindi" | "Marathi")}
+                onValueChange={(value) => form.setValue("language", value as "English" | "Hindi" | "Marathi" | "German")}
                 value={form.getValues('language')}
                 disabled={isLoading || messages.length > 0 && conversationStage !== 'chatting'}
               >
@@ -395,6 +395,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                   <SelectItem value="English">English</SelectItem>
                   <SelectItem value="Hindi">Hindi</SelectItem>
                   <SelectItem value="Marathi">Marathi</SelectItem>
+                  <SelectItem value="German">German</SelectItem>
                 </SelectContent>
               </Select>
             )}

@@ -23,7 +23,7 @@ const SummarizeFinancialNewsInputSchema = z.object({
     .string()
     .describe('The content of the financial news article to summarize.'),
   language: z
-    .enum(['English', 'Hindi', 'Marathi'])
+    .enum(['English', 'Hindi', 'Marathi', 'German'])
     .describe('The language in which to provide the summary.'),
 });
 export type SummarizeFinancialNewsInput = z.infer<

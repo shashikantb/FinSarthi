@@ -26,7 +26,7 @@ const groq = new OpenAI({
 const GeneratePersonalizedAdviceInputSchema = z.object({
   promptKey: z.string().describe("The key of the selected prompt from the JSON config."),
   formData: z.record(z.string()).describe("The user's answers to the dynamic questions."),
-  language: z.enum(["en", "hi", "mr"]),
+  language: z.enum(["en", "hi", "mr", "de"]),
 });
 
 export type GeneratePersonalizedAdviceInput = z.infer<typeof GeneratePersonalizedAdviceInputSchema>;

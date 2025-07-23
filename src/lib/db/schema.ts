@@ -21,7 +21,7 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const languageEnum = pgEnum('language', ['en', 'hi', 'mr']);
+export const languageEnum = pgEnum('language', ['en', 'hi', 'mr', 'de']);
 
 export const adviceSessions = pgTable('advice_sessions', {
   id: text('id').primaryKey().$defaultFn(() => createId()),

@@ -23,7 +23,7 @@ const TranslateFinancialTermsInputSchema = z.object({
   language: z
     .string()
     .describe(
-      'The target language for the translation (e.g., English, Hindi, Marathi).'
+      'The target language for the translation (e.g., English, Hindi, Marathi, German).'
     ),
   userLiteracyLevel: z
     .enum(['beginner', 'intermediate', 'advanced'])
