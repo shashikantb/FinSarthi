@@ -124,7 +124,7 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
     const identifier = methods.getValues("identifier");
     const isEmail = identifier.includes('@');
 
-    const newUser: Omit<NewUser, 'id' | 'createdAt'> = {
+    const newUser: Omit<NewUser, 'id' | 'createdAt' | 'passwordHash'> = {
         ...data,
         email: isEmail ? identifier : null,
         phone: isEmail ? null : identifier,
@@ -152,9 +152,13 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
     }
     
     if (existingUser) {
-        await login(existingUser.email || existingUser.phone!, 'otp_login', existingUser.role);
-        toast({ title: "Login Successful!", description: `Welcome back, ${existingUser.fullName}!`});
-        onLoginSuccess();
+        const loggedIn = await login(existingUser.email || existingUser.phone!, 'otp_login', existingUser.role);
+        if (loggedIn) {
+            toast({ title: "Login Successful!", description: `Welcome, ${existingUser.fullName}!`});
+            onLoginSuccess();
+        } else {
+            toast({ title: "Error", description: "Something went wrong during login.", variant: "destructive" });
+        }
     } else {
         toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
     }

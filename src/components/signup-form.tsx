@@ -20,34 +20,23 @@ import { createUser } from "@/services/user-service";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { roleEnum } from "@/lib/db/schema";
 
+// Schema is simplified for coach-only signup
 const signupSchema = z.object({
   fullName: z.string().min(1, "Full name is required."),
   email: z.string().email("Invalid email address."),
   password: z.string().min(6, "Password must be at least 6 characters."),
-  role: z.enum(roleEnum.enumValues),
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 
-// This component is now only for the dedicated /signup page, not the onboarding flow.
+// This component is now only for the dedicated /signup page, for coaches.
 export function SignupForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
-    defaultValues: {
-      role: 'customer',
-    }
   });
 
   const onSubmit: SubmitHandler<SignupFormValues> = async (data) => {
@@ -57,13 +46,13 @@ export function SignupForm() {
         fullName: data.fullName,
         email: data.email,
         passwordHash: data.password, // This is insecure, for prototype only
-        role: data.role,
-        isAvailable: data.role === 'coach' ? false : undefined, // Default coach to not available
+        role: 'coach', // Role is hardcoded to 'coach'
+        isAvailable: false, // Default coach to not available
       });
       
       toast({
-        title: "Account Created!",
-        description: "You can now log in.",
+        title: "Coach Account Created!",
+        description: "You can now log in using the main login button on the homepage.",
       });
       
       router.push("/home");
@@ -82,29 +71,14 @@ export function SignupForm() {
   return (
     <Card className="mx-auto max-w-sm w-full">
       <CardHeader>
-        <CardTitle className="text-xl">Sign Up</CardTitle>
+        <CardTitle className="text-xl">Coach Sign Up</CardTitle>
         <CardDescription>
-          Enter your information to create an account
+          Enter your information to create a coach account.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)} className="grid gap-4">
-            <div className="grid gap-2">
-                <Label htmlFor="role">I am a...</Label>
-                <Select onValueChange={(value) => methods.setValue('role', value as 'customer' | 'coach')} defaultValue="customer">
-                  <SelectTrigger id="role">
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="customer">Customer</SelectItem>
-                    <SelectItem value="coach">Coach</SelectItem>
-                  </SelectContent>
-                </Select>
-                 {methods.formState.errors.role && (
-                  <p className="text-xs text-destructive">{methods.formState.errors.role.message}</p>
-                )}
-            </div>
             <div className="grid gap-2">
               <Label htmlFor="full-name">Full name</Label>
               <Input
@@ -136,7 +110,7 @@ export function SignupForm() {
               )}
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="animate-spin" /> : "Create an account"}
+              {isLoading ? <Loader2 className="animate-spin" /> : "Create Coach Account"}
             </Button>
           </form>
         </FormProvider>
