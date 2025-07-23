@@ -27,6 +27,10 @@ const FinancialCoachInputSchema = z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
   })).describe('The entire conversation history, including the latest user message.'),
+  age: z.number().optional().describe("The user's age."),
+  gender: z.string().optional().describe("The user's gender."),
+  city: z.string().optional().describe("The user's city."),
+  country: z.string().optional().describe("The user's country."),
 });
 export type FinancialCoachInput = z.infer<typeof FinancialCoachInputSchema>;
 
@@ -62,11 +66,22 @@ const financialCoachFlow = ai.defineFlow(
         Loan Products: ${JSON.stringify(loans)}
         `;
 
+        // Build the user context string conditionally.
+        let userContext = "The user is talking to you.";
+        if (input.age || input.gender || input.city || input.country) {
+            userContext = `The user is a ${input.age || ''} year old ${input.gender || ''} from ${input.city || ''}, ${input.country || ''}.`.replace(/\s+/g, ' ').trim();
+        }
+
+
         const systemPrompt = `You are FinSarthi, an expert financial coach. Your goal is to provide clear, simple, and personalized financial advice.
 You are an expert on topics like budgeting, saving, investing, and loans.
 The user is conversing with you in ${input.language}. Your response MUST be in the same language.
 
 ${productContext}
+
+Here is some information about the user you are talking to:
+${userContext}
+Use this information to tailor your advice. For example, investment advice might differ for a 25-year-old versus a 55-year-old.
 
 Converse with the user based on the history of the conversation provided.
 Be friendly, empathetic, and encouraging. DO NOT make up product names; only use the ones provided above.`;

@@ -347,6 +347,10 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         const input: FinancialCoachInput = {
           language: data.language,
           history: historyForAI,
+          age: currentUser.age ?? undefined,
+          gender: currentUser.gender ?? undefined,
+          city: currentUser.city ?? undefined,
+          country: currentUser.country ?? undefined,
         };
         const result = await financialCoach(input);
         if (!result || !result.response) throw new Error("AI returned an invalid response.");
@@ -422,14 +426,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                    <div className="flex flex-col items-start gap-2">
                      <div className="flex items-end gap-2">
                         <Avatar className="h-8 w-8">
-                           {(() => {
-                               if (isHumanChat) {
-                                   if (chatPartner && chatPartner.image) {
-                                       return <AvatarImage src={chatPartner.image} data-ai-hint="profile picture" alt={chatPartner.fullName ?? 'Bot'} />;
-                                   }
-                               }
-                               return null;
-                           })()}
+                           {isHumanChat && (
+                               <AvatarImage src={'https://placehold.co/100x100.png'} data-ai-hint="profile picture" alt={chatPartner?.fullName ?? 'Bot'} />
+                           )}
                             <AvatarFallback>
                                 {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
                             </AvatarFallback>
