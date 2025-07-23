@@ -6,6 +6,8 @@ import { users, type NewUser } from "@/lib/db/schema";
 import { eq, and, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
+const FAKE_PASSWORD_SALT = "somesalt";
+
 /**
  * Creates a new user in the database.
  * @param data The data for the new user.
@@ -15,9 +17,13 @@ export async function createUser(data: Omit<NewUser, 'id' | 'createdAt'>) {
     const db = getDbInstance();
     if (!db) throw new Error("Database connection not available.");
 
-    const valuesToInsert: NewUser = {
-      ...data,
-    };
+    const valuesToInsert: NewUser = { ...data };
+
+    // "Hash" the password if it exists. In a real app, use a strong hashing library like bcrypt.
+    if (data.passwordHash) {
+        valuesToInsert.passwordHash = data.passwordHash + FAKE_PASSWORD_SALT;
+    }
+
     const [newUser] = await db.insert(users).values(valuesToInsert).returning();
     return newUser;
 }

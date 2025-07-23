@@ -11,6 +11,7 @@ export const users = pgTable('users', {
   fullName: text('full_name'),
   email: text('email').unique(),
   phone: text('phone').unique(),
+  passwordHash: text('password_hash'),
   age: integer('age'),
   city: text('city'),
   country: text('country'),

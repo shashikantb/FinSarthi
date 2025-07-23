@@ -66,7 +66,7 @@ export function SignupForm() {
         description: "You can now log in.",
       });
       
-      router.push("/login");
+      router.push("/home");
 
     } catch (error) {
       console.error("Signup failed:", error);
@@ -142,7 +142,7 @@ export function SignupForm() {
         </FormProvider>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <Link href="/login" className="underline">
+          <Link href="/home" className="underline">
             Login
           </Link>
         </div>

@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/select";
 
 
-type AuthStep = "identifier" | "otp" | "details";
+type AuthStep = "identifier" | "otp" | "details" | "password";
 
 const identifierSchema = z.object({
   identifier: z.string().min(1, "Email or phone is required."),
@@ -44,6 +44,10 @@ const identifierSchema = z.object({
 
 const otpSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits."),
+});
+
+const passwordSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters."),
 });
 
 const detailsSchema = z.object({
@@ -69,12 +73,16 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
   const { toast } = useToast();
   const { login } = useAuth();
   
-  // Combine all form schemas for a single provider
-  const combinedSchema = identifierSchema.merge(otpSchema).merge(detailsSchema);
+  const combinedSchema = identifierSchema.merge(otpSchema).merge(detailsSchema).merge(passwordSchema);
+  
+  const currentSchema = 
+    step === "identifier" ? identifierSchema :
+    step === "details" ? detailsSchema :
+    step === "password" ? passwordSchema :
+    otpSchema;
+
   const methods = useForm<z.infer<typeof combinedSchema>>({
-    resolver: zodResolver(
-      step === "identifier" ? identifierSchema : step === "details" ? detailsSchema : otpSchema
-    ),
+    resolver: zodResolver(currentSchema),
     mode: "onChange",
   });
 
@@ -84,7 +92,12 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
       const user = await findUserByEmailOrPhone(data.identifier);
       setExistingUser(user);
       if (user) {
-        setStep("otp");
+        // If user is a coach, ask for password. Otherwise, OTP.
+        if (user.role === 'coach') {
+            setStep("password");
+        } else {
+            setStep("otp");
+        }
       } else {
         setStep("details");
       }
@@ -93,6 +106,18 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
     }
     setIsLoading(false);
   };
+  
+  const handlePasswordSubmit: SubmitHandler<z.infer<typeof passwordSchema>> = async (data) => {
+    setIsLoading(true);
+    const loggedIn = await login(existingUser!.email!, data.password, existingUser!.role);
+    if(loggedIn) {
+        toast({ title: "Login Successful!", description: `Welcome back, ${existingUser!.fullName}!`});
+        onLoginSuccess();
+    } else {
+        toast({ title: "Login Failed", description: "The password you entered is incorrect.", variant: "destructive" });
+    }
+    setIsLoading(false);
+  }
 
   const handleDetailsSubmit: SubmitHandler<z.infer<typeof detailsSchema>> = async (data) => {
     setIsLoading(true);
@@ -104,14 +129,12 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
         email: isEmail ? identifier : null,
         phone: isEmail ? null : identifier,
         fullName: data.fullName,
-        role: 'customer'
+        role: 'customer' // This flow is only for customers
     }
 
     try {
         const createdUser = await createUser(newUser);
         setExistingUser(createdUser);
-        // After creating the user, immediately log them in and close the dialog.
-        // We will move them to the OTP step first, then log in upon success.
         setStep("otp");
         toast({ title: "Profile Created!", description: "Please verify with the OTP to login."});
     } catch(error) {
@@ -129,7 +152,7 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
     }
     
     if (existingUser) {
-        await login(existingUser.id);
+        await login(existingUser.email || existingUser.phone!, 'otp_login', existingUser.role);
         toast({ title: "Login Successful!", description: `Welcome back, ${existingUser.fullName}!`});
         onLoginSuccess();
     } else {
@@ -156,6 +179,7 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
         case "identifier": return "Login or Sign Up";
         case "details": return "Complete Your Profile";
         case "otp": return "Enter OTP";
+        case "password": return "Enter Password";
     }
   }
    const getDescription = () => {
@@ -163,6 +187,7 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
         case "identifier": return "Enter your email or phone number to continue.";
         case "details": return "We need a few more details to create your account.";
         case "otp": return `An OTP has been sent to ${methods.getValues("identifier")}.`;
+        case "password": return `Welcome back, ${existingUser?.fullName}! Please enter your password.`;
     }
   }
 
@@ -223,6 +248,17 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
                     </div>
                     <Button type="submit" className="w-full" disabled={isLoading}>
                         {isLoading ? <Loader2 className="animate-spin" /> : "Create Account"}
+                    </Button>
+                 </form>
+            )}
+            
+            {step === 'password' && (
+                 <form onSubmit={methods.handleSubmit(handlePasswordSubmit)} className="space-y-4">
+                     <FormField control={methods.control} name="password" render={({ field }) => (
+                        <FormItem><FormLabel>Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage/></FormItem>
+                    )}/>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? <Loader2 className="animate-spin" /> : "Login"}
                     </Button>
                  </form>
             )}
