@@ -3,6 +3,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { translations, type LanguageCode } from '@/lib/translations';
+import { LanguageSelectionModal } from '@/components/language-selection-modal';
+import { cn } from '@/lib/utils';
 
 const DEFAULT_LANGUAGE: LanguageCode = "en";
 
@@ -17,44 +19,45 @@ const TranslationsContext = createContext<TranslationsContextType | undefined>(u
 export function TranslationsProvider({ children }: { children: ReactNode }) {
   const [languageCode, setLanguageCode] = useState<LanguageCode>(DEFAULT_LANGUAGE);
   const [isMounted, setIsMounted] = useState(false);
+  const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
     const savedLang = localStorage.getItem("finmate_language") as LanguageCode | null;
     if (savedLang && translations[savedLang]) {
       setLanguageCode(savedLang);
+    } else {
+      setIsLanguageModalOpen(true);
     }
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === "finmate_language" && event.newValue && translations[event.newValue as LanguageCode]) {
-        setLanguageCode(event.newValue as LanguageCode);
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
+    setIsMounted(true);
   }, []);
 
   const setLanguage = (code: LanguageCode) => {
     if (translations[code]) {
       localStorage.setItem("finmate_language", code);
       setLanguageCode(code);
-      // Force a reload to apply translations everywhere
-      window.location.reload();
+      setIsLanguageModalOpen(false);
+      // Optional: a gentle reload could still be useful in some complex cases
+      // window.location.reload(); 
     }
   };
 
   const t = translations[languageCode] || translations[DEFAULT_LANGUAGE];
   
-  // Prevent hydration mismatch by not rendering until mounted on client
   if (!isMounted) {
+    // Render nothing on the server and until the client has mounted
+    // This prevents hydration mismatch.
     return null; 
   }
 
   return (
     <TranslationsContext.Provider value={{ t, languageCode, setLanguage }}>
-      {children}
+       <LanguageSelectionModal 
+        isOpen={isLanguageModalOpen}
+        onSelectLanguage={setLanguage}
+      />
+      <div className={cn(isLanguageModalOpen && "blur-sm")}>
+        {children}
+      </div>
     </TranslationsContext.Provider>
   );
 }
