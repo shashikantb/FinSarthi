@@ -37,6 +37,22 @@ export const translations = {
       translator: "Term Translator",
       advice: "Advice History",
     },
+    // Home Page
+    home: {
+        title: "Your Personal AI Financial Coach",
+        description: "FINmate provides personalized financial advice to help you achieve your goals. Get guidance on budgeting, saving, investing, and more.",
+        get_started: "Login / Get Started",
+        toolkit_title: "All-in-One Financial Toolkit",
+        toolkit_description: "From asking simple questions to generating complex financial plans, FINmate has the tools you need to succeed.",
+        feature1_title: "AI Coach",
+        feature1_desc: "Get instant answers to your financial questions from our conversational AI.",
+        feature2_title: "Personalized Plans",
+        feature2_desc: "Generate detailed, step-by-step financial plans tailored to your specific goals.",
+        feature3_title: "Financial Tools",
+        feature3_desc: "Simplify complex news and financial jargon with our easy-to-use summarizer and translator.",
+        try_now_title: "Try FINmate Now",
+        try_now_desc: "Ask our AI a question. No sign-up required."
+    },
     // Onboarding Page
     onboarding: {
       welcome: "Welcome to FINmate",
@@ -159,6 +175,21 @@ export const translations = {
       translator: "शब्द अनुवादक",
       advice: "सलाह का इतिहास",
     },
+    home: {
+        title: "आपका व्यक्तिगत AI वित्तीय कोच",
+        description: "FINmate आपके लक्ष्यों को प्राप्त करने में मदद करने के लिए व्यक्तिगत वित्तीय सलाह प्रदान करता है। बजट, बचत, निवेश, और बहुत कुछ पर मार्गदर्शन प्राप्त करें।",
+        get_started: "लॉगिन / आरंभ करें",
+        toolkit_title: "ऑल-इन-वन वित्तीय टूलकिट",
+        toolkit_description: "सरल प्रश्न पूछने से लेकर जटिल वित्तीय योजनाएँ बनाने तक, FINmate के पास आपकी सफलता के लिए आवश्यक उपकरण हैं।",
+        feature1_title: "AI कोच",
+        feature1_desc: "हमारे संवादी AI से अपने वित्तीय प्रश्नों के तुरंत उत्तर प्राप्त करें।",
+        feature2_title: "व्यक्तिगत योजनाएं",
+        feature2_desc: "अपने विशिष्ट लक्ष्यों के अनुरूप विस्तृत, चरण-दर-चरण वित्तीय योजनाएँ बनाएँ।",
+        feature3_title: "वित्तीय उपकरण",
+        feature3_desc: "हमारे उपयोग में आसान सारांशक और अनुवादक के साथ जटिल समाचारों और वित्तीय शब्दजाल को सरल बनाएं।",
+        try_now_title: "FINmate को अभी आज़माएं",
+        try_now_desc: "हमारे AI से एक प्रश्न पूछें। कोई साइन-अप आवश्यक नहीं है।"
+    },
     onboarding: {
       welcome: "फिनमेट में आपका स्वागत है",
       intro: "अपनी व्यक्तिगत वित्तीय योजना बनाने और शुरू करने के लिए बस कुछ कदम।",
@@ -274,6 +305,21 @@ export const translations = {
       translator: "शब्द अनुवादक",
       advice: "सल्ला इतिहास",
     },
+    home: {
+        title: "तुमचा वैयक्तिक AI आर्थिक प्रशिक्षक",
+        description: "FINmate तुम्हाला तुमचे ध्येय साध्य करण्यासाठी वैयक्तिक आर्थिक सल्ला देते. बजेटिंग, बचत, गुंतवणूक आणि बरेच काही यावर मार्गदर्शन मिळवा.",
+        get_started: "लॉगिन / प्रारंभ करा",
+        toolkit_title: "ऑल-इन-वन आर्थिक टूलकिट",
+        toolkit_description: "सोपे प्रश्न विचारण्यापासून ते गुंतागुंतीच्या आर्थिक योजना तयार करण्यापर्यंत, FINmate कडे तुमच्या यशासाठी आवश्यक साधने आहेत.",
+        feature1_title: "AI कोच",
+        feature1_desc: "आमच्या संभाषणात्मक AI कडून तुमच्या आर्थिक प्रश्नांची झटपट उत्तरे मिळवा.",
+        feature2_title: "वैयक्तिक योजना",
+        feature2_desc: "तुमच्या विशिष्ट ध्येयांनुसार तपशीलवार, चरण-दर-चरण आर्थिक योजना तयार करा.",
+        feature3_title: "आर्थिक साधने",
+        feature3_desc: "आमच्या वापरण्यास-सोप्या सारांशक आणि अनुवादकासह गुंतागुंतीच्या बातम्या आणि आर्थिक शब्दजाल सोपे करा.",
+        try_now_title: "FINmate आता वापरून पहा",
+        try_now_desc: "आमच्या AI ला एक प्रश्न विचारा. कोणत्याही साइन-अपची आवश्यकता नाही."
+    },
     onboarding: {
       welcome: "फिनमेट मध्ये आपले स्वागत आहे",
       intro: "तुमची वैयक्तिक आर्थिक योजना तयार करण्यासाठी आणि सुरू करण्यासाठी फक्त काही पायऱ्या.",
@@ -388,6 +434,21 @@ export const translations = {
       summarizer: "Nachrichten-Zusammenfassung",
       translator: "Begriffsübersetzer",
       advice: "Beratungsverlauf",
+    },
+    home: {
+        title: "Ihr persönlicher KI-Finanzcoach",
+        description: "FINmate bietet personalisierte Finanzberatung, um Ihnen zu helfen, Ihre Ziele zu erreichen. Erhalten Sie Anleitung zu Budgetierung, Sparen, Investieren und mehr.",
+        get_started: "Anmelden / Loslegen",
+        toolkit_title: "All-in-One-Finanz-Toolkit",
+        toolkit_description: "Vom Stellen einfacher Fragen bis zur Erstellung komplexer Finanzpläne hat FINmate die Werkzeuge, die Sie für Ihren Erfolg benötigen.",
+        feature1_title: "KI-Coach",
+        feature1_desc: "Erhalten Sie sofortige Antworten auf Ihre finanziellen Fragen von unserer dialogorientierten KI.",
+        feature2_title: "Personalisierte Pläne",
+        feature2_desc: "Erstellen Sie detaillierte, schrittweise Finanzpläne, die auf Ihre spezifischen Ziele zugeschnitten sind.",
+        feature3_title: "Finanzwerkzeuge",
+        feature3_desc: "Vereinfachen Sie komplexe Nachrichten und Finanzjargon mit unserem benutzerfreundlichen Zusammenfasser und Übersetzer.",
+        try_now_title: "Testen Sie FINmate jetzt",
+        try_now_desc: "Stellen Sie unserer KI eine Frage. Keine Anmeldung erforderlich."
     },
     onboarding: {
       welcome: "Willkommen bei FINmate",
