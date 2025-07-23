@@ -5,7 +5,7 @@ import { DynamicAdviceStepper } from "@/components/dynamic-advice-stepper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Wand2, PlusCircle } from "lucide-react";
+import { History, PlusCircle } from "lucide-react";
 import { getAdviceHistoryForUser } from "@/services/advice-service";
 import type { AdviceSession } from "@/lib/db/schema";
 import advicePrompts from "@/lib/advice-prompts.json";
@@ -52,7 +52,7 @@ export default function AdvicePage() {
         {!isGenerating && (
           <Button onClick={() => setIsGenerating(true)}>
             <PlusCircle className="mr-2" />
-            {t.common.new_advice}
+            {t.common.generate_new_advice}
           </Button>
         )}
       </div>
@@ -92,7 +92,7 @@ export default function AdvicePage() {
               </Accordion>
             ) : (
               <div className="text-center py-10">
-                <Wand2 className="mx-auto h-12 w-12 text-muted-foreground" />
+                <History className="mx-auto h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">{t.advice.no_history_title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{t.advice.no_history_description}</p>
               </div>

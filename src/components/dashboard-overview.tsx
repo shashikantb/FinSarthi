@@ -84,7 +84,7 @@ export function DashboardOverview() {
         <CardContent>
           <p className="mb-4 text-sm text-muted-foreground">{t.dashboard.no_data_cta_text}</p>
           <Button asChild>
-            <Link href="/advice">{t.dashboard.no_data_cta_button}</Link>
+            <Link href="/advice">{t.common.generate_new_advice}</Link>
           </Button>
         </CardContent>
       </Card>

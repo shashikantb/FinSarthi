@@ -17,6 +17,7 @@ import {
   Loader2,
   LogOut,
   Users,
+  History,
 } from "lucide-react";
 import {
   Sidebar,
@@ -136,7 +137,7 @@ function MainSidebar() {
     { href: "/coach", label: t.nav.coach, icon: MessageCircle, badge: unreadCount > 0 ? String(unreadCount) : undefined },
     { href: "/summarizer", label: t.nav.summarizer, icon: FileText },
     { href: "/translator", label: t.nav.translator, icon: Languages },
-    { href: "/advice", label: t.nav.advice, icon: Lightbulb },
+    { href: "/advice", label: t.nav.advice, icon: History },
     { href: "/coaches", label: "Regional Coaches", icon: Users },
   ];
 

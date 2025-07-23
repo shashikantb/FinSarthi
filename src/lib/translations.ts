@@ -25,7 +25,7 @@ export const translations = {
       support: "Support",
       my_account: "My Account",
       save_changes: "Save Changes",
-      new_advice: "New Advice",
+      generate_new_advice: "Generate New Advice",
     },
     // Main Navigation
     nav: {
@@ -33,7 +33,7 @@ export const translations = {
       coach: "FinSarthi Coach",
       summarizer: "News Summarizer",
       translator: "Term Translator",
-      advice: "Personalized Advice",
+      advice: "Advice History",
     },
     // Onboarding Page
     onboarding: {
@@ -77,9 +77,8 @@ export const translations = {
       income_vs_expenses: "Income vs. Expenses",
       cash_flow_desc: "A look at your cash flow over the last 6 months (simulated).",
       no_data_title: "No Financial Data Found",
-      no_data_desc: "You haven't generated any personalized advice yet.",
+      no_data_desc: "You haven't generated any advice yet.",
       no_data_cta_text: "Get started by answering a few questions to create your financial snapshot.",
-      no_data_cta_button: "Generate My Advice"
     },
     // Coach Page
     coach: {
@@ -128,13 +127,13 @@ export const translations = {
     },
     // Advice Page
     advice: {
-      title: "Personalized Advice",
+      title: "Advice History",
       description: "Generate new AI-powered financial advice or review your past sessions.",
-      history_title: "Advice History",
+      history_title: "Saved Advice",
       history_description: "Review your previously generated financial plans.",
       loading_history: "Loading history...",
       no_history_title: "No advice generated yet",
-      no_history_description: "Click \"New Advice\" to get your first personalized plan.",
+      no_history_description: "Click \"Generate New Advice\" to get your first personalized plan.",
       stepper_title: "Generate New Advice",
       stepper_description: "Fill out the steps to get a new plan.",
       stepper_onboarding_title: "Get Your Financial Plan",
@@ -167,14 +166,14 @@ export const translations = {
       support: "सहायता",
       my_account: "मेरा खाता",
       save_changes: "बदलाव सहेजें",
-      new_advice: "नई सलाह",
+      generate_new_advice: "नई सलाह उत्पन्न करें",
     },
     nav: {
       dashboard: "डैशबोर्ड",
       coach: "फिनसारथी कोच",
       summarizer: "समाचार सारांशक",
       translator: "शब्द अनुवादक",
-      advice: "व्यक्तिगत सलाह",
+      advice: "सलाह का इतिहास",
     },
     onboarding: {
       welcome: "फिनसारथी में आपका स्वागत है",
@@ -215,9 +214,8 @@ export const translations = {
       income_vs_expenses: "आय बनाम व्यय",
       cash_flow_desc: "पिछले 6 महीनों में आपके नकदी प्रवाह पर एक नजर (จำลอง)।",
       no_data_title: "कोई वित्तीय डेटा नहीं मिला",
-      no_data_desc: "आपने अभी तक कोई व्यक्तिगत सलाह उत्पन्न नहीं की है।",
+      no_data_desc: "आपने अभी तक कोई सलाह उत्पन्न नहीं की है।",
       no_data_cta_text: "अपना वित्तीय स्नैपशॉट बनाने के लिए कुछ सवालों के जवाब देकर शुरू करें।",
-      no_data_cta_button: "मेरी सलाह उत्पन्न करें"
     },
     coach: {
       title: "फिनसारथी कोच",
@@ -262,13 +260,13 @@ export const translations = {
       explanation_placeholder: "आपका स्पष्टीकरण यहां दिखाई देगा।",
     },
     advice: {
-      title: "व्यक्तिगत सलाह",
+      title: "सलाह का इतिहास",
       description: "नई AI-संचालित वित्तीय सलाह उत्पन्न करें या अपने पिछले सत्रों की समीक्षा करें।",
-      history_title: "सलाह इतिहास",
+      history_title: "सहेजी गई सलाह",
       history_description: "अपनी पहले से उत्पन्न वित्तीय योजनाओं की समीक्षा करें।",
       loading_history: "इतिहास लोड हो रहा है...",
       no_history_title: "अभी तक कोई सलाह उत्पन्न नहीं हुई है",
-      no_history_description: "अपनी पहली व्यक्तिगत योजना प्राप्त करने के लिए \"नई सलाह\" पर क्लिक करें।",
+      no_history_description: "अपनी पहली व्यक्तिगत योजना प्राप्त करने के लिए \"नई सलाह उत्पन्न करें\" पर क्लिक करें।",
       stepper_title: "नई सलाह उत्पन्न करें",
       stepper_description: "एक नई योजना प्राप्त करने के लिए चरणों को भरें।",
       stepper_onboarding_title: "अपनी वित्तीय योजना प्राप्त करें",
@@ -300,14 +298,14 @@ export const translations = {
       support: "समर्थन",
       my_account: "माझे खाते",
       save_changes: "बदल जतन करा",
-      new_advice: "नवीन सल्ला",
+      generate_new_advice: "नवीन सल्ला तयार करा",
     },
     nav: {
       dashboard: "डॅशबोर्ड",
       coach: "फिनसारथी कोच",
       summarizer: "बातम्या सारांशक",
       translator: "शब्द अनुवादक",
-      advice: "वैयक्तिकृत सल्ला",
+      advice: "सल्ला इतिहास",
     },
     onboarding: {
       welcome: "फिनसारथी मध्ये आपले स्वागत आहे",
@@ -348,9 +346,8 @@ export const translations = {
       income_vs_expenses: "उत्पन्न विरुद्ध खर्च",
       cash_flow_desc: "मागील ६ महिन्यांतील तुमच्या रोख प्रवाहावर एक नजर (सिम्युलेटेड).",
       no_data_title: "कोणताही आर्थिक डेटा आढळला नाही",
-      no_data_desc: "तुम्ही अद्याप कोणताही वैयक्तिकृत सल्ला तयार केलेला नाही.",
+      no_data_desc: "तुम्ही अद्याप कोणताही सल्ला तयार केलेला नाही.",
       no_data_cta_text: "तुमचा आर्थिक स्नॅपशॉट तयार करण्यासाठी काही प्रश्नांची उत्तरे देऊन प्रारंभ करा.",
-      no_data_cta_button: "माझा सल्ला तयार करा"
     },
     coach: {
       title: "फिनसारथी कोच",
@@ -395,13 +392,13 @@ export const translations = {
       explanation_placeholder: "तुमचे स्पष्टीकरण येथे दिसेल.",
     },
     advice: {
-      title: "वैयक्तिकृत सल्ला",
+      title: "सल्ला इतिहास",
       description: "नवीन AI-शक्तीवर आधारित आर्थिक सल्ला तयार करा किंवा तुमच्या मागील सत्रांचे पुनरावलोकन करा.",
-      history_title: "सल्ला इतिहास",
+      history_title: "जतन केलेला सल्ला",
       history_description: "तुमच्या पूर्वी तयार केलेल्या आर्थिक योजनांचे पुनरावलोकन करा.",
       loading_history: "इतिहास लोड होत आहे...",
       no_history_title: "अद्याप कोणताही सल्ला तयार केलेला नाही",
-      no_history_description: "तुमची पहिली वैयक्तिक योजना मिळविण्यासाठी \"नवीन सल्ला\" वर क्लिक करा.",
+      no_history_description: "तुमची पहिली वैयक्तिक योजना मिळविण्यासाठी \"नवीन सल्ला तयार करा\" वर क्लिक करा.",
       stepper_title: "नवीन सल्ला तयार करा",
       stepper_description: "नवीन योजना मिळविण्यासाठी पायऱ्या भरा.",
       stepper_onboarding_title: "तुमची आर्थिक योजना मिळवा",

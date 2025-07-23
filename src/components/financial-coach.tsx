@@ -192,7 +192,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 generatedAdvice: generatedAdvice,
             }, true); // `true` for isLoggedIn
             
-            toast({ title: "Advice Saved!", description: "You can review it in the Personalized Advice tab." });
+            toast({ title: "Advice Saved!", description: "You can review it in the Advice History tab." });
         }
         startNewGuidedFlow();
 
@@ -295,6 +295,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const handlePlayPause = (message: Message) => {
     if (currentlyPlayingId === message.id && isPlaying) {
         stopSpeaking();
+        setCurrentlyPlayingId(null);
     } else {
         stopSpeaking();
         speak(message.content, locale);
@@ -561,4 +562,3 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
-
