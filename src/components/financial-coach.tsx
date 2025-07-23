@@ -34,13 +34,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut, Play, Save } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -64,9 +57,9 @@ type Message = {
   buttons?: { label: string; value: string; action?: "select_prompt" }[];
 };
 
+// The form schema no longer needs a language field.
 const formSchema = z.object({
   query: z.string().min(1, "Message cannot be empty."),
-  language: z.enum(["English", "Hindi", "Marathi", "German"]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -98,7 +91,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     resolver: zodResolver(formSchema),
     defaultValues: {
       query: "",
-      language: "English",
     },
   });
 
@@ -282,15 +274,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   }, [isHumanChat, fetchHumanMessages, chatSession, currentUser.id]);
 
-  const language = form.watch("language");
-  const locale = langToLocale[language as keyof typeof langToLocale] || 'en-US';
-  
-  useEffect(() => {
-    const langName = languages[languageCode as keyof typeof languages]?.name;
-    if (langName) {
-      form.setValue("language", langName as "English" | "Hindi" | "Marathi" | "German");
-    }
-  }, [languageCode, form]);
+  const languageName = languages[languageCode as keyof typeof languages]?.name || "English";
+  const locale = langToLocale[languageName as keyof typeof langToLocale] || 'en-US';
 
   useEffect(() => {
     if (scrollViewportRef.current) {
@@ -321,7 +306,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const handleSubmit = form.handleSubmit(async (data: FormValues) => {
     if (conversationStage === 'questioning') {
       handleQuestionAnswer(data.query);
-      form.reset({ query: '', language: data.language });
+      form.reset({ query: '' });
       return;
     }
     
@@ -329,7 +314,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     setError('');
-    form.reset({ query: '', language: data.language });
+    form.reset({ query: '' });
   
     try {
       if (isHumanChat) {
@@ -344,8 +329,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         }
 
         const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
+        
+        const langName = languages[languageCode]?.name || "English";
+        
         const input: FinancialCoachInput = {
-          language: data.language,
+          language: langName as "English" | "Hindi" | "Marathi" | "German",
           history: historyForAI,
           age: currentUser.age ?? undefined,
           gender: currentUser.gender ?? undefined,
@@ -374,8 +362,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const cardTitle = isHumanChat ? `Chat with ${chatPartner?.fullName}` : t.coach.chat_title;
   const cardDescription = isHumanChat ? `You are now chatting directly with a user.` : t.coach.chat_description;
 
-  const hasUserSentMessage = messages.some(m => m.role === 'user');
-
   return (
     <Card className="w-full flex flex-col h-[calc(100vh-10rem)]">
       <CardHeader className="flex flex-row justify-between items-center border-b">
@@ -384,23 +370,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             <CardDescription>{cardDescription}</CardDescription>
         </div>
         <div className="flex items-center gap-2">
-            {!isHumanChat && (
-              <Select
-                onValueChange={(value) => form.setValue("language", value as "English" | "Hindi" | "Marathi" | "German")}
-                value={form.getValues('language')}
-                disabled={isLoading || hasUserSentMessage}
-              >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Language" />
-                  </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="English">English</SelectItem>
-                  <SelectItem value="Hindi">Hindi</SelectItem>
-                  <SelectItem value="Marathi">Marathi</SelectItem>
-                  <SelectItem value="German">German</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
             {isHumanChat && currentUser.role === 'coach' && (
                 <Button variant="outline" size="sm" onClick={handleCloseChat}>
                     <LogOut className="mr-2 h-4 w-4"/>
@@ -579,5 +548,3 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
-
-    
