@@ -61,7 +61,7 @@ type Message = {
   id: string;
   role: MessageRole;
   content: string;
-  buttons?: { label: string; value: string; action?: "select_prompt" | "save_advice" }[];
+  buttons?: { label: string; value: string; action?: "select_prompt" }[];
 };
 
 const formSchema = z.object({
@@ -118,34 +118,41 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         form.setValue("query", transcript);
         form.handleSubmit(handleSubmit)();
     }
-  }, [transcript]);
+  }, [transcript, form]);
 
-  // Guided flow logic
+  const startNewGuidedFlow = useCallback(() => {
+    const greetingMessage: Message = {
+      id: createId(),
+      role: 'assistant',
+      content: `Hi, ${currentUser.fullName}! I'm FinSarthi, your personal AI financial coach. What would you like help with today?`,
+    };
+    const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
+    const promptMessage: Message = {
+      id: createId(),
+      role: 'assistant',
+      content: "Please select one of the following topics to get started:",
+      buttons: promptButtons,
+    };
+    setMessages([greetingMessage, promptMessage]);
+    setConversationStage("prompt_selection");
+    setSelectedPromptKey(null);
+    setCurrentQuestionIndex(0);
+    setCollectedAnswers({});
+    setGeneratedAdvice(null);
+    setIsAdviceSaved(false);
+  }, [currentUser, languageCode]);
+
   useEffect(() => {
     if (conversationStage === 'greeting' && !isHumanChat) {
-      const greetingMessage: Message = {
-        id: createId(),
-        role: 'assistant',
-        content: `Hi, ${currentUser.fullName}! I'm FinSarthi, your personal AI financial coach. What would you like help with today?`,
-      };
-      const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
-      const promptMessage: Message = {
-        id: createId(),
-        role: 'assistant',
-        content: "Please select one of the following topics to get started:",
-        buttons: promptButtons,
-      };
-      setMessages([greetingMessage, promptMessage]);
-      setConversationStage("prompt_selection");
+      startNewGuidedFlow();
     }
-  }, [conversationStage, currentUser, languageCode, isHumanChat]);
+  }, [conversationStage, isHumanChat, startNewGuidedFlow]);
 
   const handlePromptSelection = async (promptKey: string) => {
     setSelectedPromptKey(promptKey);
     const selectedPrompt = advicePrompts.find(p => p.key === promptKey);
     if (!selectedPrompt) return;
 
-    // Remove buttons from previous message
     setMessages(prev => prev.map(m => ({ ...m, buttons: undefined })));
 
     const userSelectionMessage: Message = {
@@ -173,27 +180,21 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   };
 
-  const handleSaveAdvice = async () => {
-    if (!generatedAdvice || !selectedPromptKey || isAdviceSaved) return;
+  const handleSaveAndEndChat = async () => {
+    if (!generatedAdvice || !selectedPromptKey) return;
 
     try {
-        await createAdviceSessionForCurrentUser({
-            promptKey: selectedPromptKey,
-            formData: collectedAnswers,
-            language: languageCode as LanguageCode,
-            generatedAdvice: generatedAdvice,
-        }, true); // `true` for isLoggedIn
-        
-        toast({ title: "Advice Saved!", description: "You can review it in the Personalized Advice tab." });
-        setIsAdviceSaved(true);
-
-        // Update the message to remove the button and confirm saving
-        setMessages(prev => prev.map(m => {
-            if (m.buttons?.some(b => b.action === 'save_advice')) {
-                return { ...m, content: `${m.content}\n\n(This advice has been saved.)`, buttons: undefined };
-            }
-            return m;
-        }));
+        if (!isAdviceSaved) {
+            await createAdviceSessionForCurrentUser({
+                promptKey: selectedPromptKey,
+                formData: collectedAnswers,
+                language: languageCode as LanguageCode,
+                generatedAdvice: generatedAdvice,
+            }, true); // `true` for isLoggedIn
+            
+            toast({ title: "Advice Saved!", description: "You can review it in the Personalized Advice tab." });
+        }
+        startNewGuidedFlow();
 
     } catch(error) {
         console.error("Failed to save advice:", error);
@@ -219,7 +220,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       setCurrentQuestionIndex(nextQuestionIndex);
       askQuestion(nextQuestionIndex, selectedPromptKey);
     } else {
-      // All questions answered, generate advice
       setConversationStage("generating_advice");
       setIsLoading(true);
       const adviceMessage: Message = { id: createId(), role: 'assistant', content: "Thanks! Generating your personalized advice now..." };
@@ -232,18 +232,17 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           language: languageCode,
         });
 
-        setGeneratedAdvice(adviceResult.advice); // Store the generated advice
-        setIsAdviceSaved(false); // Reset saved status for new advice
+        setGeneratedAdvice(adviceResult.advice);
+        setIsAdviceSaved(false);
 
         const resultMessage: Message = { 
             id: createId(), 
             role: 'assistant', 
             content: adviceResult.advice,
-            buttons: [{ label: "Save Advice", value: "save", action: "save_advice" }]
         };
         setMessages(prev => [...prev.filter(m => m.id !== adviceMessage.id), resultMessage]);
         
-        const finalMessage: Message = { id: createId(), role: 'assistant', content: "You can now ask me any follow-up questions." };
+        const finalMessage: Message = { id: createId(), role: 'assistant', content: "You can now ask me any follow-up questions or save this advice." };
         setMessages(prev => [...prev, finalMessage]);
 
       } catch (e) {
@@ -294,11 +293,10 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }, [messages]);
 
   const handlePlayPause = (message: Message) => {
-    if (currentlyPlayingId === message.id) {
+    if (currentlyPlayingId === message.id && isPlaying) {
         stopSpeaking();
-        setCurrentlyPlayingId(null);
     } else {
-        stopSpeaking(); 
+        stopSpeaking();
         speak(message.content, locale);
         setCurrentlyPlayingId(message.id);
     }
@@ -318,7 +316,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       return;
     }
     
-    // Normal chat logic
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
@@ -330,7 +327,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         await sendMessage(chatSession.id, currentUser.id, data.query);
         await fetchHumanMessages(); 
       } else {
-        // Reset guided flow state once user starts typing freely
         if (conversationStage !== "chatting") {
             setConversationStage("chatting");
             setSelectedPromptKey(null);
@@ -400,11 +396,10 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full w-full" viewportRef={scrollViewportRef}>
           <div className="space-y-4 p-4">
-            {messages.length === 0 && !isHumanChat && (
-                <div className="text-center text-muted-foreground pt-10">Starting conversation...</div>
-            )}
-             {messages.length === 0 && isHumanChat && (
-                <div className="text-center text-muted-foreground pt-10">Start the conversation!</div>
+            {messages.length === 0 && (
+                <div className="text-center text-muted-foreground pt-10">
+                    {isHumanChat ? "Start the conversation!" : "Starting conversation..."}
+                </div>
             )}
             {messages.map((message) => (
               <div
@@ -449,11 +444,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                             <Button key={button.value} size="sm" variant="outline" 
                                 onClick={() => {
                                     if (button.action === 'select_prompt') handlePromptSelection(button.value);
-                                    if (button.action === 'save_advice') handleSaveAdvice();
                                 }}
-                                disabled={isAdviceSaved && button.action === 'save_advice'}
                             >
-                              {button.action === 'save_advice' && <Save className="mr-2 h-4 w-4"/>}
                               {button.label}
                             </Button>
                           ))}
@@ -502,10 +494,23 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="pt-4 border-t">
+      <CardFooter className="pt-4 border-t flex flex-col items-stretch gap-2">
+        {!isHumanChat && generatedAdvice && (
+          <div className="flex justify-center">
+            <Button
+              onClick={handleSaveAndEndChat}
+              disabled={isAdviceSaved}
+              variant="outline"
+              size="sm"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {isAdviceSaved ? "Advice Saved" : "Save Advice and End Chat"}
+            </Button>
+          </div>
+        )}
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(handleSubmit)}
+            onSubmit={handleSubmit}
             className="flex w-full items-start gap-3"
           >
              {!isHumanChat && (
@@ -557,4 +562,3 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   );
 }
 
-    
