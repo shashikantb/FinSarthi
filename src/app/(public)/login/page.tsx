@@ -61,7 +61,7 @@ export default function LoginPage() {
         if (loggedInUser.role === 'coach') {
             router.push("/coach-dashboard");
         } else {
-            router.push("/dashboard");
+            router.push("/advice");
         }
     } else {
       toast({

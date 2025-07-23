@@ -132,7 +132,7 @@ export default function OnboardingPage() {
         
         if (loggedInUser) {
             toast({ title: "Account Created!", description: "Welcome to FinSarthi!" });
-            router.push("/dashboard");
+            router.push("/advice");
         } else {
             throw new Error("Automatic login failed. Please log in manually.");
         }
