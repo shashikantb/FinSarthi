@@ -15,6 +15,7 @@ import OpenAI from 'openai';
 import { getProducts } from '@/services/financial-product-service';
 import { GeneratePersonalizedAdviceOutputSchema } from './generate-personalized-advice-schema';
 import advicePrompts from '@/lib/advice-prompts.json';
+import { type LanguageCode } from '@/lib/translations';
 
 const groq = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
@@ -58,7 +59,7 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
                 const questionConfig = promptConfig.questions.find(q => q.key === key);
                 if (!questionConfig) return ''; // Skip if question config not found
 
-                const questionLabel = questionConfig.label[language as keyof typeof questionConfig.label] || key;
+                const questionLabel = questionConfig.label[language as LanguageCode] || key;
                 
                 // Add currency symbol for numeric inputs to give AI better context
                 const displayValue = questionConfig.type === 'number' ? `₹${value}` : value;
@@ -82,7 +83,7 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       `;
 
       // Use the system prompt from the JSON config
-      const systemPrompt = promptConfig.systemPrompt[language as keyof typeof promptConfig.systemPrompt];
+      const systemPrompt = promptConfig.systemPrompt[language as LanguageCode];
 
       const finalPrompt = `
       ${systemPrompt}
@@ -95,10 +96,10 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
 
       Your Task:
       1.  **Analyze the user's situation** based on the information they provided.
-      2.  **Provide Actionable Steps:** Give 3-5 clear, simple, and prioritized steps.
+      2.  **Provide Actionable Steps:** Give 3-5 clear, simple, and prioritized steps. Your response should be well-structured, easy to read, and use markdown for formatting (like lists and bold text).
       3.  **Suggest Products:** When relevant, suggest suitable products from the list provided. Do not invent products.
       4.  **Language and Tone:** Your response MUST be in ${language}. Be encouraging, empathetic, and supportive. Your name is FinSarthi.
-      5.  **Output Format**: Your response MUST be ONLY the advice text. Do not include any other text, greetings, explanations, or markdown formatting.
+      5.  **Output Format**: Your response MUST be ONLY the advice text. Do not include any other text, greetings, or explanations.
       `;
 
       const completion = await groq.chat.completions.create({
@@ -125,3 +126,5 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
     }
   }
 );
+
+    

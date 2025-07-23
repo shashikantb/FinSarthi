@@ -9,6 +9,7 @@ import {
   financialCoach,
   type FinancialCoachInput,
 } from "@/ai/flows/financial-coach";
+import { generatePersonalizedAdvice } from "@/ai/flows/generate-personalized-advice";
 import {
   sendMessage,
   getMessagesForChat,
@@ -46,16 +47,20 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
-import { languages, langToLocale } from "@/lib/translations";
+import { languages, langToLocale, type LanguageCode } from "@/lib/translations";
 import { createId } from "@paralleldrive/cuid2";
 import { useAppTranslations } from "@/hooks/use-app-translations";
 import { useToast } from "@/hooks/use-toast";
+import advicePrompts from "@/lib/advice-prompts.json";
 
+type MessageRole = "user" | "assistant";
+type ConversationStage = "greeting" | "prompt_selection" | "questioning" | "generating_advice" | "chatting";
 
 type Message = {
   id: string;
-  role: "user" | "assistant";
+  role: MessageRole;
   content: string;
+  buttons?: { label: string; value: string }[];
 };
 
 const formSchema = z.object({
@@ -79,7 +84,13 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const { t, languageCode } = useAppTranslations();
   const { toast } = useToast();
   const isHumanChat = !!(chatSession && chatPartner);
-  
+
+  // Guided flow state
+  const [conversationStage, setConversationStage] = useState<ConversationStage>(isHumanChat ? "chatting" : "greeting");
+  const [selectedPromptKey, setSelectedPromptKey] = useState<string | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [collectedAnswers, setCollectedAnswers] = useState<Record<string, string>>({});
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -87,7 +98,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       language: "English",
     },
   });
-  
+
   const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
 
   const { speak, stop: stopSpeaking, isPlaying } = useBrowserTts({
@@ -106,6 +117,108 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   }, [transcript]);
 
+  // Guided flow logic
+  useEffect(() => {
+    if (conversationStage === 'greeting' && !isHumanChat) {
+      const greetingMessage: Message = {
+        id: createId(),
+        role: 'assistant',
+        content: `Hi, ${currentUser.fullName}! I'm FinSarthi, your personal AI financial coach. What would you like help with today?`,
+      };
+      const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key }));
+      const promptMessage: Message = {
+        id: createId(),
+        role: 'assistant',
+        content: "Please select one of the following topics to get started:",
+        buttons: promptButtons,
+      };
+      setMessages([greetingMessage, promptMessage]);
+      setConversationStage("prompt_selection");
+    }
+  }, [conversationStage, currentUser, languageCode, isHumanChat]);
+
+  const handlePromptSelection = async (promptKey: string) => {
+    setSelectedPromptKey(promptKey);
+    const selectedPrompt = advicePrompts.find(p => p.key === promptKey);
+    if (!selectedPrompt) return;
+
+    // Remove buttons from previous message
+    setMessages(prev => prev.map(m => ({ ...m, buttons: undefined })));
+
+    const userSelectionMessage: Message = {
+      id: createId(),
+      role: 'user',
+      content: selectedPrompt.title[languageCode as LanguageCode],
+    };
+    setMessages(prev => [...prev, userSelectionMessage]);
+
+    setConversationStage("questioning");
+    setCurrentQuestionIndex(0);
+    askQuestion(0, promptKey);
+  };
+
+  const askQuestion = (qIndex: number, promptKey: string) => {
+    const prompt = advicePrompts.find(p => p.key === promptKey);
+    if (prompt && prompt.questions[qIndex]) {
+      const question = prompt.questions[qIndex];
+      const questionMessage: Message = {
+        id: createId(),
+        role: 'assistant',
+        content: question.label[languageCode as LanguageCode],
+      };
+      setMessages(prev => [...prev, questionMessage]);
+    }
+  };
+
+  const handleQuestionAnswer = async (answer: string) => {
+    const userMessage: Message = { role: 'user', content: answer, id: createId() };
+    setMessages(prev => [...prev, userMessage]);
+    
+    if (!selectedPromptKey) return;
+    const prompt = advicePrompts.find(p => p.key === selectedPromptKey);
+    if (!prompt) return;
+
+    const questionKey = prompt.questions[currentQuestionIndex].key;
+    const newAnswers = { ...collectedAnswers, [questionKey]: answer };
+    setCollectedAnswers(newAnswers);
+
+    const nextQuestionIndex = currentQuestionIndex + 1;
+    if (nextQuestionIndex < prompt.questions.length) {
+      setCurrentQuestionIndex(nextQuestionIndex);
+      askQuestion(nextQuestionIndex, selectedPromptKey);
+    } else {
+      // All questions answered, generate advice
+      setConversationStage("generating_advice");
+      setIsLoading(true);
+      const adviceMessage: Message = { id: createId(), role: 'assistant', content: "Thanks! Generating your personalized advice now..." };
+      setMessages(prev => [...prev, adviceMessage]);
+      
+      try {
+        const adviceResult = await generatePersonalizedAdvice({
+          promptKey: selectedPromptKey,
+          formData: newAnswers,
+          language: languageCode,
+        });
+        const resultMessage: Message = { id: createId(), role: 'assistant', content: adviceResult.advice };
+        setMessages(prev => [...prev.filter(m => m.id !== adviceMessage.id), resultMessage]);
+        
+        const finalMessage: Message = { id: createId(), role: 'assistant', content: "You can now ask me any follow-up questions." };
+        setMessages(prev => [...prev, finalMessage]);
+
+      } catch (e) {
+        const errorMessage: Message = { id: createId(), role: 'assistant', content: "Sorry, I couldn't generate advice right now. Please try again." };
+        setMessages(prev => [...prev.filter(m => m.id !== adviceMessage.id), errorMessage]);
+      } finally {
+        setIsLoading(false);
+        setConversationStage("chatting");
+        // Reset guided flow state
+        setSelectedPromptKey(null);
+        setCurrentQuestionIndex(0);
+        setCollectedAnswers({});
+      }
+    }
+  };
+
 
   const fetchHumanMessages = useCallback(async () => {
     if (!chatSession) return;
@@ -121,7 +234,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   useEffect(() => {
     if (isHumanChat) {
       markMessagesAsRead(chatSession!.id, currentUser.id);
-
       fetchHumanMessages();
       const interval = setInterval(fetchHumanMessages, 5000); 
       return () => clearInterval(interval);
@@ -147,7 +259,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const handlePlayPause = (message: Message) => {
     if (currentlyPlayingId === message.id) {
         stopSpeaking();
-        setCurrentlyPlayingId(null);
     } else {
         stopSpeaking(); 
         speak(message.content, locale);
@@ -163,6 +274,13 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }
 
   const handleSubmit = form.handleSubmit(async (data: FormValues) => {
+    if (conversationStage === 'questioning') {
+      handleQuestionAnswer(data.query);
+      form.reset({ query: '', language: data.language });
+      return;
+    }
+    
+    // Normal chat logic
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
@@ -236,8 +354,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full w-full" viewportRef={scrollViewportRef}>
           <div className="space-y-4 p-4">
-            {messages.length === 0 && (
-                <div className="text-center text-muted-foreground pt-10">Start a conversation by typing or speaking!</div>
+            {messages.length === 0 && !isHumanChat && (
+                <div className="text-center text-muted-foreground pt-10">Starting conversation...</div>
+            )}
+             {messages.length === 0 && isHumanChat && (
+                <div className="text-center text-muted-foreground pt-10">Start the conversation!</div>
             )}
             {messages.map((message) => (
               <div
@@ -248,31 +369,43 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 )}
               >
                 {message.role === "assistant" && (
-                   <div className="flex items-end gap-2">
-                     <Avatar className="h-8 w-8">
-                       <AvatarImage src={isHumanChat ? `https://placehold.co/100x100.png` : undefined} data-ai-hint="profile picture" alt={chatPartner?.fullName ?? 'Bot'} />
-                      <AvatarFallback>
-                        {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div
-                      className={cn(
-                        "max-w-xs rounded-lg p-3 text-sm md:max-w-md shadow",
-                        "bg-muted rounded-bl-none"
-                      )}
-                    >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                    </div>
-                     {!isHumanChat && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => handlePlayPause(message)}
+                   <div className="flex flex-col items-start gap-2">
+                     <div className="flex items-end gap-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={isHumanChat ? `https://placehold.co/100x100.png` : undefined} data-ai-hint="profile picture" alt={chatPartner?.fullName ?? 'Bot'} />
+                          <AvatarFallback>
+                            {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div
+                          className={cn(
+                            "max-w-xs rounded-lg p-3 text-sm md:max-w-md shadow",
+                            "bg-muted rounded-bl-none"
+                          )}
                         >
-                            {currentlyPlayingId === message.id && isPlaying ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                        </Button>
-                     )}
+                          <p className="whitespace-pre-wrap">{message.content}</p>
+                        </div>
+                         {!isHumanChat && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => handlePlayPause(message)}
+                                disabled={isListening}
+                            >
+                                {currentlyPlayingId === message.id && isPlaying ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                            </Button>
+                         )}
+                     </div>
+                      {message.buttons && (
+                        <div className="flex flex-wrap gap-2 ml-10">
+                          {message.buttons.map(button => (
+                            <Button key={button.value} size="sm" variant="outline" onClick={() => handlePromptSelection(button.value)}>
+                              {button.label}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
                    </div>
                 )}
                 
@@ -328,7 +461,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                     size="icon" 
                     className={cn("shrink-0", isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600')}
                     onClick={() => isListening ? stopListening() : startListening({ lang: locale })}
-                    disabled={isLoading}
+                    disabled={isLoading || conversationStage === 'prompt_selection'}
                 >
                    {isListening ? <Square className="h-5 w-5"/> : <Mic className="h-5 w-5" />}
                    <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
@@ -341,9 +474,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      placeholder={isListening ? "Listening..." : t.coach.placeholder}
+                      placeholder={isListening ? "Listening..." : (conversationStage === 'questioning' ? "Type your answer..." : t.coach.placeholder)}
                       {...field}
-                      disabled={isLoading || isListening}
+                      disabled={isLoading || isListening || conversationStage === 'prompt_selection'}
                       autoComplete="off"
                     />
                   </FormControl>
@@ -353,7 +486,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             />
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || conversationStage === 'prompt_selection'}
               size="icon"
               className="shrink-0"
             >
@@ -370,3 +503,5 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
+
+    
