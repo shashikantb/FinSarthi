@@ -117,17 +117,17 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
 
   const startNewGuidedFlow = useCallback(() => {
-    const greeting = currentUser.fullName === 'Guest' ? "Hi there!" : `Hi, ${currentUser.fullName}!`;
+    const greetingText = isGuest ? t.coach.greeting_guest : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User');
     const greetingMessage: Message = {
       id: createId(),
       role: 'assistant',
-      content: `${greeting} I'm FINmate, your personal AI financial coach. What would you like help with today?`,
+      content: greetingText,
     };
     const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
     const promptMessage: Message = {
       id: createId(),
       role: 'assistant',
-      content: "Please select one of the following topics to get started:",
+      content: t.coach.prompt_selection_title,
       buttons: promptButtons,
     };
     setMessages([greetingMessage, promptMessage]);
@@ -137,7 +137,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     setCollectedAnswers({});
     setGeneratedAdvice(null);
     setIsAdviceSaved(false);
-  }, [currentUser, languageCode]);
+  }, [currentUser, languageCode, t, isGuest]);
 
   useEffect(() => {
     if (conversationStage === 'greeting' && !isHumanChat) {
@@ -146,11 +146,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }, [conversationStage, isHumanChat, startNewGuidedFlow]);
 
   const handlePromptSelection = async (promptKey: string) => {
-    if (isGuest) {
-      toast({ title: "Please Login", description: "You need to log in to generate personalized advice.", variant: "destructive" });
-      return;
-    }
-
+    // Removed the guest check that was blocking the flow
     setSelectedPromptKey(promptKey);
     const selectedPrompt = advicePrompts.find(p => p.key === promptKey);
     if (!selectedPrompt) return;
@@ -194,7 +190,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 generatedAdvice: generatedAdvice,
             }, true); // `true` for isLoggedIn
             
-            toast({ title: "Advice Saved!", description: "You can review it in the Advice History tab." });
+            toast({ title: t.coach.toast_advice_saved_title, description: t.coach.toast_advice_saved_desc });
             setIsAdviceSaved(true); // Mark as saved
         }
         // After saving (or if already saved), reset the flow.
@@ -202,7 +198,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
     } catch(error) {
         console.error("Failed to save advice:", error);
-        toast({ title: "Error", description: "Could not save your advice session.", variant: "destructive" });
+        toast({ title: t.common.error, description: t.coach.toast_advice_save_error, variant: "destructive" });
     }
   };
 
@@ -226,7 +222,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     } else {
       setConversationStage("generating_advice");
       setIsLoading(true);
-      const adviceMessage: Message = { id: createId(), role: 'assistant', content: "Thanks! Generating your personalized advice now..." };
+      const adviceMessage: Message = { id: createId(), role: 'assistant', content: t.coach.generating_advice };
       setMessages(prev => [...prev, adviceMessage]);
       
       try {
@@ -246,11 +242,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         };
         setMessages(prev => [...prev.filter(m => m.id !== adviceMessage.id), resultMessage]);
         
-        const finalMessage: Message = { id: createId(), role: 'assistant', content: "You can now ask me any follow-up questions or save this advice." };
+        const finalMessage: Message = { id: createId(), role: 'assistant', content: t.coach.follow_up_prompt };
         setMessages(prev => [...prev, finalMessage]);
 
       } catch (e) {
-        const errorMessage: Message = { id: createId(), role: 'assistant', content: "Sorry, I couldn't generate advice right now. Please try again." };
+        const errorMessage: Message = { id: createId(), role: 'assistant', content: t.common.error_generic };
         setMessages(prev => [...prev.filter(m => m.id !== adviceMessage.id), errorMessage]);
       } finally {
         setIsLoading(false);
@@ -365,8 +361,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   });
 
-  const cardTitle = isHumanChat ? `Chat with ${chatPartner?.fullName}` : t.coach.chat_title;
-  const cardDescription = isHumanChat ? `You are now chatting directly with a user.` : t.coach.chat_description;
+  const cardTitle = isHumanChat ? `${t.coach.chat_with} ${chatPartner?.fullName}` : t.coach.chat_title;
+  const cardDescription = isHumanChat ? t.coach.human_chat_desc : t.coach.chat_description;
 
   return (
     <Card className="w-full flex flex-col h-[calc(100vh-10rem)] max-h-[700px]">
@@ -379,7 +375,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             {isHumanChat && currentUser.role === 'coach' && (
                 <Button variant="outline" size="sm" onClick={handleCloseChat}>
                     <LogOut className="mr-2 h-4 w-4"/>
-                    Close Chat
+                    {t.coach.close_chat}
                 </Button>
             )}
         </div>
@@ -389,7 +385,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           <div className="space-y-4 p-4">
             {messages.length === 0 && (
                 <div className="text-center text-muted-foreground pt-10">
-                    {isHumanChat ? "Start the conversation!" : "Starting conversation..."}
+                    {isHumanChat ? t.coach.start_conversation : t.coach.starting_conversation}
                 </div>
             )}
             {messages.map((message) => (
@@ -488,7 +484,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         </ScrollArea>
       </CardContent>
       <CardFooter className="pt-4 border-t flex flex-col items-stretch gap-2">
-        {!isHumanChat && !isGuest && generatedAdvice && (
+        {!isHumanChat && generatedAdvice && (
           <div className="flex justify-center">
             <Button
               onClick={handleSaveAndEndChat}
@@ -497,7 +493,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
               size="sm"
             >
               <Save className="mr-2 h-4 w-4" />
-              {isAdviceSaved ? "Advice Saved" : "Save Advice and Start New Chat"}
+              {isAdviceSaved ? t.coach.advice_saved_button : t.coach.save_and_new_chat_button}
             </Button>
           </div>
         )}
@@ -525,7 +521,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      placeholder={isListening ? "Listening..." : (conversationStage === 'questioning' ? "Type your answer..." : t.coach.placeholder)}
+                      placeholder={isListening ? "Listening..." : (conversationStage === 'questioning' ? t.coach.answer_placeholder : t.coach.placeholder)}
                       {...field}
                       disabled={isLoading || isListening || conversationStage === 'prompt_selection'}
                       autoComplete="off"
