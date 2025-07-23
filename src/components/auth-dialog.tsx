@@ -110,6 +110,8 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
     try {
         const createdUser = await createUser(newUser);
         setExistingUser(createdUser);
+        // After creating the user, immediately log them in and close the dialog.
+        // We will move them to the OTP step first, then log in upon success.
         setStep("otp");
         toast({ title: "Profile Created!", description: "Please verify with the OTP to login."});
     } catch(error) {
@@ -127,7 +129,7 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
     }
     
     if (existingUser) {
-        login(existingUser.id);
+        await login(existingUser.id);
         toast({ title: "Login Successful!", description: `Welcome back, ${existingUser.fullName}!`});
         onLoginSuccess();
     } else {
@@ -241,4 +243,3 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
     </Dialog>
   );
 }
-
