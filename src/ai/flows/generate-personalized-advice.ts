@@ -17,11 +17,6 @@ import { GeneratePersonalizedAdviceOutputSchema } from './generate-personalized-
 import advicePrompts from '@/lib/advice-prompts.json';
 import { type LanguageCode } from '@/lib/translations';
 
-const groq = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: 'https://api.groq.com/openai/v1',
-});
-
 // This schema is now dynamic, accepting any key-value pair of strings.
 const GeneratePersonalizedAdviceInputSchema = z.object({
   promptKey: z.string().describe("The key of the selected prompt from the JSON config."),
@@ -43,6 +38,15 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
     outputSchema: GeneratePersonalizedAdviceOutputSchema,
   },
   async (input) => {
+    if (!process.env.GROQ_API_KEY) {
+      return { advice: "I'm sorry, the AI service is not configured. The GROQ_API_KEY is missing." };
+    }
+    
+    const groq = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1',
+    });
+
     try {
         const { promptKey, formData, language } = input;
         

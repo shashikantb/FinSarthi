@@ -13,11 +13,6 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import OpenAI from 'openai';
 
-const groq = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: 'https://api.groq.com/openai/v1',
-});
-
 const TranslateFinancialTermsInputSchema = z.object({
   term: z.string().describe('The financial term or concept to translate.'),
   language: z
@@ -55,6 +50,15 @@ const translateFinancialTermsFlow = ai.defineFlow(
     outputSchema: TranslateFinancialTermsOutputSchema,
   },
   async (input) => {
+    if (!process.env.GROQ_API_KEY) {
+      return { simplifiedExplanation: "I'm sorry, the AI service is not configured. The GROQ_API_KEY is missing." };
+    }
+
+    const groq = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1',
+    });
+
     try {
       const prompt = `You are a financial expert who can translate complex financial terms into easy-to-understand language.
 

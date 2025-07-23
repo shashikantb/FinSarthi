@@ -14,11 +14,6 @@ import { z } from 'genkit';
 import OpenAI from 'openai';
 import { getProducts } from '@/services/financial-product-service';
 
-const groq = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: 'https://api.groq.com/openai/v1',
-});
-
 const FinancialCoachInputSchema = z.object({
   language: z
     .enum(['English', 'Hindi', 'Marathi', 'German'])
@@ -52,6 +47,15 @@ const financialCoachFlow = ai.defineFlow(
     outputSchema: FinancialCoachOutputSchema,
   },
   async (input) => {
+    if (!process.env.GROQ_API_KEY) {
+      return { response: "I'm sorry, the AI service is not configured. The GROQ_API_KEY is missing." };
+    }
+    
+    const groq = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1',
+    });
+
     try {
         const [savings, investments, loans] = await Promise.all([
             getProducts('savings'),

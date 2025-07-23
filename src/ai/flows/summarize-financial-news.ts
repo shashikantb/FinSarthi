@@ -13,11 +13,6 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import OpenAI from 'openai';
 
-const groq = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: 'https://api.groq.com/openai/v1',
-});
-
 const SummarizeFinancialNewsInputSchema = z.object({
   articleContent: z
     .string()
@@ -50,6 +45,15 @@ const summarizeFinancialNewsFlow = ai.defineFlow(
     outputSchema: SummarizeFinancialNewsOutputSchema,
   },
   async (input) => {
+    if (!process.env.GROQ_API_KEY) {
+      return { summary: "I'm sorry, the AI service is not configured. The GROQ_API_KEY is missing." };
+    }
+
+    const groq = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1',
+    });
+    
     try {
       const prompt = `You are an AI that summarizes financial news articles.
 
