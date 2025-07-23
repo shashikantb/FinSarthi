@@ -188,10 +188,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           id: createId(),
         };
         setMessages(currentMessages => [...currentMessages, modelMessage]);
-        
-        if (!isHumanChat) {
-          handlePlayPause(modelMessage);
-        }
       }
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);

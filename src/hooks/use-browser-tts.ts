@@ -48,7 +48,7 @@ export function useBrowserTts({ onEnd }: BrowserTtsOptions = {}) {
     utterance.lang = lang;
     
     // Find a matching voice from the loaded voices
-    const voice = voices.find(v => v.lang === lang);
+    const voice = voices.find(v => v.lang === lang || v.lang.startsWith(lang.split('-')[0]));
     if (voice) {
       utterance.voice = voice;
     } else {
@@ -62,7 +62,9 @@ export function useBrowserTts({ onEnd }: BrowserTtsOptions = {}) {
       onEnd?.();
     };
     utterance.onerror = (e) => {
-        console.error("SpeechSynthesis Error", e);
+        if (e.error !== 'canceled') {
+            console.error("SpeechSynthesis Error", e);
+        }
         setIsPlaying(false);
         utteranceRef.current = null;
         onEnd?.();
