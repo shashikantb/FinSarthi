@@ -5,12 +5,14 @@
         "title": {
             "en": "Setting up your Budget",
             "hi": "अपना बजट सेट करना",
-            "mr": "तुमचे बजेट सेट करणे"
+            "mr": "तुमचे बजेट सेट करणे",
+            "de": "Ihr Budget aufstellen"
         },
         "description": {
             "en": "Let's create a basic budget to track your income and expenses.",
             "hi": "आइए आपकी आय और व्यय को ट्रैक करने के लिए एक मूल बजट बनाएं।",
-            "mr": "तुमचे उत्पन्न आणि खर्च ट्रॅक करण्यासाठी एक मूलभूत बजेट तयार करूया."
+            "mr": "तुमचे उत्पन्न आणि खर्च ट्रॅक करण्यासाठी एक मूलभूत बजेट तयार करूया.",
+            "de": "Lassen Sie uns ein einfaches Budget erstellen, um Ihre Einnahmen und Ausgaben zu verfolgen."
         },
         "questions": [
             {
@@ -18,13 +20,15 @@
                 "label": {
                     "en": "What is your total monthly income?",
                     "hi": "आपकी कुल मासिक आय क्या है?",
-                    "mr": "तुमचे एकूण मासिक उत्पन्न किती आहे?"
+                    "mr": "तुमचे एकूण मासिक उत्पन्न किती आहे?",
+                    "de": "Wie hoch ist Ihr gesamtes monatliches Einkommen?"
                 },
                 "type": "number",
                 "placeholder": {
                     "en": "e.g., 50000",
                     "hi": "उदा., ५००००",
-                    "mr": "उदा., ५००००"
+                    "mr": "उदा., ५००००",
+                    "de": "z.B. 50000"
                 }
             },
             {
@@ -32,20 +36,23 @@
                 "label": {
                     "en": "What are your total monthly expenses?",
                     "hi": "आपके कुल मासिक व्यय क्या हैं?",
-                    "mr": "तुमचा एकूण मासिक खर्च किती आहे?"
+                    "mr": "तुमचा एकूण मासिक खर्च किती आहे?",
+                    "de": "Wie hoch sind Ihre gesamten monatlichen Ausgaben?"
                 },
                 "type": "number",
                 "placeholder": {
                     "en": "e.g., 35000",
                     "hi": "उदा., ३५०००",
-                    "mr": "उदा., ३५०००"
+                    "mr": "उदा., ३५०००",
+                    "de": "z.B. 35000"
                 }
             }
         ],
         "systemPrompt": {
             "en": "You are a financial coach. Based on the user's income and expenses, provide a simple budgeting plan. Calculate their monthly savings and suggest the 50/30/20 rule (50% needs, 30% wants, 20% savings). Provide actionable tips.",
             "hi": "आप एक वित्तीय कोच हैं। उपयोगकर्ता की आय और व्यय के आधार पर, एक सरल बजट योजना प्रदान करें। उनकी मासिक बचत की गणना करें और 50/30/20 नियम (50% ज़रूरतें, 30% चाहत, 20% बचत) सुझाएं। कार्रवाई योग्य सुझाव प्रदान करें।",
-            "mr": "तुम्ही आर्थिक प्रशिक्षक आहात. वापरकर्त्याचे उत्पन्न आणि खर्च यावर आधारित, एक साधी बजेट योजना द्या. त्यांच्या मासिक बचतीची गणना करा आणि 50/30/20 नियम (50% गरजा, 30% इच्छा, 20% बचत) सुचवा. कृती करण्यायोग्य टिपा द्या."
+            "mr": "तुम्ही आर्थिक प्रशिक्षक आहात. वापरकर्त्याचे उत्पन्न आणि खर्च यावर आधारित, एक साधी बजेट योजना द्या. त्यांच्या मासिक बचतीची गणना करा आणि 50/30/20 नियम (50% गरजा, 30% इच्छा, 20% बचत) सुचवा. कृती करण्यायोग्य टिपा द्या.",
+            "de": "Sie sind ein Finanzcoach. Erstellen Sie basierend auf dem Einkommen und den Ausgaben des Nutzers einen einfachen Budgetplan. Berechnen Sie ihre monatlichen Ersparnisse und schlagen Sie die 50/30/20-Regel vor (50% Bedürfnisse, 30% Wünsche, 20% Ersparnisse). Geben Sie umsetzbare Tipps."
         }
     },
     {
@@ -53,12 +60,14 @@
         "title": {
             "en": "Start Investing (Beginner)",
             "hi": "निवेश शुरू करें (शुरुआती)",
-            "mr": "गुंतवणूक सुरू करा (नवशिक्या)"
+            "mr": "गुंतवणूक सुरू करा (नवशिक्या)",
+            "de": "Mit Investieren beginnen (Anfänger)"
         },
         "description": {
             "en": "Get advice on how to start your investment journey.",
             "hi": "अपनी निवेश यात्रा कैसे शुरू करें, इस पर सलाह लें।",
-            "mr": "तुमचा गुंतवणूक प्रवास कसा सुरू करायचा याबद्दल सल्ला मिळवा."
+            "mr": "तुमचा गुंतवणूक प्रवास कसा सुरू करायचा याबद्दल सल्ला मिळवा.",
+            "de": "Erhalten Sie Ratschläge, wie Sie Ihre Investitionsreise beginnen können."
         },
         "questions": [
             {
@@ -66,36 +75,55 @@
                 "label": {
                     "en": "How much can you save per month to invest?",
                     "hi": "आप प्रति माह निवेश के लिए कितना बचा सकते हैं?",
-                    "mr": "तुम्ही गुंतवणुकीसाठी दरमहा किती बचत करू शकता?"
+                    "mr": "तुम्ही गुंतवणुकीसाठी दरमहा किती बचत करू शकता?",
+                    "de": "Wie viel können Sie monatlich zum Investieren sparen?"
                 },
                 "type": "number",
-                "placeholder": { "en": "e.g., 5000" }
+                "placeholder": {
+                    "en": "e.g., 5000",
+                    "hi": "उदा., ५०००",
+                    "mr": "उदा., ५०००",
+                    "de": "z.B. 5000"
+                }
             },
             {
                 "key": "risk_tolerance",
                 "label": {
                     "en": "On a scale of 1 (low) to 5 (high), what is your risk tolerance?",
                     "hi": "1 (कम) से 5 (उच्च) के पैमाने पर, आपकी जोखिम सहनशीलता क्या है?",
-                    "mr": "१ (कमी) ते ५ (उच्च) च्या स्केलवर, तुमची जोखीम सहन करण्याची क्षमता किती आहे?"
+                    "mr": "१ (कमी) ते ५ (उच्च) च्या स्केलवर, तुमची जोखीम सहन करण्याची क्षमता किती आहे?",
+                    "de": "Wie hoch ist Ihre Risikobereitschaft auf einer Skala von 1 (niedrig) bis 5 (hoch)?"
                 },
                 "type": "number",
-                "placeholder": { "en": "e.g., 3" }
+                "placeholder": {
+                    "en": "e.g., 3",
+                    "hi": "उदा., ३",
+                    "mr": "उदा., ३",
+                    "de": "z.B. 3"
+                }
             },
             {
                 "key": "goal",
                 "label": {
                     "en": "What is your primary investment goal?",
                     "hi": "आपका प्राथमिक निवेश लक्ष्य क्या है?",
-                    "mr": "तुमचे प्राथमिक गुंतवणुकीचे ध्येय काय आहे?"
+                    "mr": "तुमचे प्राथमिक गुंतवणुकीचे ध्येय काय आहे?",
+                    "de": "Was ist Ihr primäres Investitionsziel?"
                 },
                 "type": "textarea",
-                "placeholder": { "en": "e.g., Save for retirement, buy a car, build wealth" }
+                "placeholder": {
+                    "en": "e.g., Save for retirement, buy a car, build wealth",
+                    "hi": "उदा., सेवानिवृत्ति के लिए बचत, कार खरीदना, संपत्ति निर्माण",
+                    "mr": "उदा., निवृत्तीसाठी बचत, कार खरेदी, संपत्ती निर्माण",
+                    "de": "z.B. für den Ruhestand sparen, ein Auto kaufen, Vermögen aufbauen"
+                }
             }
         ],
         "systemPrompt": {
             "en": "You are a financial coach advising a beginner investor. Based on their monthly savings, risk tolerance, and goals, recommend a simple investment strategy. Suggest specific types of products like Mutual Funds or ETFs from the provided list. Explain concepts simply.",
             "hi": "आप एक शुरुआती निवेशक को सलाह देने वाले वित्तीय कोच हैं। उनकी मासिक बचत, जोखिम सहनशीलता और लक्ष्यों के आधार पर, एक सरल निवेश रणनीति सुझाएं। प्रदान की गई सूची से म्युचुअल फंड या ईटीएफ जैसे विशिष्ट प्रकार के उत्पादों का सुझाव दें। अवधारणाओं को सरल रूप से समझाएं।",
-            "mr": "तुम्ही एका नवशिक्या गुंतवणूकदाराला सल्ला देणारे आर्थिक प्रशिक्षक आहात. त्यांच्या मासिक बचत, जोखीम सहनशीलता आणि ध्येयांच्या आधारावर, एक साधी गुंतवणूक धोरण सुचवा. दिलेल्या यादीतून म्युच्युअल फंड किंवा ईटीएफ सारख्या विशिष्ट प्रकारच्या उत्पादनांची शिफारस करा. संकल्पना सोप्या भाषेत समजावून सांगा."
+            "mr": "तुम्ही एका नवशिक्या गुंतवणूकदाराला सल्ला देणारे आर्थिक प्रशिक्षक आहात. त्यांच्या मासिक बचत, जोखीम सहनशीलता आणि ध्येयांच्या आधारावर, एक साधी गुंतवणूक धोरण सुचवा. दिलेल्या यादीतून म्युच्युअल फंड किंवा ईटीएफ सारख्या विशिष्ट प्रकारच्या उत्पादनांची शिफारस करा. संकल्पना सोप्या भाषेत समजावून सांगा.",
+            "de": "Sie sind ein Finanzcoach, der einen Anfänger-Investor berät. Basierend auf den monatlichen Ersparnissen, der Risikobereitschaft und den Zielen des Nutzers empfehlen Sie eine einfache Anlagestrategie. Schlagen Sie spezifische Produkte wie Investmentfonds oder ETFs aus der bereitgestellten Liste vor. Erklären Sie Konzepte einfach."
         }
     },
     {
@@ -103,12 +131,14 @@
         "title": {
             "en": "Managing your Debt",
             "hi": "अपने कर्ज का प्रबंधन",
-            "mr": "तुमच्या कर्जाचे व्यवस्थापन"
+            "mr": "तुमच्या कर्जाचे व्यवस्थापन",
+            "de": "Ihre Schulden verwalten"
         },
         "description": {
             "en": "Get a plan to manage and reduce your existing debt.",
             "hi": "अपने मौजूदा कर्ज को प्रबंधित करने और कम करने की योजना प्राप्त करें।",
-            "mr": "तुमचे विद्यमान कर्ज व्यवस्थापित करण्यासाठी आणि कमी करण्यासाठी योजना मिळवा."
+            "mr": "तुमचे विद्यमान कर्ज व्यवस्थापित करण्यासाठी आणि कमी करण्यासाठी योजना मिळवा.",
+            "de": "Erhalten Sie einen Plan, um Ihre bestehenden Schulden zu verwalten und zu reduzieren."
         },
         "questions": [
             {
@@ -116,36 +146,822 @@
                 "label": {
                     "en": "What is your total outstanding debt (excluding home loan)?",
                     "hi": "आपका कुल बकाया ऋण क्या है (गृह ऋण को छोड़कर)?",
-                    "mr": "तुमचे एकूण थकीत कर्ज किती आहे (गृहकर्ज वगळून)?"
+                    "mr": "तुमचे एकूण थकीत कर्ज किती आहे (गृहकर्ज वगळून)?",
+                    "de": "Wie hoch ist Ihre gesamte ausstehende Schuld (ohne Hypothekendarlehen)?"
                 },
                 "type": "number",
-                "placeholder": { "en": "e.g., 100000" }
+                "placeholder": {
+                    "en": "e.g., 100000",
+                    "hi": "उदा., १०००००",
+                    "mr": "उदा., १०००००",
+                    "de": "z.B. 100000"
+                }
             },
             {
                 "key": "debt_types",
                 "label": {
                     "en": "What types of debt do you have?",
                     "hi": "आपके पास किस प्रकार के ऋण हैं?",
-                    "mr": "तुमच्याकडे कोणत्या प्रकारचे कर्ज आहे?"
+                    "mr": "तुमच्याकडे कोणत्या प्रकारचे कर्ज आहे?",
+                    "de": "Welche Arten von Schulden haben Sie?"
                 },
                 "type": "text",
-                "placeholder": { "en": "e.g., Credit card, personal loan" }
+                "placeholder": {
+                    "en": "e.g., Credit card, personal loan",
+                    "hi": "उदा., क्रेडिट कार्ड, व्यक्तिगत ऋण",
+                    "mr": "उदा., क्रेडिट कार्ड, वैयक्तिक कर्ज",
+                    "de": "z.B. Kreditkarte, Privatkredit"
+                }
             },
             {
                 "key": "monthly_income",
                 "label": {
                     "en": "What is your total monthly income?",
                     "hi": "आपकी कुल मासिक आय क्या है?",
-                    "mr": "तुमचे एकूण मासिक उत्पन्न किती आहे?"
+                    "mr": "तुमचे एकूण मासिक उत्पन्न किती आहे?",
+                    "de": "Wie hoch ist Ihr gesamtes monatliches Einkommen?"
                 },
                 "type": "number",
-                "placeholder": { "en": "e.g., 75000" }
+                "placeholder": {
+                    "en": "e.g., 75000",
+                    "hi": "उदा., ७५०००",
+                    "mr": "उदा., ७५०००",
+                    "de": "z.B. 75000"
+                }
             }
         ],
         "systemPrompt": {
             "en": "You are a debt management expert. The user wants help managing their debt. Based on their total debt, debt types, and income, create a clear action plan. Suggest a debt repayment strategy like the 'debt snowball' or 'debt avalanche' method. Explain the chosen strategy and provide motivational advice.",
             "hi": "आप एक ऋण प्रबंधन विशेषज्ञ हैं। उपयोगकर्ता अपने ऋण के प्रबंधन में मदद चाहता है। उनके कुल ऋण, ऋण के प्रकार और आय के आधार पर, एक स्पष्ट कार्य योजना बनाएं। 'डेट स्नोबॉल' या 'डेट एवलांच' विधि जैसी ऋण चुकौती रणनीति सुझाएं। चुनी हुई रणनीति की व्याख्या करें और प्रेरक सलाह प्रदान करें।",
-            "mr": "तुम्ही कर्ज व्यवस्थापन तज्ञ आहात. वापरकर्त्याला त्यांचे कर्ज व्यवस्थापित करण्यास मदत हवी आहे. त्यांचे एकूण कर्ज, कर्जाचे प्रकार आणि उत्पन्न यावर आधारित, एक स्पष्ट कृती योजना तयार करा. 'डेट स्नोबॉल' किंवा 'डेट अॅव्हेलँश' पद्धतीसारखी कर्ज परतफेड धोरण सुचवा. निवडलेल्या धोरणाचे स्पष्टीकरण द्या आणि प्रेरक सल्ला द्या."
+            "mr": "तुम्ही कर्ज व्यवस्थापन तज्ञ आहात. वापरकर्त्याला त्यांचे कर्ज व्यवस्थापित करण्यास मदत हवी आहे. त्यांचे एकूण कर्ज, कर्जाचे प्रकार आणि उत्पन्न यावर आधारित, एक स्पष्ट कृती योजना तयार करा. 'डेट स्नोबॉल' किंवा 'डेट अॅव्हेलँश' पद्धतीसारखी कर्ज परतफेड धोरण सुचवा. निवडलेल्या धोरणाचे स्पष्टीकरण द्या आणि प्रेरक सल्ला द्या.",
+            "de": "Sie sind ein Experte für Schuldenmanagement. Der Nutzer möchte Hilfe bei der Verwaltung seiner Schulden. Erstellen Sie basierend auf der Gesamtschuld, den Schuldenarten und dem Einkommen einen klaren Aktionsplan. Schlagen Sie eine Rückzahlungsstrategie wie die 'Schulden-Schneeball'- oder 'Schulden-Lawine'-Methode vor. Erklären Sie die gewählte Strategie und geben Sie motivierende Ratschläge."
+        }
+    },
+    {
+        "key": "saving_habits",
+        "title": {
+            "en": "Building Saving Habits",
+            "hi": "बचत की आदतें बनाना",
+            "mr": "बचत सवयी निर्माण करणे",
+            "de": "Spargewohnheiten aufbauen"
+        },
+        "description": {
+            "en": "Learn how to develop consistent saving habits for financial security.",
+            "hi": "वित्तीय सुरक्षा के लिए लगातार बचत की आदतें विकसित करने का तरीका जानें।",
+            "mr": "आर्थिक सुरक्षेसाठी सातत्यपूर्ण बचत सवयी कशा विकसित कराव्यात हे जाणून घ्या.",
+            "de": "Lernen Sie, wie Sie beständige Spargewohnheiten für finanzielle Sicherheit entwickeln."
+        },
+        "questions": [
+            {
+                "key": "monthly_income",
+                "label": {
+                    "en": "What is your total monthly income?",
+                    "hi": "आपकी कुल मासिक आय क्या है?",
+                    "mr": "तुमचे एकूण मासिक उत्पन्न किती आहे?",
+                    "de": "Wie hoch ist Ihr gesamtes monatliches Einkommen?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 40000",
+                    "hi": "उदा., ४००००",
+                    "mr": "उदा., ४००००",
+                    "de": "z.B. 40000"
+                }
+            },
+            {
+                "key": "current_savings",
+                "label": {
+                    "en": "How much do you currently save each month?",
+                    "hi": "आप वर्तमान में प्रत्येक माह कितना बचत करते हैं?",
+                    "mr": "तुम्ही सध्या दरमहा किती बचत करता?",
+                    "de": "Wie viel sparen Sie derzeit monatlich?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 2000",
+                    "hi": "उदा., २०००",
+                    "mr": "उदा., २०००",
+                    "de": "z.B. 2000"
+                }
+            },
+            {
+                "key": "saving_goal",
+                "label": {
+                    "en": "What is your savings goal (e.g., emergency fund, vacation)?",
+                    "hi": "आपका बचत लक्ष्य क्या है (उदा., आपातकालीन निधि, छुट्टी)?",
+                    "mr": "तुमचे बचत ध्येय काय आहे (उदा., आपत्कालीन निधी, सुट्टी)?",
+                    "de": "Was ist Ihr Sparziel (z.B. Notfallfonds, Urlaub)?"
+                },
+                "type": "textarea",
+                "placeholder": {
+                    "en": "e.g., Build an emergency fund of 50000",
+                    "hi": "उदा., ५०००० का आपातकालीन निधि बनाना",
+                    "mr": "उदा., ५०००० चा आपत्कालीन निधी तयार करणे",
+                    "de": "z.B. einen Notfallfonds von 50000 aufbauen"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a financial coach helping the user build saving habits. Based on their income, current savings, and goals, suggest practical strategies to save more effectively (e.g., automate savings, cut discretionary spending). Provide tips to stay motivated and build a consistent saving habit.",
+            "hi": "आप एक वित्तीय कोच हैं जो उपयोगकर्ता को बचत की आदतें बनाने में मदद कर रहे हैं। उनकी आय, वर्तमान बचत और लक्ष्यों के आधार पर, अधिक प्रभावी ढंग से बचत करने की व्यावहारिक रणनीतियाँ सुझाएँ (उदा., स्वचालित बचत, विवेकाधीन खर्च में कटौती)। प्रेरित रहने और लगातार बचत की आदत बनाने के लिए सुझाव दें।",
+            "mr": "तुम्ही एक आर्थिक प्रशिक्षक आहात जे वापरकर्त्याला बचत सवयी निर्माण करण्यास मदत करत आहात. त्यांचे उत्पन्न, सध्याची बचत आणि ध्येय यावर आधारित, अधिक प्रभावीपणे बचत करण्यासाठी व्यावहारिक रणनीती सुचवा (उदा., स्वयंचलित बचत, विवेकाधीन खर्चात कपात). प्रेरित राहण्यासाठी आणि सातत्यपूर्ण बचत सवय निर्माण करण्यासाठी टिपा द्या.",
+            "de": "Sie sind ein Finanzcoach, der dem Nutzer hilft, Spargewohnheiten aufzubauen. Schlagen Sie basierend auf ihrem Einkommen, aktuellen Ersparnissen und Zielen praktische Strategien vor, um effektiver zu sparen (z.B. automatisiertes Sparen, Reduzierung diskretionärer Ausgaben). Geben Sie Tipps, um motiviert zu bleiben und eine beständige Spargewohnheit aufzubauen."
+        }
+    },
+    {
+        "key": "banking_basics",
+        "title": {
+            "en": "Understanding Banking Basics",
+            "hi": "बैंकिंग की मूल बातें समझना",
+            "mr": "बँकिंगच्या मूलभूत गोष्टी समजून घेणे",
+            "de": "Grundlagen des Bankwesens verstehen"
+        },
+        "description": {
+            "en": "Learn about different bank accounts and how to choose the right one.",
+            "hi": "विभिन्न बैंक खातों के बारे में जानें और सही खाता चुनने का तरीका।",
+            "mr": "विविध बँक खात्यांबद्दल जाणून घ्या आणि योग्य खाते कसे निवडावे.",
+            "de": "Lernen Sie verschiedene Bankkonten kennen und wie Sie das richtige auswählen."
+        },
+        "questions": [
+            {
+                "key": "account_type",
+                "label": {
+                    "en": "What type of bank account are you interested in (e.g., savings, current, fixed deposit)?",
+                    "hi": "आप किस प्रकार के बैंक खाते में रुचि रखते हैं (उदा., बचत, चालू, सावधि जमा)?",
+                    "mr": "तुम्हाला कोणत्या प्रकारच्या बँक खात्यात रस आहे (उदा., बचत, चालू, मुदत ठेव)?",
+                    "de": "An welcher Art von Bankkonto sind Sie interessiert (z.B. Sparkonto, Girokonto, Festgeldkonto)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., Savings account",
+                    "hi": "उदा., बचत खाता",
+                    "mr": "उदा., बचत खाते",
+                    "de": "z.B. Sparkonto"
+                }
+            },
+            {
+                "key": "banking_needs",
+                "label": {
+                    "en": "What are your primary banking needs (e.g., daily transactions, saving, high interest)?",
+                    "hi": "आपकी प्राथमिक बैंकिंग आवश्यकताएँ क्या हैं (उदा., दैनिक लेनदेन, बचत, उच्च ब्याज)?",
+                    "mr": "तुमच्या प्राथमिक बँकिंग गरजा काय आहेत (उदा., दैनंदिन व्यवहार, बचत, उच्च व्याज)?",
+                    "de": "Was sind Ihre primären Bankbedürfnisse (z.B. tägliche Transaktionen, Sparen, hohe Zinsen)?"
+                },
+                "type": "textarea",
+                "placeholder": {
+                    "en": "e.g., Need a savings account with online banking",
+                    "hi": "उदा., ऑनलाइन बैंकिंग के साथ बचत खाता चाहिए",
+                    "mr": "उदा., ऑनलाइन बँकिंगसह बचत खाते हवे",
+                    "de": "z.B. ein Sparkonto mit Online-Banking benötigt"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a banking advisor. Based on the user's preferred account type and banking needs, explain the features of relevant bank accounts (e.g., savings, current, fixed deposit). Recommend a suitable account type and provide tips on managing bank accounts effectively.",
+            "hi": "आप एक बैंकिंग सलाहकार हैं। उपयोगकर्ता के पसंदीदा खाता प्रकार और बैंकिंग आवश्यकताओं के आधार पर, संबंधित बैंक खातों (उदा., बचत, चालू, सावधि जमा) की विशेषताओं को समझाएँ। उपयुक्त खाता प्रकार की सिफारिश करें और बैंक खातों को प्रभावी ढंग से प्रबंधित करने के लिए सुझाव दें।",
+            "mr": "तुम्ही बँकिंग सल्लागार आहात. वापरकर्त्याच्या पसंत केलेल्या खाते प्रकार आणि बँकिंग गरजांवर आधारित, संबंधित बँक खात्यांच्या (उदा., बचत, चालू, मुदत ठेव) वैशिष्ट्यांचे स्पष्टीकरण द्या. योग्य खाते प्रकाराची शिफारस करा आणि बँक खाते प्रभावीपणे व्यवस्थापित करण्यासाठी टिपा द्या.",
+            "de": "Sie sind ein Bankberater. Erklären Sie basierend auf dem bevorzugten Kontotyp und den Bankbedürfnissen des Nutzers die Merkmale relevanter Bankkonten (z.B. Spar-, Giro-, Festgeldkonto). Empfehlen Sie einen geeigneten Kontotyp und geben Sie Tipps zur effektiven Verwaltung von Bankkonten."
+        }
+    },
+    {
+        "key": "loans_and_credit",
+        "title": {
+            "en": "Understanding Loans and Credit",
+            "hi": "ऋण और क्रेडिट को समझना",
+            "mr": "कर्ज आणि क्रेडिट समजून घेणे",
+            "de": "Kredite und Kreditkarten verstehen"
+        },
+        "description": {
+            "en": "Get guidance on choosing and managing loans or credit options.",
+            "hi": "ऋण या क्रेडिट विकल्पों को चुनने और प्रबंधित करने के लिए मार्गदर्शन प्राप्त करें।",
+            "mr": "कर्ज किंवा क्रेडिट पर्याय निवडण्यासाठी आणि व्यवस्थापित करण्यासाठी मार्गदर्शन मिळवा.",
+            "de": "Erhalten Sie Anleitungen zur Auswahl und Verwaltung von Krediten oder Kreditoptionen."
+        },
+        "questions": [
+            {
+                "key": "loan_purpose",
+                "label": {
+                    "en": "What is the purpose of the loan or credit (e.g., home, car, personal)?",
+                    "hi": "ऋण या क्रेडिट का उद्देश्य क्या है (उदा., घर, कार, व्यक्तिगत)?",
+                    "mr": "कर्ज किंवा क्रेडिटचा हेतू काय आहे (उदा., घर, कार, वैयक्तिक)?",
+                    "de": "Was ist der Zweck des Kredits oder der Kreditkarte (z.B. Haus, Auto, persönlich)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., Car loan",
+                    "hi": "उदा., कार ऋण",
+                    "mr": "उदा., कार कर्ज",
+                    "de": "z.B. Autokredit"
+                }
+            },
+            {
+                "key": "loan_amount",
+                "label": {
+                    "en": "How much loan or credit amount do you need?",
+                    "hi": "आपको कितनी ऋण या क्रेडिट राशि की आवश्यकता है?",
+                    "mr": "तुम्हाला किती कर्ज किंवा क्रेडिट रक्कम हवी आहे?",
+                    "de": "Wie viel Kredit- oder Kreditkartenbetrag benötigen Sie?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 500000",
+                    "hi": "उदा., ५०००००",
+                    "mr": "उदा., ५०००००",
+                    "de": "z.B. 500000"
+                }
+            },
+            {
+                "key": "repayment_capacity",
+                "label": {
+                    "en": "How much can you afford to repay monthly?",
+                    "hi": "आप प्रति माह कितना चुकाने में सक्षम हैं?",
+                    "mr": "तुम्ही दरमहा किती परतफेड करू शकता?",
+                    "de": "Wie viel können Sie monatlich zurückzahlen?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 10000",
+                    "hi": "उदा., १००००",
+                    "mr": "उदा., १००००",
+                    "de": "z.B. 10000"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a loan advisor. Based on the user's loan purpose, required amount, and repayment capacity, suggest appropriate loan or credit options (e.g., personal loan, auto loan, credit card). Explain interest rates, tenure, and repayment terms in simple language. Provide tips to avoid over-borrowing.",
+            "hi": "आप एक ऋण सलाहकार हैं। उपयोगकर्ता के ऋण उद्देश्य, आवश्यक राशि और चुकौती क्षमता के आधार पर, उपयुक्त ऋण या क्रेडिट विकल्प सुझाएँ (उदा., व्यक्तिगत ऋण, ऑटो ऋण, क्रेडिट कार्ड)। ब्याज दरों, अवधि और चुकौती शर्तों को सरल भाषा में समझाएँ। अति-उधार से बचने के लिए सुझाव दें।",
+            "mr": "तुम्ही कर्ज सल्लागार आहात. वापरकर्त्याच्या कर्जाच्या हेतू, आवश्यक रक्कम आणि परतफेड क्षमतेवर आधारित, योग्य कर्ज किंवा क्रेडिट पर्याय सुचवा (उदा., वैयक्तिक कर्ज, ऑटो कर्ज, क्रेडिट कार्ड). व्याजदर, मुदत आणि परतफेड अटी सोप्या भाषेत समजावून सांगा. जास्त कर्ज घेण्यापासून बचाव करण्यासाठी टिपा द्या.",
+            "de": "Sie sind ein Kreditberater. Schlagen Sie basierend auf dem Zweck des Kredits, dem benötigten Betrag und der Rückzahlungskapazität des Nutzers geeignete Kredit- oder Kreditkartenoptionen vor (z.B. Privatkredit, Autokredit, Kreditkarte). Erklären Sie Zinssätze, Laufzeit und Rückzahlungsbedingungen in einfacher Sprache. Geben Sie Tipps, um übermäßiges Borgen zu vermeiden."
+        }
+    },
+    {
+        "key": "govt_schemes",
+        "title": {
+            "en": "Exploring Government Schemes",
+            "hi": "सरकारी योजनाओं की खोज",
+            "mr": "सरकारी योजनांचा शोध",
+            "de": "Staatliche Programme erkunden"
+        },
+        "description": {
+            "en": "Discover government financial schemes that suit your needs.",
+            "hi": "आपकी आवश्यकताओं के अनुरूप सरकारी वित्तीय योजनाएँ खोजें।",
+            "mr": "तुमच्या गरजेनुसार सरकारी आर्थिक योजना शोधा.",
+            "de": "Entdecken Sie staatliche Finanzprogramme, die Ihren Bedürfnissen entsprechen."
+        },
+        "questions": [
+            {
+                "key": "purpose",
+                "label": {
+                    "en": "What is the purpose of seeking a government scheme (e.g., savings, housing, education)?",
+                    "hi": "सरकारी योजना की तलाश का उद्देश्य क्या है (उदा., बचत, आवास, शिक्षा)?",
+                    "mr": "सरकारी योजनेचा शोध घेण्याचा हेतू काय आहे (उदा., बचत, गृहनिर्माण, शिक्षण)?",
+                    "de": "Was ist der Zweck der Suche nach einem staatlichen Programm (z.B. Sparen, Wohnen, Bildung)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., Savings for retirement",
+                    "hi": "उदा., सेवानिवृत्ति के लिए बचत",
+                    "mr": "उदा., निवृत्तीसाठी बचत",
+                    "de": "z.B. Sparen für den Ruhestand"
+                }
+            },
+            {
+                "key": "eligibility",
+                "label": {
+                    "en": "What is your age and occupation (to check eligibility)?",
+                    "hi": "आपकी उम्र और व्यवसाय क्या है (पात्रता जाँचने के लिए)?",
+                    "mr": "तुमचे वय आणि व्यवसाय काय आहे (पात्रता तपासण्यासाठी)?",
+                    "de": "Wie alt sind Sie und was ist Ihr Beruf (um die Berechtigung zu prüfen)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., 30 years, private employee",
+                    "hi": "उदा., ३० वर्ष, निजी कर्मचारी",
+                    "mr": "उदा., ३० वर्षे, खासगी कर्मचारी",
+                    "de": "z.B. 30 Jahre, Angestellter im privaten Sektor"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a financial advisor specializing in government schemes. Based on the user's purpose and eligibility details (age, occupation), recommend relevant government financial schemes (e.g., PMJJBY, NPS, Sukanya Samriddhi). Explain eligibility criteria and benefits in simple terms. Provide steps to apply for the scheme.",
+            "hi": "आप सरकारी योजनाओं में विशेषज्ञता रखने वाले वित्तीय सलाहकार हैं। उपयोगकर्ता के उद्देश्य और पात्रता विवरण (उम्र, व्यवसाय) के आधार पर, प्रासंगिक सरकारी वित्तीय योजनाएँ सुझाएँ (उदा., पीएमजेजेबीवाई, एनपीएस, सुकन्या समृद्धि)। पात्रता मानदंड और लाभों को सरल शब्दों में समझाएँ। योजना के लिए आवेदन करने के चरण प्रदान करें।",
+            "mr": "तुम्ही सरकारी योजनांमध्ये तज्ञ असलेले आर्थिक सल्लागार आहात. वापरकर्त्याच्या हेतू आणि पात्रता तपशील (वय, व्यवसाय) यावर आधारित, प्रासंगिक सरकारी आर्थिक योजना सुचवा (उदा., पीएमजेजेबीवाय, एनपीएस, सुकन्या समृद्धी). पात्रता निकष आणि फायदे सोप्या शब्दांत समजावून सांगा. योजनेसाठी अर्ज करण्याच्या पायऱ्या द्या.",
+            "de": "Sie sind ein Finanzberater, der sich auf staatliche Programme spezialisiert hat. Empfehlen Sie basierend auf dem Zweck und den Berechtigungsdetails des Nutzers (Alter, Beruf) relevante staatliche Finanzprogramme (z.B. PMJJBY, NPS, Sukanya Samriddhi). Erklären Sie die Berechtigungskriterien und Vorteile in einfachen Worten. Geben Sie Schritte zur Beantragung des Programms an."
+        }
+    },
+    {
+        "key": "digital_payment",
+        "title": {
+            "en": "Mastering Digital Payments",
+            "hi": "डिजिटल भुगतान में महारत हासिल करना",
+            "mr": "डिजिटल पेमेंटमध्ये प्रभुत्व मिळवणे",
+            "de": "Digitale Zahlungen meistern"
+        },
+        "description": {
+            "en": "Learn how to use digital payment methods safely and effectively.",
+            "hi": "डिजिटल भुगतान विधियों को सुरक्षित और प्रभावी ढंग से उपयोग करना सीखें।",
+            "mr": "डिजिटल पेमेंट पद्धती सुरक्षित आणि प्रभावीपणे कशा वापराव्यात हे शिका.",
+            "de": "Lernen Sie, wie Sie digitale Zahlungsmethoden sicher und effektiv nutzen."
+        },
+        "questions": [
+            {
+                "key": "payment_methods",
+                "label": {
+                    "en": "Which digital payment methods do you currently use (e.g., UPI, cards, net banking)?",
+                    "hi": "आप वर्तमान में कौन सी डिजिटल भुगतान विधियों का उपयोग करते हैं (उदा., यूपीआई, कार्ड, नेट बैंकिंग)?",
+                    "mr": "तुम्ही सध्या कोणत्या डिजिटल पेमेंट पद्धती वापरता (उदा., यूपीआय, कार्ड, नेट बँकिंग)?",
+                    "de": "Welche digitalen Zahlungsmethoden nutzen Sie derzeit (z.B. UPI, Karten, Online-Banking)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., UPI, debit card",
+                    "hi": "उदा., यूपीआई, डेबिट कार्ड",
+                    "mr": "उदा., यूपीआय, डेबिट कार्ड",
+                    "de": "z.B. UPI, Debitkarte"
+                }
+            },
+            {
+                "key": "concerns",
+                "label": {
+                    "en": "What concerns do you have about digital payments (e.g., security, fees)?",
+                    "hi": "डिजिटल भुगतानों के बारे में आपकी क्या चिंताएँ हैं (उदा., सुरक्षा, शुल्क)?",
+                    "mr": "डिजिटल पेमेंटबद्दल तुमच्या काय चिंता आहेत (उदा., सुरक्षा, फी)?",
+                    "de": "Welche Bedenken haben Sie bezüglich digitaler Zahlungen (z.B. Sicherheit, Gebühren)?"
+                },
+                "type": "textarea",
+                "placeholder": {
+                    "en": "e.g., Worried about fraud or hidden charges",
+                    "hi": "उदा., धोखाधड़ी या छिपे शुल्कों की चिंता",
+                    "mr": "उदा., फसवणूक किंवा लपवलेल्या शुल्कांबद्दल काळजी",
+                    "de": "z.B. Sorge vor Betrug oder versteckten Gebühren"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a digital payment expert. Based on the user's current payment methods and concerns, explain how to use digital payments (e.g., UPI, mobile apps, cards) safely and efficiently. Address their specific concerns and provide tips to avoid fraud or unnecessary fees.",
+            "hi": "आप एक डिजिटल भुगतान विशेषज्ञ हैं। उपयोगकर्ता की वर्तमान भुगतान विधियों और चिंताओं के आधार पर, डिजिटल भुगतानों (उदा., यूपीआई, मोबाइल ऐप्स, कार्ड) को सुरक्षित और कुशलता से उपयोग करने का तरीका समझाएँ। उनकी विशिष्ट चिंताओं को संबोधित करें और धोखाधड़ी या अनावश्यक शुल्क से बचने के लिए सुझाव दें।",
+            "mr": "तुम्ही डिजिटल पेमेंट तज्ञ आहात. वापरकर्त्याच्या सध्याच्या पेमेंट पद्धती आणि चिंतांवर आधारित, डिजिटल पेमेंट्स (उदा., यूपीआय, मोबाइल अॅप्स, कार्ड) सुरक्षित आणि कार्यक्षमतेने कसे वापरावे हे समजावून सांगा. त्यांच्या विशिष्ट चिंता संबोधित करा आणि फसवणूक किंवा अनावश्यक शुल्क टाळण्यासाठी टिपा द्या.",
+            "de": "Sie sind ein Experte für digitale Zahlungen. Erklären Sie basierend auf den aktuellen Zahlungsmethoden und Bedenken des Nutzers, wie digitale Zahlungen (z.B. UPI, mobile Apps, Karten) sicher und effizient genutzt werden können. Gehen Sie auf ihre spezifischen Bedenken ein und geben Sie Tipps, um Betrug oder unnötige Gebühren zu vermeiden."
+        }
+    },
+    {
+        "key": "fraud_awareness",
+        "title": {
+            "en": "Fraud Awareness and Prevention",
+            "hi": "धोखाधड़ी जागरूकता और रोकथाम",
+            "mr": "फसवणूक जागरूकता आणि प्रतिबंध",
+            "de": "Betrugsbewusstsein und -prävention"
+        },
+        "description": {
+            "en": "Learn how to protect yourself from financial scams and frauds.",
+            "hi": "वित्तीय घोटालों और धोखाधड़ी से खुद को बचाने का तरीका जानें।",
+            "mr": "आर्थिक घोटाळे आणि फसवणुकीपासून स्वतःचे संरक्षण कसे करावे हे शिका.",
+            "de": "Lernen Sie, wie Sie sich vor finanziellen Betrügereien und Scams schützen können."
+        },
+        "questions": [
+            {
+                "key": "fraud_experience",
+                "label": {
+                    "en": "Have you ever encountered a financial scam or suspicious activity?",
+                    "hi": "क्या आपने कभी वित्तीय घोटाले या संदिग्ध गतिविधि का सामना किया है?",
+                    "mr": "तुम्हाला कधी आर्थिक घोटाळा किंवा संशयास्पद 활동ाचा सामना करावा लागला आहे का?",
+                    "de": "Haben Sie jemals einen finanziellen Betrug oder verdächtige Aktivitäten erlebt?"
+                },
+                "type": "textarea",
+                "placeholder": {
+                    "en": "e.g., Received a phishing email or suspicious call",
+                    "hi": "उदा., फ़िशिंग ईमेल या संदिग्ध कॉल प्राप्त हुआ",
+                    "mr": "उदा., फिशिंग ईमेल किंवा संशयास्पद कॉल प्राप्त झाला",
+                    "de": "z.B. eine Phishing-E-Mail oder einen verdächtigen Anruf erhalten"
+                }
+            },
+            {
+                "key": "protection_concerns",
+                "label": {
+                    "en": "What are your main concerns about financial fraud?",
+                    "hi": "वित्तीय धोखाधड़ी के बारे में आपकी मुख्य चिंताएँ क्या हैं?",
+                    "mr": "आर्थिक फसवणुकीबद्दल तुमच्या मुख्य चिंता काय आहेत?",
+                    "de": "Was sind Ihre Hauptsorgen bezüglich finanziellen Betrugs?"
+                },
+                "type": "textarea",
+                "placeholder": {
+                    "en": "e.g., Online banking security, phishing",
+                    "hi": "उदा., ऑनलाइन बैंकिंग सुरक्षा, फ़िशिंग",
+                    "mr": "उदा., ऑनलाइन बँकिंग सुरक्षा, फिशिंग",
+                    "de": "z.B. Sicherheit beim Online-Banking, Phishing"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a financial security expert. Based on the user's experiences and concerns, provide practical advice on identifying and avoiding financial scams (e.g., phishing, fake calls, fraudulent apps). Explain red flags to watch for and steps to secure financial accounts.",
+            "hi": "आप एक वित्तीय सुरक्षा विशेषज्ञ हैं। उपयोगकर्ता के अनुभवों और चिंताओं के आधार पर, वित्तीय घोटालों (उदा., फ़िशिंग, नकली कॉल, धोखाधड़ी ऐप्स) को पहचानने और उनसे बचने के लिए व्यावहारिक सलाह दें। देखने योग्य खतरे के संकेतों और वित्तीय खातों को सुरक्षित करने के चरणों को समझाएँ।",
+            "mr": "तुम्ही आर्थिक सुरक्षा तज्ञ आहात. वापरकर्त्याच्या अनुभवांवर आणि चिंतांवर आधारित, आर्थिक घोटाळे (उदा., फिशिंग, बनावट कॉल, फसवे अॅप्स) ओळखण्यासाठी आणि त्यापासून वाचण्यासाठी व्यावहारिक सल्ला द्या. लक्ष ठेवण्याच्या धोक्याच्या चिन्हांचे आणि आर्थिक खाती सुरक्षित करण्याच्या पायऱ्यांचे स्पष्टीकरण द्या.",
+            "de": "Sie sind ein Experte für finanzielle Sicherheit. Geben Sie basierend auf den Erfahrungen und Bedenken des Nutzers praktische Ratschläge, wie man finanzielle Betrügereien (z.B. Phishing, gefälschte Anrufe, betrügerische Apps) erkennt und vermeidet. Erklären Sie Warnsignale, auf die man achten sollte, und Schritte zur Sicherung finanzieller Konten."
+        }
+    },
+    {
+        "key": "insurance_planning",
+        "title": {
+            "en": "Insurance Planning",
+            "hi": "बीमा योजना",
+            "mr": "विमा नियोजन",
+            "de": "Versicherungsplanung"
+        },
+        "description": {
+            "en": "Find the right insurance plan to protect yourself and your family.",
+            "hi": "खुद और अपने परिवार की सुरक्षा के लिए सही बीमा योजना खोजें।",
+            "mr": "स्वतः आणि तुमच्या कुटुंबाच्या संरक्षणासाठी योग्य विमा योजना शोधा.",
+            "de": "Finden Sie den richtigen Versicherungsplan, um sich und Ihre Familie zu schützen."
+        },
+        "questions": [
+            {
+                "key": "insurance_type",
+                "label": {
+                    "en": "What type of insurance are you looking for (e.g., health, life, vehicle)?",
+                    "hi": "आप किस प्रकार के बीमा की तलाश में हैं (उदा., स्वास्थ्य, जीवन, वाहन)?",
+                    "mr": "तुम्ही कोणत्या प्रकारच्या विम्याच्या शोधात आहात (उदा., आरोग्य, जीवन, वाहन)?",
+                    "de": "Welche Art von Versicherung suchen Sie (z.B. Kranken-, Lebens-, Kfz-Versicherung)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., Health insurance",
+                    "hi": "उदा., स्वास्थ्य बीमा",
+                    "mr": "उदा., आरोग्य विमा",
+                    "de": "z.B. Krankenversicherung"
+                }
+            },
+            {
+                "key": "dependents",
+                "label": {
+                    "en": "How many dependents do you need to cover (e.g., family members)?",
+                    "hi": "आपको कितने आश्रितों को कवर करने की आवश्यकता है (उदा., परिवार के सदस्य)?",
+                    "mr": "तुम्हाला किती अवलंबितांना कव्हर करायचे आहे (उदा., कुटुंबातील सदस्य)?",
+                    "de": "Wie viele Angehörige müssen Sie abdecken (z.B. Familienmitglieder)?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 3",
+                    "hi": "उदा., ३",
+                    "mr": "उदा., ३",
+                    "de": "z.B. 3"
+                }
+            },
+            {
+                "key": "budget",
+                "label": {
+                    "en": "What is your monthly budget for insurance premiums?",
+                    "hi": "बीमा प्रीमियम के लिए आपका मासिक बजट क्या है?",
+                    "mr": "विमा प्रीमियमसाठी तुमचे मासिक बजेट काय आहे?",
+                    "de": "Wie hoch ist Ihr monatliches Budget für Versicherungsprämien?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 2000",
+                    "hi": "उदा., २०००",
+                    "mr": "उदा., २०००",
+                    "de": "z.B. 2000"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are an insurance advisor. Based on the user's insurance type, dependents, and budget, recommend suitable insurance plans (e.g., term life, health, vehicle insurance). Explain coverage, premiums, and benefits in simple terms. Provide tips to choose a reliable insurer.",
+            "hi": "आप एक बीमा सलाहकार हैं। उपयोगकर्ता के बीमा प्रकार, आश्रितों और बजट के आधार पर, उपयुक्त बीमा योजनाएँ सुझाएँ (उदा., टर्म लाइफ, स्वास्थ्य, वाहन बीमा)। कवरेज, प्रीमियम और लाभों को सरल शब्दों में समझाएँ। एक विश्वसनीय बीमाकर्ता चुनने के लिए सुझाव दें।",
+            "mr": "तुम्ही विमा सल्लागार आहात. वापरकर्त्याच्या विमा प्रकार, अवलंबित आणि बजेट यावर आधारित, योग्य विमा योजना सुचवा (उदा., टर्म लाइफ, आरोग्य, वाहन विमा). कव्हरेज, प्रीमियम आणि फायदे सोप्या शब्दांत समजावून सांगा. विश्वासार्ह विमाकर्ता निवडण्यासाठी टिपा द्या.",
+            "de": "Sie sind ein Versicherungsberater. Empfehlen Sie basierend auf dem Versicherungstyp, den Angehörigen und dem Budget des Nutzers geeignete Versicherungspläne (z.B. Risikolebens-, Kranken-, Kfz-Versicherung). Erklären Sie Deckung, Prämien und Vorteile in einfachen Worten. Geben Sie Tipps zur Auswahl eines zuverlässigen Versicherers."
+        }
+    },
+    {
+        "key": "finance_service_locator",
+        "title": {
+            "en": "Finance Service Locator",
+            "hi": "वित्तीय सेवा लोकेटर",
+            "mr": "आर्थिक सेवा शोधक",
+            "de": "Finanzdienstleistungssuche"
+        },
+        "description": {
+            "en": "Find nearby financial services like banks, ATMs, or financial advisors.",
+            "hi": "नजदीकी वित्तीय सेवाएँ जैसे बैंक, एटीएम, या वित्तीय सलाहकार खोजें।",
+            "mr": "जवळील आर्थिक सेवा जसे बँका, एटीएम, किंवा आर्थिक सल्लागार शोधा.",
+            "de": "Finden Sie nahegelegene Finanzdienstleistungen wie Banken, Geldautomaten oder Finanzberater."
+        },
+        "questions": [
+            {
+                "key": "location",
+                "label": {
+                    "en": "What is your city or postal code?",
+                    "hi": "आपका शहर या पिन कोड क्या है?",
+                    "mr": "तुमचे शहर किंवा पिन कोड काय आहे?",
+                    "de": "Was ist Ihre Stadt oder Postleitzahl?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., Mumbai, 400001",
+                    "hi": "उदा., मुंबई, ४००००१",
+                    "mr": "उदा., मुंबई, ४००००१",
+                    "de": "z.B. Berlin, 10115"
+                }
+            },
+            {
+                "key": "service_type",
+                "label": {
+                    "en": "What financial service are you looking for (e.g., bank branch, ATM, advisor)?",
+                    "hi": "आप कौन सी वित्तीय सेवा की तलाश में हैं (उदा., बैंक शाखा, एटीएम, सलाहकार)?",
+                    "mr": "तुम्ही कोणत्या आर्थिक सेवेच्या शोधात आहात (उदा., बँक शाखा, एटीएम, सल्लागार)?",
+                    "de": "Welche Finanzdienstleistung suchen Sie (z.B. Bankfiliale, Geldautomat, Berater)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., ATM",
+                    "hi": "उदा., एटीएम",
+                    "mr": "उदा., एटीएम",
+                    "de": "z.B. Geldautomat"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a financial service locator assistant. Based on the user's location and desired service, provide guidance on finding nearby banks, ATMs, or financial advisors. Suggest reliable methods (e.g., bank websites, apps) to locate these services and explain what to consider when choosing a provider.",
+            "hi": "आप एक वित्तीय सेवा लोकेटर सहायक हैं। उपयोगकर्ता के स्थान और वांछित सेवा के आधार पर, नजदीकी बैंकों, एटीएम, या वित्तीय सलाहकारों को खोजने के लिए मार्गदर्शन प्रदान करें। इन सेवाओं को खोजने के लिए विश्वसनीय तरीके (उदा., बैंक वेबसाइट्स, ऐप्स) सुझाएँ और प्रदाता चुनते समय क्या विचार करना चाहिए, यह समझाएँ।",
+            "mr": "तुम्ही आर्थिक सेवा शोधक सहाय्यक आहात. वापरकर्त्याच्या स्थान आणि इच्छित सेवेवर आधारित, जवळील बँका, एटीएम, किंवा आर्थिक सल्लागार शोधण्यासाठी मार्गदर्शन करा. या सेवा शोधण्यासाठी विश्वासार्ह पद्धती (उदा., बँक वेबसाइट्स, अॅप्स) सुचवा आणि प्रदाता निवडताना काय विचार करावा हे समजावून सांगा.",
+            "de": "Sie sind ein Assistent für die Suche nach Finanzdienstleistungen. Geben Sie basierend auf dem Standort und der gewünschten Dienstleistung des Nutzers Anleitungen, wie man nahegelegene Banken, Geldautomaten oder Finanzberater findet. Schlagen Sie zuverlässige Methoden vor (z.B. Bank-Websites, Apps) und erklären Sie, was bei der Auswahl eines Anbieters zu beachten ist."
+        }
+    },
+    {
+        "key": "sip_planning",
+        "title": {
+            "en": "Systematic Investment Plan (SIP)",
+            "hi": "सिस्टमेटिक इनवेस्टमेंट प्लान (एसआईपी)",
+            "mr": "नियोजित गुंतवणूक योजना (एसआयपी)",
+            "de": "Systematischer Investitionsplan (SIP)"
+        },
+        "description": {
+            "en": "Plan your Systematic Investment Plan (SIP) to grow your wealth steadily.",
+            "hi": "अपनी संपत्ति को स्थिर रूप से बढ़ाने के लिए सिस्टमेटिक इनवेस्टमेंट प्लान (एसआईपी) की योजना बनाएँ।",
+            "mr": "तुमची संपत्ती स्थिरपणे वाढवण्यासाठी नियोजित गुंतवणूक योजना (एसआयपी) तयार करा.",
+            "de": "Planen Sie Ihren systematischen Investitionsplan (SIP), um Ihr Vermögen stetig zu steigern."
+        },
+        "questions": [
+            {
+                "key": "sip_amount",
+                "label": {
+                    "en": "How much can you invest monthly in an SIP?",
+                    "hi": "आप एसआईपी में प्रति माह कितना निवेश कर सकते हैं?",
+                    "mr": "तुम्ही एसआयपीमध्ये दरमहा किती गुंतवणूक करू शकता?",
+                    "de": "Wie viel können Sie monatlich in einen SIP investieren?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 5000",
+                    "hi": "उदा., ५०००",
+                    "mr": "उदा., ५०००",
+                    "de": "z.B. 5000"
+                }
+            },
+            {
+                "key": "investment_horizon",
+                "label": {
+                    "en": "How long do you plan to invest in the SIP (in years)?",
+                    "hi": "आप एसआईपी में कितने समय तक निवेश करने की योजना बना रहे हैं (वर्षों में)?",
+                    "mr": "तुम्ही एसआयपीमध्ये किती काळ गुंतवणूक करण्याची योजना आखत आहात (वर्षांमध्ये)?",
+                    "de": "Wie lange planen Sie, in den SIP zu investieren (in Jahren)?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 10",
+                    "hi": "उदा., १०",
+                    "mr": "उदा., १०",
+                    "de": "z.B. 10"
+                }
+            },
+            {
+                "key": "financial_goal",
+                "label": {
+                    "en": "What is your financial goal for this SIP?",
+                    "hi": "इस एसआईपी के लिए आपका वित्तीय लक्ष्य क्या है?",
+                    "mr": "या एसआयपीसाठी तुमचे आर्थिक ध्येय काय आहे?",
+                    "de": "Was ist Ihr finanzielles Ziel für diesen SIP?"
+                },
+                "type": "textarea",
+                "placeholder": {
+                    "en": "e.g., Save for a house, retirement",
+                    "hi": "उदा., घर के लिए बचत, सेवानिवृत्ति",
+                    "mr": "उदा., घरासाठी बचत, निवृत्ती",
+                    "de": "z.B. für ein Haus sparen, Ruhestand"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a financial advisor specializing in SIPs. Based on the user's monthly investment amount, investment horizon, and financial goal, recommend a suitable SIP strategy. Suggest mutual fund types (e.g., equity, debt, hybrid) and explain the power of compounding. Provide steps to start an SIP.",
+            "hi": "आप एक वित्तीय सलाहकार हैं जो एसआईपी में विशेषज्ञता रखते हैं। उपयोगकर्ता की मासिक निवेश राशि, निवेश अवधि और वित्तीय लक्ष्य के आधार पर, उपयुक्त एसआईपी रणनीति सुझाएँ। म्युचुअल फंड के प्रकार (उदा., इक्विटी, डेट, हाइब्रिड) सुझाएँ और चक्रवृद्धि की शक्ति समझाएँ। एसआईपी शुरू करने के चरण प्रदान करें।",
+            "mr": "तुम्ही एसआयपीमध्ये तज्ञ असलेले आर्थिक सल्लागार आहात. वापरकर्त्याच्या मासिक गुंतवणूक रक्कम, गुंतवणूक कालावधी आणि आर्थिक ध्येय यावर आधारित, योग्य एसआयपी धोरण सुचवा. म्युच्युअल फंडांचे प्रकार (उदा., इक्विटी, डेट, हायब्रिड) सुचवा आणि चक्रवाढीची शक्ती समजावून सांगा. एसआयपी सुरू करण्याच्या पायऱ्या द्या.",
+            "de": "Sie sind ein Finanzberater, der sich auf SIPs spezialisiert hat. Empfehlen Sie basierend auf dem monatlichen Investitionsbetrag, dem Anlagehorizont und dem finanziellen Ziel des Nutzers eine geeignete SIP-Strategie. Schlagen Sie Arten von Investmentfonds vor (z.B. Aktien, Anleihen, Hybrid) und erklären Sie die Kraft des Zinseszinses. Geben Sie Schritte an, um einen SIP zu starten."
+        }
+    },
+    {
+        "key": "tax_planning",
+        "title": {
+            "en": "Tax Planning",
+            "hi": "कर योजना",
+            "mr": "कर नियोजन",
+            "de": "Steuerplanung"
+        },
+        "description": {
+            "en": "Optimize your taxes with effective planning and deductions.",
+            "hi": "प्रभावी योजना और कटौतियों के साथ अपने करों को अनुकूलित करें।",
+            "mr": "प्रभावी नियोजन आणि कपातीसह तुमचे कर ऑप्टिमाइझ करा.",
+            "de": "Optimieren Sie Ihre Steuern mit effektiver Planung und Abzügen."
+        },
+        "questions": [
+            {
+                "key": "annual_income",
+                "label": {
+                    "en": "What is your total annual income?",
+                    "hi": "आपकी कुल वार्षिक आय क्या है?",
+                    "mr": "तुमचे एकूण वार्षिक उत्पन्न किती आहे?",
+                    "de": "Wie hoch ist Ihr gesamtes jährliches Einkommen?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 600000",
+                    "hi": "उदा., ६०००००",
+                    "mr": "उदा., ६०००००",
+                    "de": "z.B. 600000"
+                }
+            },
+            {
+                "key": "current_deductions",
+                "label": {
+                    "en": "What tax-saving investments or deductions do you currently use?",
+                    "hi": "आप वर्तमान में कौन से कर-बचत निवेश या कटौतियों का उपयोग करते हैं?",
+                    "mr": "तुम्ही सध्या कोणत्या कर-बचत गुंतवणुकीचा किंवा कपातीचा वापर करता?",
+                    "de": "Welche steuersparenden Investitionen oder Abzüge nutzen Sie derzeit?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., ELSS, PPF, insurance",
+                    "hi": "उदा., ईएलएसएस, पीपीएफ, बीमा",
+                    "mr": "उदा., ईएलएसएस, पीपीएफ, विमा",
+                    "de": "z.B. ELSS, PPF, Versicherung"
+                }
+            },
+            {
+                "key": "tax_regime",
+                "label": {
+                    "en": "Do you prefer the old or new tax regime?",
+                    "hi": "आप पुराने या नए कर व्यवस्था को पसंद करते हैं?",
+                    "mr": "तुम्ही जुन्या की नवीन कर प्रणालीला प्राधान्य देता?",
+                    "de": "Bevorzugen Sie das alte oder neue Steuersystem?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., Old regime",
+                    "hi": "उदा., पुरानी व्यवस्था",
+                    "mr": "उदा., जुनी प्रणाली",
+                    "de": "z.B. altes Steuersystem"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a tax planning expert. Based on the user's annual income, current deductions, and preferred tax regime, suggest tax-saving strategies (e.g., ELSS, PPF, NPS). Explain applicable deductions and benefits under the chosen regime in simple terms. Provide tips to maximize tax savings.",
+            "hi": "आप एक कर योजना विशेषज्ञ हैं। उपयोगकर्ता की वार्षिक आय, वर्तमान कटौतियों और पसंदीदा कर व्यवस्था के आधार पर, कर-बचत रणनीतियाँ सुझाएँ (उदा., ईएलएसएस, पीपीएफ, एनपीएस)। चुनी हुई व्यवस्था के तहत लागू कटौतियों और लाभों को सरल शब्दों में समझाएँ। कर बचत को अधिकतम करने के लिए सुझाव दें।",
+            "mr": "तुम्ही कर नियोजन तज्ञ आहात. वापरकर्त्याच्या वार्षिक उत्पन्न, सध्याच्या कपाती आणि पसंत केलेल्या कर प्रणालीवर आधारित, कर-बचत धोरणे सुचवा (उदा., ईएलएसएस, पीपीएफ, एनपीएस). निवडलेल्या प्रणाली अंतर्गत लागू कपाती आणि फायदे सोप्या शब्दांत समजावून सांगा. कर बचत वाढवण्यासाठी टिपा द्या.",
+            "de": "Sie sind ein Experte für Steuerplanung. Schlagen Sie basierend auf dem jährlichen Einkommen, den aktuellen Abzügen und dem bevorzugten Steuersystem des Nutzers steuersparende Strategien vor (z.B. ELSS, PPF, NPS). Erklären Sie die geltenden Abzüge und Vorteile des gewählten Systems in einfachen Worten. Geben Sie Tipps, um Steuerersparnisse zu maximieren."
+        }
+    },
+    {
+        "key": "stock_market",
+        "title": {
+            "en": "Stock Market Basics",
+            "hi": "शेयर बाजार की मूल बातें",
+            "mr": "शेअर मार्केटच्या मूलभूत गोष्टी",
+            "de": "Grundlagen des Aktienmarktes"
+        },
+        "description": {
+            "en": "Learn the basics of investing in the stock market.",
+            "hi": "शेयर बाजार में निवेश की मूल बातें सीखें।",
+            "mr": "शेअर मार्केटमध्ये गुंतवणुकीच्या मूलभूत गोष्टी शिका.",
+            "de": "Lernen Sie die Grundlagen des Investierens am Aktienmarkt."
+        },
+        "questions": [
+            {
+                "key": "investment_amount",
+                "label": {
+                    "en": "How much are you planning to invest in stocks initially?",
+                    "hi": "आप शुरू में शेयरों में कितना निवेश करने की योजना बना रहे हैं?",
+                    "mr": "तुम्ही सुरुवातीला शेअर्समध्ये किती गुंतवणूक करण्याची योजना आखत आहात?",
+                    "de": "Wie viel planen Sie zunächst in Aktien zu investieren?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 10000",
+                    "hi": "उदा., १००००",
+                    "mr": "उदा., १००००",
+                    "de": "z.B. 10000"
+                }
+            },
+            {
+                "key": "experience_level",
+                "label": {
+                    "en": "What is your experience level with stock market investing (beginner, intermediate, advanced)?",
+                    "hi": "शेयर बाजार निवेश में आपका अनुभव स्तर क्या है (शुरुआती, मध्यवर्ती, उन्नत)?",
+                    "mr": "शेअर मार्केट गुंतवणुकीचा तुमचा अनुभव स्तर काय आहे (नवशिक्या, मध्यम, प्रगत)?",
+                    "de": "Welches Erfahrungslevel haben Sie beim Investieren am Aktienmarkt (Anfänger, Fortgeschrittener, Experte)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., Beginner",
+                    "hi": "उदा., शुरुआती",
+                    "mr": "उदा., नवशिक्या",
+                    "de": "z.B. Anfänger"
+                }
+            },
+            {
+                "key": "investment_goal",
+                "label": {
+                    "en": "What is your goal for stock market investing?",
+                    "hi": "शेयर बाजार निवेश के लिए आपका लक्ष्य क्या है?",
+                    "mr": "शेअर मार्केट गुंतवणुकीसाठी तुमचे ध्येय काय आहे?",
+                    "de": "Was ist Ihr Ziel für das Investieren am Aktienmarkt?"
+                },
+                "type": "textarea",
+                "placeholder": {
+                    "en": "e.g., Long-term wealth, short-term gains",
+                    "hi": "उदा., दीर्घकालिक संपत्ति, अल्पकालिक लाभ",
+                    "mr": "उदा., दीर्घकालीन संपत्ती, अल्पकालिक नफा",
+                    "de": "z.B. langfristiger Vermögensaufbau, kurzfristige Gewinne"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a stock market advisor. Based on the user's investment amount, experience level, and goals, provide a beginner-friendly guide to stock market investing. Explain key concepts (e.g., stocks, diversification, risk) and suggest a starting strategy (e.g., blue-chip stocks, ETFs). Provide tips to avoid common mistakes.",
+            "hi": "आप एक शेयर बाजार सलाहकार हैं। उपयोगकर्ता की निवेश राशि, अनुभव स्तर और लक्ष्यों के आधार पर, शेयर बाजार निवेश के लिए शुरुआती-अनुकूल मार्गदर्शिका प्रदान करें। प्रमुख अवधारणाओं (उदा., शेयर, विविधीकरण, जोखिम) को समझाएँ और शुरुआती रणनीति सुझाएँ (उदा., ब्लू-चिप स्टॉक, ईटीएफ)। सामान्य गलतियों से बचने के लिए सुझाव दें।",
+            "mr": "तुम्ही शेअर मार्केट सल्लागार आहात. वापरकर्त्याच्या गुंतवणूक रक्कम, अनुभव स्तर आणि ध्येयांवर आधारित, शेअर मार्केट गुंतवणुकीसाठी नवशिक्यांसाठी अनुकूल मार्गदर्शक द्या. प्रमुख संकल्पना (उदा., शेअर्स, विविधीकरण, जोखीम) समजावून सांगा आणि प्रारंभिक धोरण सुचवा (उदा., ब्लू-चिप स्टॉक्स, ईटीएफ). सामान्य चुका टाळण्यासाठी टिपा द्या.",
+            "de": "Sie sind ein Aktienmarktberater. Stellen Sie basierend auf dem Investitionsbetrag, dem Erfahrungslevel und den Zielen des Nutzers eine anfängerfreundliche Anleitung für das Investieren am Aktienmarkt bereit. Erklären Sie Schlüsselkonzepte (z.B. Aktien, Diversifikation, Risiko) und schlagen Sie eine Startstrategie vor (z.B. Blue-Chip-Aktien, ETFs). Geben Sie Tipps, um häufige Fehler zu vermeiden."
+        }
+    },
+    {
+        "key": "wealth_building",
+        "title": {
+            "en": "Wealth Building Strategies",
+            "hi": "संपत्ति निर्माण की रणनीतियाँ",
+            "mr": "संपत्ती निर्माण धोरणे",
+            "de": "Strategien zum Vermögensaufbau"
+        },
+        "description": {
+            "en": "Develop a long-term plan to build and grow your wealth.",
+            "hi": "अपनी संपत्ति को बनाने और बढ़ाने के लिए दीर्घकालिक योजना विकसित करें।",
+            "mr": "तुमची संपत्ती निर्माण आणि वाढवण्यासाठी दीर्घकालीन योजना विकसित करा.",
+            "de": "Entwickeln Sie einen langfristigen Plan, um Ihr Vermögen aufzubauen und zu vermehren."
+        },
+        "questions": [
+            {
+                "key": "current_net_worth",
+                "label": {
+                    "en": "What is your current net worth (assets minus liabilities)?",
+                    "hi": "आपकी वर्तमान निवल संपत्ति क्या है (संपत्ति माइनस देनदारियाँ)?",
+                    "mr": "तुमची सध्याची निव्वळ संपत्ती किती आहे (मालमत्ता वजा दायित्वे)?",
+                    "de": "Wie hoch ist Ihr aktuelles Nettovermögen (Vermögenswerte minus Verbindlichkeiten)?"
+                },
+                "type": "number",
+                "placeholder": {
+                    "en": "e.g., 500000",
+                    "de": "z.B. 500000"
+                }
+            },
+            {
+                "key": "investment_types",
+                "label": {
+                    "en": "What types of investments do you currently hold (e.g., stocks, real estate)?",
+                    "hi": "आपके पास वर्तमान में किस प्रकार के निवेश हैं (उदा., शेयर, रियल एस्टेट)?",
+                    "mr": "तुमच्याकडे सध्या कोणत्या प्रकारच्या गुंतवणुका आहेत (उदा., शेअर्स, रिअल इस्टेट)?",
+                    "de": "Welche Arten von Investitionen halten Sie derzeit (z.B. Aktien, Immobilien)?"
+                },
+                "type": "text",
+                "placeholder": {
+                    "en": "e.g., Mutual funds, fixed deposit",
+                    "de": "z.B. Investmentfonds, Festgeld"
+                }
+            },
+            {
+                "key": "wealth_goal",
+                "label": {
+                    "en": "What is your long-term wealth-building goal?",
+                    "hi": "आपका दीर्घकालिक संपत्ति निर्माण लक्ष्य क्या है?",
+                    "mr": "तुमचे दीर्घकालीन संपत्ती निर्माण ध्येय काय आहे?",
+                    "de": "Was ist Ihr langfristiges Ziel für den Vermögensaufbau?"
+                },
+                "type": "textarea",
+                "placeholder": {
+                    "en": "e.g., Achieve financial independence, buy property",
+                    "de": "z.B. finanzielle Unabhängigkeit erreichen, Immobilie kaufen"
+                }
+            }
+        ],
+        "systemPrompt": {
+            "en": "You are a wealth management advisor. Based on the user's current net worth, existing investments, and wealth-building goals, recommend a diversified strategy to grow wealth (e.g., stocks, mutual funds, real estate). Explain asset allocation and long-term planning in simple terms. Provide tips for consistent wealth growth.",
+            "hi": "आप एक संपत्ति प्रबंधन सलाहकार हैं। उपयोगकर्ता की वर्तमान निवल संपत्ति, मौजूदा निवेश और संपत्ति निर्माण लक्ष्यों के आधार पर, संपत्ति बढ़ाने के लिए विविध रणनीति सुझाएँ (उदा., शेयर, म्युचुअल फंड, रियल एस्टेट)। परिसंपत्ति आवंटन और दीर्घकालिक योजना को सरल शब्दों में समझाएँ। निरंतर संपत्ति वृद्धि के लिए सुझाव दें।",
+            "mr": "तुम्ही संपत्ती व्यवस्थापन सल्लागार आहात. वापरकर्त्याच्या सध्याच्या निव्वळ संपत्ती, विद्यमान गुंतवणुका आणि संपत्ती निर्माण ध्येयांवर आधारित, संपत्ती वाढवण्यासाठी वैविध्यपूर्ण धोरण सुचवा (उदा., शेअर्स, म्युच्युअल फंड, रिअल इस्टेट). मालमत्ता वाटप आणि दीर्घकालीन नियोजन सोप्या शब्दांत समजावून सांगा. सातत्यपूर्ण संपत्ती वाढीसाठी टिपा द्या.",
+            "de": "Sie sind ein Vermögensberater. Basierend auf dem aktuellen Nettovermögen, den bestehenden Investitionen und den Zielen des Nutzers zum Vermögensaufbau empfehlen Sie eine diversifizierte Strategie zum Vermögenswachstum (z.B. Aktien, Investmentfonds, Immobilien). Erklären Sie die Vermögensaufteilung und die langfristige Planung in einfachen Worten. Geben Sie Tipps für stetiges Vermögenswachstum."
         }
     }
+    
 ]
