@@ -58,7 +58,7 @@ function AppHeader() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/home');
   };
 
   return (
@@ -77,7 +77,7 @@ function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src="https://placehold.co/100x100" alt={user?.fullName ?? 'User'} />
+                <AvatarImage src="https://placehold.co/100x100" data-ai-hint="profile picture" alt={user?.fullName ?? 'User'} />
                 <AvatarFallback>{user?.fullName?.[0]?.toUpperCase() ?? 'U'}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
@@ -129,7 +129,7 @@ function MainSidebar() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/home');
   };
   
   const menuItems = [
@@ -217,7 +217,7 @@ function CoachLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/home');
   };
 
   const navItems = [
@@ -245,7 +245,7 @@ function CoachLayout({ children }: { children: React.ReactNode }) {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Avatar>
-                  <AvatarImage src="https://placehold.co/100x100" alt={user?.fullName ?? 'Coach'} />
+                  <AvatarImage src="https://placehold.co/100x100" data-ai-hint="profile picture" alt={user?.fullName ?? 'Coach'} />
                   <AvatarFallback>{user?.fullName?.[0]?.toUpperCase() ?? 'C'}</AvatarFallback>
                 </Avatar>
                 <span className="sr-only">Toggle user menu</span>
@@ -274,7 +274,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace("/login");
+      router.replace("/home");
     }
   }, [isLoading, isAuthenticated, router]);
 

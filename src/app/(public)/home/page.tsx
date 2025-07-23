@@ -1,8 +1,13 @@
 
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Bot, BarChart2, MessageSquare, Briefcase } from "lucide-react";
+import { AuthDialog } from "@/components/auth-dialog";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
   <div className="flex flex-col items-center p-6 text-center bg-card rounded-xl shadow-sm">
@@ -30,6 +35,9 @@ const HeroIllustration = () => (
 
 
 export default function HomePage() {
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const router = useRouter();
+  
   return (
     <div className="flex flex-col bg-background">
       <section className="relative w-full py-20 md:py-32 lg:py-40">
@@ -47,15 +55,8 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Button asChild size="lg">
-                  <Link href="/onboarding">
-                    Get Started <ArrowRight className="ml-2" />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                   <Link href="/login">
-                    Login
-                  </Link>
+                <Button onClick={() => setIsAuthDialogOpen(true)} size="lg">
+                    Login / Get Started <ArrowRight className="ml-2" />
                 </Button>
               </div>
             </div>
@@ -95,7 +96,15 @@ export default function HomePage() {
             </div>
         </div>
       </section>
-
+      
+      <AuthDialog 
+        open={isAuthDialogOpen}
+        onOpenChange={setIsAuthDialogOpen}
+        onLoginSuccess={() => {
+            setIsAuthDialogOpen(false);
+            router.push('/coach');
+        }}
+      />
     </div>
   );
 }

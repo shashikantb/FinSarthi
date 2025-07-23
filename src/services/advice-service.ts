@@ -2,22 +2,25 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { adviceSessions, users, type NewAdviceSession, type AdviceSession } from "@/lib/db/schema";
+import { adviceSessions, users, type NewAdviceSession, type AdviceSession as RawAdviceSession } from "@/lib/db/schema";
 import { eq, desc, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
+// Redefine AdviceSession locally to remove income/expenses which are no longer part of the flow.
+export type AdviceSession = Omit<RawAdviceSession, 'formData'> & {
+  formData: Record<string, any>;
+};
+
 
 /**
  * A helper function to process a raw database session object
  * into the AdviceSession type used by the application.
- * It extracts income and expenses from the formData JSON for dashboard compatibility.
  */
 function processSession(session: typeof adviceSessions.$inferSelect): AdviceSession {
     const formData = (session.formData as Record<string, any>) || {};
     return {
         ...session,
         formData: formData,
-        income: Number(formData?.income) || 0,
-        expenses: Number(formData?.expenses) || 0,
     }
 }
 
@@ -49,6 +52,8 @@ export async function createAdviceSessionForCurrentUser(
   };
 
   if (isLoggedIn) {
+    // This part might need adjustment based on the new auth flow.
+    // For now, it remains, but might not be used if auth state is managed differently.
     const recentUser = await getMostRecentUser();
     if (recentUser) {
       valuesToInsert.userId = recentUser.id;
@@ -59,7 +64,6 @@ export async function createAdviceSessionForCurrentUser(
   
   if (isLoggedIn) {
       revalidatePath('/advice');
-      revalidatePath('/dashboard');
   }
 
   return processSession(newSession);
@@ -75,7 +79,6 @@ export async function associateSessionWithUser(sessionId: string, userId: string
     .set({ userId })
     .where(eq(adviceSessions.id, sessionId));
 
-  revalidatePath('/dashboard');
   revalidatePath('/advice');
 }
 

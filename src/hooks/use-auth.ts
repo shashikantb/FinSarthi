@@ -1,12 +1,9 @@
 
-// src/hooks/use-auth.ts
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { getUserById } from "@/services/user-service"; // We need a way to validate the user
+import { getUserById, findUserByEmailOrPhone } from "@/services/user-service";
 import type { User } from "@/lib/db/schema";
-import { getUserByCredentials } from "@/services/user-service";
 
 const SESSION_KEY = "finsarthi_session_userId";
 
@@ -24,7 +21,6 @@ export function useAuth() {
           if (fetchedUser) {
             setUser(fetchedUser);
           } else {
-            // Clear invalid session
             localStorage.removeItem(SESSION_KEY);
           }
         } catch (error) {
@@ -37,10 +33,12 @@ export function useAuth() {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password_hash: string, role: 'customer' | 'coach'): Promise<User | null> => {
+  // Simplified login function that just sets the session.
+  // The actual user verification (OTP) happens in the AuthDialog.
+  const login = async (userId: string): Promise<User | null> => {
     setIsLoading(true);
     try {
-      const loggedInUser = await getUserByCredentials(email, password_hash, role);
+      const loggedInUser = await getUserById(userId);
       if (loggedInUser) {
         localStorage.setItem(SESSION_KEY, loggedInUser.id);
         setUser(loggedInUser);

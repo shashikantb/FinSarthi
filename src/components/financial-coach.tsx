@@ -110,15 +110,19 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   const { isListening, transcript, startListening, stopListening } = useSpeechRecognition({});
 
-  const language = form.watch("language");
-  const locale = langToLocale[language as keyof typeof langToLocale] || 'en-US';
-
   useEffect(() => {
     if (transcript) {
         form.setValue("query", transcript);
-        form.handleSubmit(handleSubmit)();
     }
   }, [transcript, form]);
+  
+  useEffect(() => {
+    if (transcript && !isListening) {
+      // Wait a tick to ensure the input value is set before submitting
+      setTimeout(() => form.handleSubmit(handleSubmit)(), 0);
+    }
+  }, [transcript, isListening, form]);
+
 
   const startNewGuidedFlow = useCallback(() => {
     const greetingMessage: Message = {
@@ -193,7 +197,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             }, true); // `true` for isLoggedIn
             
             toast({ title: "Advice Saved!", description: "You can review it in the Advice History tab." });
+            setIsAdviceSaved(true); // Mark as saved
         }
+        // After saving (or if already saved), reset the flow.
         startNewGuidedFlow();
 
     } catch(error) {
@@ -276,6 +282,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   }, [isHumanChat, fetchHumanMessages, chatSession, currentUser.id]);
 
+  const language = form.watch("language");
+  const locale = langToLocale[language as keyof typeof langToLocale] || 'en-US';
+  
   useEffect(() => {
     const langName = languages[languageCode as keyof typeof languages]?.name;
     if (langName) {
@@ -295,7 +304,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const handlePlayPause = (message: Message) => {
     if (currentlyPlayingId === message.id && isPlaying) {
         stopSpeaking();
-        setCurrentlyPlayingId(null);
     } else {
         stopSpeaking();
         speak(message.content, locale);
@@ -414,10 +422,17 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                    <div className="flex flex-col items-start gap-2">
                      <div className="flex items-end gap-2">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={isHumanChat ? `https://placehold.co/100x100.png` : undefined} data-ai-hint="profile picture" alt={chatPartner?.fullName ?? 'Bot'} />
-                          <AvatarFallback>
-                            {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
-                          </AvatarFallback>
+                           {(() => {
+                               if (isHumanChat) {
+                                   if (chatPartner && chatPartner.image) {
+                                       return <AvatarImage src={chatPartner.image} data-ai-hint="profile picture" alt={chatPartner.fullName ?? 'Bot'} />;
+                                   }
+                               }
+                               return null;
+                           })()}
+                            <AvatarFallback>
+                                {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
+                            </AvatarFallback>
                         </Avatar>
                         <div
                           className={cn(
@@ -466,7 +481,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                             <p className="whitespace-pre-wrap">{message.content}</p>
                         </div>
                         <Avatar className="h-8 w-8">
-                            <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="profile picture" alt={currentUser.fullName ?? 'User'} />
+                            <AvatarImage src={'https://placehold.co/100x100.png'} data-ai-hint="profile picture" alt={currentUser.fullName ?? 'User'} />
                             <AvatarFallback>
                                 <UserIcon className="h-5 w-5" />
                             </AvatarFallback>
@@ -562,3 +577,5 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
+
+    

@@ -1,15 +1,20 @@
 
-import { pgTable, text, timestamp, pgEnum, jsonb, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, pgEnum, jsonb, boolean, integer } from 'drizzle-orm/pg-core';
 import { createId } from '@paralleldrive/cuid2';
 
 export const roleEnum = pgEnum('role', ['customer', 'coach']);
+export const genderEnum = pgEnum('gender', ['male', 'female', 'other']);
 export const chatRequestStatusEnum = pgEnum('chat_request_status', ['pending', 'accepted', 'declined', 'closed']);
 
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => createId()),
   fullName: text('full_name'),
-  email: text('email').notNull().unique(),
-  passwordHash: text('password_hash'),
+  email: text('email').unique(),
+  phone: text('phone').unique(),
+  age: integer('age'),
+  city: text('city'),
+  country: text('country'),
+  gender: genderEnum('gender'),
   role: roleEnum('role').default('customer').notNull(),
   isAvailable: boolean('is_available').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -49,12 +54,8 @@ export const chatMessages = pgTable('chat_messages', {
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
-// This type is used across the app. We simulate the income/expenses fields
-// for dashboard compatibility by extracting them from the formData JSON.
 export type AdviceSession = Omit<typeof adviceSessions.$inferSelect, 'formData'> & {
   formData: Record<string, any>;
-  income: number;
-  expenses: number;
 };
 
 export type NewAdviceSession = typeof adviceSessions.$inferInsert;
