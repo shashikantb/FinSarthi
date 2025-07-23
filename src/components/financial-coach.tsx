@@ -40,7 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut } from "lucide-react";
+import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut, Play } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -80,7 +80,12 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const { toast } = useToast();
   const isHumanChat = !!(chatSession && chatPartner);
 
-  const { speak, stop: stopSpeaking, isPlaying } = useBrowserTts();
+  const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
+
+  const { speak, stop: stopSpeaking, isPlaying } = useBrowserTts({
+    onEnd: () => setCurrentlyPlayingId(null),
+  });
+
   const { isListening, startListening, stopListening } = useSpeechRecognition({
     onTranscript: (transcript) => {
         form.setValue("query", transcript);
@@ -138,6 +143,16 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   }, [messages]);
 
+  const handlePlayPause = (message: Message) => {
+    if (currentlyPlayingId === message.id) {
+        stopSpeaking();
+        setCurrentlyPlayingId(null);
+    } else {
+        speak(message.content, locale);
+        setCurrentlyPlayingId(message.id);
+    }
+  };
+
   const handleCloseChat = async () => {
     if (!chatSession) return;
     await updateChatRequestStatus(chatSession.id, 'closed');
@@ -173,7 +188,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           id: createId(),
         };
         setMessages(currentMessages => [...currentMessages, modelMessage]);
-        speak(result.response, locale);
       }
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
@@ -211,11 +225,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 </SelectContent>
               </Select>
             )}
-             {!isHumanChat && (
-                <Button variant="destructive" size="icon" onClick={stopSpeaking} disabled={!isPlaying} title="Stop Speaking">
-                    <Square className="h-5 w-5"/>
-                </Button>
-            )}
             {isHumanChat && currentUser.role === 'coach' && (
                 <Button variant="outline" size="sm" onClick={handleCloseChat}>
                     <LogOut className="mr-2 h-4 w-4"/>
@@ -234,35 +243,56 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
               <div
                 key={message.id}
                 className={cn(
-                  "flex items-start gap-3",
+                  "flex items-end gap-3",
                   message.role === "user" ? "justify-end" : "justify-start"
                 )}
               >
                 {message.role === "assistant" && (
-                  <Avatar className="h-8 w-8">
-                     <AvatarImage src={isHumanChat ? `https://placehold.co/100x100.png` : undefined} data-ai-hint="profile picture" alt={chatPartner?.fullName ?? 'Bot'} />
-                    <AvatarFallback>
-                      {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
-                    </AvatarFallback>
-                  </Avatar>
+                   <div className="flex items-end gap-2">
+                     <Avatar className="h-8 w-8">
+                       <AvatarImage src={isHumanChat ? `https://placehold.co/100x100.png` : undefined} data-ai-hint="profile picture" alt={chatPartner?.fullName ?? 'Bot'} />
+                      <AvatarFallback>
+                        {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div
+                      className={cn(
+                        "max-w-xs rounded-lg p-3 text-sm md:max-w-md shadow",
+                        "bg-muted rounded-bl-none"
+                      )}
+                    >
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    </div>
+                     {!isHumanChat && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => handlePlayPause(message)}
+                        >
+                            {currentlyPlayingId === message.id ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                        </Button>
+                     )}
+                   </div>
                 )}
-                <div
-                  className={cn(
-                    "max-w-xs rounded-lg p-3 text-sm md:max-w-md shadow",
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-none"
-                      : "bg-muted rounded-bl-none"
-                  )}
-                >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-                </div>
+                
                 {message.role === "user" && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="profile picture" alt={currentUser.fullName ?? 'User'} />
-                    <AvatarFallback>
-                      <UserIcon className="h-5 w-5" />
-                    </AvatarFallback>
-                  </Avatar>
+                    <div className="flex items-end gap-2">
+                        <div
+                            className={cn(
+                                "max-w-xs rounded-lg p-3 text-sm md:max-w-md shadow",
+                                "bg-primary text-primary-foreground rounded-br-none"
+                            )}
+                        >
+                            <p className="whitespace-pre-wrap">{message.content}</p>
+                        </div>
+                        <Avatar className="h-8 w-8">
+                            <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="profile picture" alt={currentUser.fullName ?? 'User'} />
+                            <AvatarFallback>
+                                <UserIcon className="h-5 w-5" />
+                            </AvatarFallback>
+                        </Avatar>
+                    </div>
                 )}
               </div>
             ))}
@@ -340,5 +370,3 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
-
-    

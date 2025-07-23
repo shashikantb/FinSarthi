@@ -1,9 +1,13 @@
 // src/hooks/use-browser-tts.ts
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-export function useBrowserTts() {
+interface BrowserTtsOptions {
+    onEnd?: () => void;
+}
+
+export function useBrowserTts({ onEnd }: BrowserTtsOptions = {}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -54,15 +58,28 @@ export function useBrowserTts() {
     utterance.onend = () => {
       setIsPlaying(false);
       utteranceRef.current = null;
+      onEnd?.();
     };
     utterance.onerror = (e) => {
         console.error("SpeechSynthesis Error", e);
         setIsPlaying(false);
         utteranceRef.current = null;
+        onEnd?.();
     };
 
     window.speechSynthesis.speak(utterance);
   };
 
-  return { speak, isPlaying };
+  const stop = useCallback(() => {
+      if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+      }
+      setIsPlaying(false);
+      setCurrentlyPlayingId(null);
+  }, []);
+
+  return { speak, stop, isPlaying };
 }
+
+// Add this state to your component to manage which audio is playing.
+// const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
