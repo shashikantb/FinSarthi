@@ -40,15 +40,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Send, Bot, User as UserIcon, Volume2, Play, LogOut } from "lucide-react";
+import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useBrowserTts } from "@/hooks/use-browser-tts";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { languages, langToLocale } from "@/lib/translations";
 import { createId } from "@paralleldrive/cuid2";
 import { useAppTranslations } from "@/hooks/use-app-translations";
 import { useToast } from "@/hooks/use-toast";
+
 
 type Message = {
   id: string;
@@ -69,31 +71,6 @@ interface FinancialCoachProps {
   chatPartner?: User;
 }
 
-
-function AudioPlayer({ message, language }: { message: Message, language: string }) {
-  const { speak, isPlaying } = useBrowserTts();
-  
-  if (message.role !== "assistant") return null;
-
-  const locale = langToLocale[language as keyof typeof langToLocale];
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => speak(message.content, locale)}
-      className="h-7 w-7"
-    >
-      {isPlaying ? (
-        <Volume2 className="h-4 w-4" />
-      ) : (
-        <Play className="h-4 w-4" />
-      )}
-      <span className="sr-only">Play audio</span>
-    </Button>
-  );
-}
-
 export function FinancialCoach({ currentUser, chatSession, chatPartner }: FinancialCoachProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -102,6 +79,14 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const { t, languageCode } = useAppTranslations();
   const { toast } = useToast();
   const isHumanChat = !!(chatSession && chatPartner);
+
+  const { speak, stop: stopSpeaking, isPlaying } = useBrowserTts();
+  const { isListening, startListening, stopListening } = useSpeechRecognition({
+    onTranscript: (transcript) => {
+        form.setValue("query", transcript);
+        handleSubmit();
+    }
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -112,6 +97,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   });
 
   const language = form.watch("language");
+  
+  const locale = langToLocale[language as keyof typeof langToLocale] || 'en-US';
 
   const fetchHumanMessages = useCallback(async () => {
     if (!chatSession) return;
@@ -158,7 +145,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     window.location.reload(); // Force reload to reflect the change
   }
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  const handleSubmit = form.handleSubmit(async (data: FormValues) => {
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
@@ -186,6 +173,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           id: createId(),
         };
         setMessages(currentMessages => [...currentMessages, modelMessage]);
+        speak(result.response, locale);
       }
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
@@ -194,28 +182,54 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     } finally {
         setIsLoading(false);
     }
-  };
+  });
 
   const cardTitle = isHumanChat ? `Chat with ${chatPartner.fullName}` : t.coach.chat_title;
   const cardDescription = isHumanChat ? `You are now chatting directly with a user.` : t.coach.chat_description;
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row justify-between items-center">
+    <Card className="w-full flex flex-col h-[calc(100vh-10rem)]">
+      <CardHeader className="flex flex-row justify-between items-center border-b">
         <div>
             <CardTitle>{cardTitle}</CardTitle>
             <CardDescription>{cardDescription}</CardDescription>
         </div>
-        {isHumanChat && currentUser.role === 'coach' && (
-            <Button variant="outline" size="sm" onClick={handleCloseChat}>
-                <LogOut className="mr-2 h-4 w-4"/>
-                Close Chat
-            </Button>
-        )}
+        <div className="flex items-center gap-2">
+            {!isHumanChat && (
+              <Select
+                onValueChange={(value) => form.setValue("language", value as "English" | "Hindi" | "Marathi")}
+                value={form.getValues('language')}
+                disabled={isLoading || messages.length > 0}
+              >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Language" />
+                  </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="English">English</SelectItem>
+                  <SelectItem value="Hindi">Hindi</SelectItem>
+                  <SelectItem value="Marathi">Marathi</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+             {!isHumanChat && (
+                <Button variant="destructive" size="icon" onClick={stopSpeaking} disabled={!isPlaying} title="Stop Speaking">
+                    <Square className="h-5 w-5"/>
+                </Button>
+            )}
+            {isHumanChat && currentUser.role === 'coach' && (
+                <Button variant="outline" size="sm" onClick={handleCloseChat}>
+                    <LogOut className="mr-2 h-4 w-4"/>
+                    Close Chat
+                </Button>
+            )}
+        </div>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[400px] w-full pr-4" ref={scrollAreaRef}>
+      <CardContent className="flex-1 p-0">
+        <ScrollArea className="h-full w-full p-4" ref={scrollAreaRef}>
           <div className="space-y-4">
+            {messages.length === 0 && (
+                <div className="text-center text-muted-foreground pt-10">Start a conversation by typing or speaking!</div>
+            )}
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -234,16 +248,13 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 )}
                 <div
                   className={cn(
-                    "max-w-xs rounded-lg p-3 text-sm md:max-w-md",
+                    "max-w-xs rounded-lg p-3 text-sm md:max-w-md shadow",
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "bg-primary text-primary-foreground rounded-br-none"
+                      : "bg-muted rounded-bl-none"
                   )}
                 >
-                  <div className="flex items-center gap-2">
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                    {message.role === "assistant" && !isHumanChat && <AudioPlayer message={message} language={language} />}
-                  </div>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
                 </div>
                 {message.role === "user" && (
                   <Avatar className="h-8 w-8">
@@ -263,7 +274,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                   </AvatarFallback>
                 </Avatar>
                 <div className="max-w-xs rounded-lg p-3 text-sm md:max-w-md bg-muted">
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <div className="flex items-center">
+                    <span className="animate-bounce mr-1">.</span>
+                    <span className="animate-bounce delay-75 mr-1">.</span>
+                    <span className="animate-bounce delay-150">.</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -274,35 +289,21 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       <CardFooter className="pt-4 border-t">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex w-full items-start gap-4"
+            onSubmit={handleSubmit}
+            className="flex w-full items-start gap-3"
           >
-             {!isHumanChat && <FormField
-              control={form.control}
-              name="language"
-              render={({ field }) => (
-                <FormItem className="w-1/4">
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                    disabled={isLoading || messages.length > 0}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Language" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="English">English</SelectItem>
-                      <SelectItem value="Hindi">Hindi</SelectItem>
-                      <SelectItem value="Marathi">Marathi</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />}
+             {!isHumanChat && (
+                <Button 
+                    type="button" 
+                    size="icon" 
+                    className={cn("shrink-0", isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600')}
+                    onClick={() => isListening ? stopListening() : startListening({ lang: locale })}
+                    disabled={isLoading}
+                >
+                   {isListening ? <Square className="h-5 w-5"/> : <Mic className="h-5 w-5" />}
+                   <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
+                </Button>
+             )}
             <FormField
               control={form.control}
               name="query"
@@ -310,9 +311,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      placeholder={t.coach.placeholder}
+                      placeholder={isListening ? "Listening..." : t.coach.placeholder}
                       {...field}
-                      disabled={isLoading}
+                      disabled={isLoading || isListening}
                       autoComplete="off"
                     />
                   </FormControl>
@@ -339,3 +340,5 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
+
+    

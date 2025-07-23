@@ -3,7 +3,7 @@
 // It does not require any external npm packages.
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface SpeechRecognitionOptions {
   onTranscript?: (transcript: string) => void;
@@ -24,17 +24,11 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
     recognitionRef.current = new SpeechRecognition();
     const recognition = recognitionRef.current;
 
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
+    recognition.continuous = false; // We want to process after each pause
+    recognition.interimResults = false; // We only care about the final result
 
     recognition.onresult = (event) => {
-      let finalTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        }
-      }
+      const finalTranscript = event.results[event.results.length - 1][0].transcript.trim();
       setTranscript(finalTranscript);
       if (onTranscript && finalTranscript) {
         onTranscript(finalTranscript);
@@ -46,21 +40,20 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
     };
 
     recognition.onerror = (event) => {
-      // The "aborted" and "network" errors are common and can be safely ignored.
-      if (event.error !== 'aborted' && event.error !== 'network') {
-        console.error("Speech recognition error", event.error);
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
+          console.error("Speech recognition error", event.error);
       }
       setIsListening(false);
     };
 
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.stop();
+        recognitionRef.current.abort();
       }
     };
   }, [onTranscript]);
 
-  const startListening = ({lang = 'en-US'} = {}) => {
+  const startListening = useCallback(({lang = 'en-US'} = {}) => {
     if (recognitionRef.current && !isListening) {
       try {
         recognitionRef.current.lang = lang;
@@ -68,19 +61,18 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
         setIsListening(true);
         setTranscript("");
       } catch(e) {
-        // This can happen if start is called while already started.
-        console.error(e);
+        console.error("Speech recognition could not start: ", e);
         setIsListening(false);
       }
     }
-  };
+  }, [isListening]);
 
-  const stopListening = () => {
+  const stopListening = useCallback(() => {
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
     }
-  };
+  }, [isListening]);
 
   return {
     isListening,
@@ -89,3 +81,5 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
     stopListening,
   };
 }
+
+    
