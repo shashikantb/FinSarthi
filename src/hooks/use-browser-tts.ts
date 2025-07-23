@@ -1,3 +1,4 @@
+
 // src/hooks/use-browser-tts.ts
 "use client";
 
@@ -75,11 +76,7 @@ export function useBrowserTts({ onEnd }: BrowserTtsOptions = {}) {
           window.speechSynthesis.cancel();
       }
       setIsPlaying(false);
-      setCurrentlyPlayingId(null);
   }, []);
 
   return { speak, stop, isPlaying };
 }
-
-// Add this state to your component to manage which audio is playing.
-// const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);

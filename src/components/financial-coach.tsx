@@ -87,6 +87,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       language: "English",
     },
   });
+  
+  const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
 
   const { speak, stop: stopSpeaking, isPlaying } = useBrowserTts({
     onEnd: () => setCurrentlyPlayingId(null),
@@ -98,8 +100,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         form.handleSubmit(handleSubmit)(); 
     }
   });
-  
-  const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
 
   const language = form.watch("language");
   const locale = langToLocale[language as keyof typeof langToLocale] || 'en-US';
@@ -169,6 +169,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     try {
       if (isHumanChat) {
         await sendMessage(chatSession.id, currentUser.id, data.query);
+        // Human chat messages are fetched via polling, so no need to add to state here.
+        await fetchHumanMessages(); // fetch immediately after sending
       } else {
         const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
         const input: FinancialCoachInput = {
@@ -184,11 +186,15 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           id: createId(),
         };
         setMessages(currentMessages => [...currentMessages, modelMessage]);
-        handlePlayPause(modelMessage);
+        // Auto-play TTS for AI coach response
+        if (!isHumanChat) {
+          handlePlayPause(modelMessage);
+        }
       }
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
       setError(`Failed to get response. ${e.message || ''}`.trim());
+      // On error, remove the optimistic user message that was added.
       setMessages(currentMessages => currentMessages.filter(m => m.id !== userMessage.id)); 
     } finally {
         setIsLoading(false);
@@ -316,7 +322,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       <CardFooter className="pt-4 border-t">
         <Form {...form}>
           <form
-            onSubmit={handleSubmit}
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="flex w-full items-start gap-3"
           >
              {!isHumanChat && (
