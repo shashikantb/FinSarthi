@@ -1,3 +1,4 @@
+
 // src/hooks/use-speech-recognition.ts
 // This hook uses the browser's built-in Web Speech API for speech-to-text functionality.
 // It does not require any external npm packages.
@@ -33,9 +34,12 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
       if (onTranscript && finalTranscript) {
         onTranscript(finalTranscript);
       }
+      setIsListening(false); // Stop listening after a result is finalized
     };
 
     recognition.onend = () => {
+      // This can be triggered by speech ending, or by calling .stop()
+      // We set isListening to false here to ensure the state is always correct.
       setIsListening(false);
     };
 
@@ -81,5 +85,3 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
     stopListening,
   };
 }
-
-    

@@ -75,24 +75,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
   const { t, languageCode } = useAppTranslations();
   const { toast } = useToast();
   const isHumanChat = !!(chatSession && chatPartner);
-
-  const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
-
-  const { speak, stop: stopSpeaking, isPlaying } = useBrowserTts({
-    onEnd: () => setCurrentlyPlayingId(null),
-  });
-
-  const { isListening, startListening, stopListening } = useSpeechRecognition({
-    onTranscript: (transcript) => {
-        form.setValue("query", transcript);
-        handleSubmit();
-    }
-  });
-
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -101,8 +88,20 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     },
   });
 
-  const language = form.watch("language");
+  const { speak, stop: stopSpeaking, isPlaying } = useBrowserTts({
+    onEnd: () => setCurrentlyPlayingId(null),
+  });
+
+  const { isListening, startListening, stopListening } = useSpeechRecognition({
+    onTranscript: (transcript) => {
+        form.setValue("query", transcript);
+        form.handleSubmit(handleSubmit)(); 
+    }
+  });
   
+  const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
+
+  const language = form.watch("language");
   const locale = langToLocale[language as keyof typeof langToLocale] || 'en-US';
 
   const fetchHumanMessages = useCallback(async () => {
@@ -112,17 +111,16 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       id: msg.id,
       role: msg.senderId === currentUser.id ? 'user' : 'assistant',
       content: msg.content
-    })).reverse(); // Reverse to show oldest first
+    })).reverse(); 
     setMessages(formattedMessages);
   }, [chatSession, currentUser.id]);
 
   useEffect(() => {
     if (isHumanChat) {
-      // Mark messages as read when the chat is opened
       markMessagesAsRead(chatSession!.id, currentUser.id);
 
       fetchHumanMessages();
-      const interval = setInterval(fetchHumanMessages, 5000); // Poll every 5 seconds
+      const interval = setInterval(fetchHumanMessages, 5000); 
       return () => clearInterval(interval);
     }
   }, [isHumanChat, fetchHumanMessages, chatSession, currentUser.id]);
@@ -135,9 +133,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }, [languageCode, form]);
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
-        top: scrollAreaRef.current.scrollHeight,
+    if (scrollViewportRef.current) {
+        scrollViewportRef.current.scrollTo({
+        top: scrollViewportRef.current.scrollHeight,
         behavior: "smooth",
       });
     }
@@ -148,6 +146,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         stopSpeaking();
         setCurrentlyPlayingId(null);
     } else {
+        stopSpeaking(); 
         speak(message.content, locale);
         setCurrentlyPlayingId(message.id);
     }
@@ -157,7 +156,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     if (!chatSession) return;
     await updateChatRequestStatus(chatSession.id, 'closed');
     toast({ title: "Chat Closed", description: "The chat session has been ended."});
-    window.location.reload(); // Force reload to reflect the change
+    window.location.reload(); 
   }
 
   const handleSubmit = form.handleSubmit(async (data: FormValues) => {
@@ -169,11 +168,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   
     try {
       if (isHumanChat) {
-        // Human-to-human chat logic
         await sendMessage(chatSession.id, currentUser.id, data.query);
-        // Optimistically show message, polling will confirm
       } else {
-        // AI chat logic
         const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
         const input: FinancialCoachInput = {
           language: data.language,
@@ -188,6 +184,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           id: createId(),
         };
         setMessages(currentMessages => [...currentMessages, modelMessage]);
+        handlePlayPause(modelMessage);
       }
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
@@ -233,9 +230,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             )}
         </div>
       </CardHeader>
-      <CardContent className="flex-1 p-0">
-        <ScrollArea className="h-full w-full p-4" ref={scrollAreaRef}>
-          <div className="space-y-4">
+      <CardContent className="flex-1 p-0 overflow-hidden">
+        <ScrollArea className="h-full w-full" viewportRef={scrollViewportRef}>
+          <div className="space-y-4 p-4">
             {messages.length === 0 && (
                 <div className="text-center text-muted-foreground pt-10">Start a conversation by typing or speaking!</div>
             )}
@@ -270,7 +267,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                             className="h-7 w-7"
                             onClick={() => handlePlayPause(message)}
                         >
-                            {currentlyPlayingId === message.id ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                            {currentlyPlayingId === message.id && isPlaying ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                         </Button>
                      )}
                    </div>
