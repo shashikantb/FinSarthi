@@ -374,6 +374,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const cardTitle = isHumanChat ? `Chat with ${chatPartner?.fullName}` : t.coach.chat_title;
   const cardDescription = isHumanChat ? `You are now chatting directly with a user.` : t.coach.chat_description;
 
+  const hasUserSentMessage = messages.some(m => m.role === 'user');
+
   return (
     <Card className="w-full flex flex-col h-[calc(100vh-10rem)]">
       <CardHeader className="flex flex-row justify-between items-center border-b">
@@ -386,7 +388,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
               <Select
                 onValueChange={(value) => form.setValue("language", value as "English" | "Hindi" | "Marathi" | "German")}
                 value={form.getValues('language')}
-                disabled={isLoading || messages.length > 0 && conversationStage !== 'chatting'}
+                disabled={isLoading || hasUserSentMessage}
               >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Language" />
@@ -577,3 +579,5 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
+
+    
