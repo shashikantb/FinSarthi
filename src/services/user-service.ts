@@ -1,7 +1,7 @@
 
 "use server";
 
-import { db } from "@/lib/db";
+import { getDbInstance } from "@/lib/db";
 import { users, type NewUser } from "@/lib/db/schema";
 import { eq, and, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -12,6 +12,9 @@ import { revalidatePath } from "next/cache";
  * @returns The newly created user.
  */
 export async function createUser(data: Omit<NewUser, 'id' | 'createdAt'>) {
+    const db = getDbInstance();
+    if (!db) throw new Error("Database connection not available.");
+
     const valuesToInsert: NewUser = {
       ...data,
     };
@@ -25,6 +28,9 @@ export async function createUser(data: Omit<NewUser, 'id' | 'createdAt'>) {
  * @returns The user object or null if not found.
  */
 export async function getUserById(id: string) {
+  const db = getDbInstance();
+  if (!db) return null;
+
   const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return user ?? null;
 }
@@ -36,6 +42,13 @@ export async function getUserById(id: string) {
  */
 export async function findUserByEmailOrPhone(identifier: string) {
     if (!identifier) return null;
+    
+    const db = getDbInstance();
+    if (!db) {
+        console.log("No DB connection, returning null for user lookup.");
+        return null; // Return null if DB is not available
+    }
+
     const [user] = await db.select()
         .from(users)
         .where(
@@ -53,6 +66,9 @@ export async function findUserByEmailOrPhone(identifier: string) {
  * @returns An array of available coach user objects.
  */
 export async function getAvailableCoaches() {
+    const db = getDbInstance();
+    if (!db) return [];
+
     const availableCoaches = await db.select()
         .from(users)
         .where(
@@ -71,6 +87,9 @@ export async function getAvailableCoaches() {
  * @param isAvailable The new availability status.
  */
 export async function updateUserAvailability(userId: string, isAvailable: boolean) {
+    const db = getDbInstance();
+    if (!db) return;
+
     await db.update(users).set({ isAvailable }).where(eq(users.id, userId));
     revalidatePath('/coaches');
 }

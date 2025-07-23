@@ -1,7 +1,7 @@
 
 "use server";
 
-import { db } from "@/lib/db";
+import { getDbInstance } from "@/lib/db";
 import { chatRequests, chatMessages, type NewChatRequest, users, type User } from "@/lib/db/schema";
 import { and, eq, desc, or, ne, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -13,6 +13,9 @@ import { revalidatePath } from "next/cache";
  * @returns The newly created chat request object.
  */
 export async function createChatRequest(customerId: string, coachId: string) {
+  const db = getDbInstance();
+  if (!db) throw new Error("Database not available.");
+
   // Check if an active request already exists
   const existingRequest = await db.query.chatRequests.findFirst({
     where: and(
@@ -47,6 +50,9 @@ export async function createChatRequest(customerId: string, coachId: string) {
  * @returns An array of chat requests with associated customer information.
  */
 export async function getChatRequestsForCoach(coachId: string) {
+    const db = getDbInstance();
+    if (!db) return [];
+
     const requests = await db
         .select({
             request: chatRequests,
@@ -70,6 +76,9 @@ export async function getChatRequestsForCoach(coachId: string) {
  * @returns An array of chat requests.
  */
 export async function getChatRequestsForCustomer(customerId: string) {
+    const db = getDbInstance();
+    if (!db) return [];
+
     const requests = await db
         .select()
         .from(chatRequests)
@@ -85,6 +94,9 @@ export async function getChatRequestsForCustomer(customerId: string) {
  * @param status The new status ('accepted' or 'declined').
  */
 export async function updateChatRequestStatus(requestId: string, status: 'accepted' | 'declined' | 'closed') {
+    const db = getDbInstance();
+    if (!db) return null;
+
     const [updatedRequest] = await db.update(chatRequests)
         .set({ status, updatedAt: new Date() })
         .where(eq(chatRequests.id, requestId))
@@ -106,6 +118,9 @@ export async function updateChatRequestStatus(requestId: string, status: 'accept
  * @returns The newly created message object.
  */
 export async function sendMessage(chatRequestId: string, senderId: string, content: string) {
+    const db = getDbInstance();
+    if (!db) throw new Error("Database not available.");
+
     const [newMessage] = await db.insert(chatMessages).values({
         chatRequestId,
         senderId,
@@ -125,6 +140,9 @@ export async function sendMessage(chatRequestId: string, senderId: string, conte
  * @returns An array of message objects, ordered by creation date.
  */
 export async function getMessagesForChat(chatRequestId: string) {
+    const db = getDbInstance();
+    if (!db) return [];
+    
     return await db.query.chatMessages.findMany({
         where: eq(chatMessages.chatRequestId, chatRequestId),
         orderBy: desc(chatMessages.createdAt)
@@ -138,6 +156,9 @@ export async function getMessagesForChat(chatRequestId: string) {
  * @returns The chat request and the chat partner, or null if no active chat is found.
  */
 export async function getActiveChatSession(userId: string): Promise<{ session: typeof chatRequests.$inferSelect, partner: User } | null> {
+    const db = getDbInstance();
+    if (!db) return null;
+
     const session = await db.query.chatRequests.findFirst({
         where: and(
             or(eq(chatRequests.customerId, userId), eq(chatRequests.coachId, userId)),
@@ -166,6 +187,9 @@ export async function getActiveChatSession(userId: string): Promise<{ session: t
  * @param recipientId The ID of the user for whom messages should be marked as read.
  */
 export async function markMessagesAsRead(chatRequestId: string, recipientId: string) {
+    const db = getDbInstance();
+    if (!db) return;
+
     await db.update(chatMessages)
         .set({ isRead: true })
         .where(and(
@@ -183,6 +207,9 @@ export async function markMessagesAsRead(chatRequestId: string, recipientId: str
  * @returns The total number of unread messages.
  */
 export async function getUnreadMessageCountForUser(userId: string): Promise<number> {
+    const db = getDbInstance();
+    if (!db) return 0;
+    
     const activeChats = await db.select({ id: chatRequests.id })
         .from(chatRequests)
         .where(and(
