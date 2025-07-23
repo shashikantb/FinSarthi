@@ -41,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut, Play } from "lucide-react";
+import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut, Play, Save } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -52,6 +52,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { useAppTranslations } from "@/hooks/use-app-translations";
 import { useToast } from "@/hooks/use-toast";
 import advicePrompts from "@/lib/advice-prompts.json";
+import { createAdviceSessionForCurrentUser } from "@/services/advice-service";
 
 type MessageRole = "user" | "assistant";
 type ConversationStage = "greeting" | "prompt_selection" | "questioning" | "generating_advice" | "chatting";
@@ -60,7 +61,7 @@ type Message = {
   id: string;
   role: MessageRole;
   content: string;
-  buttons?: { label: string; value: string }[];
+  buttons?: { label: string; value: string; action?: "select_prompt" | "save_advice" }[];
 };
 
 const formSchema = z.object({
@@ -90,6 +91,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const [selectedPromptKey, setSelectedPromptKey] = useState<string | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [collectedAnswers, setCollectedAnswers] = useState<Record<string, string>>({});
+  const [generatedAdvice, setGeneratedAdvice] = useState<string | null>(null);
+  const [isAdviceSaved, setIsAdviceSaved] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -125,7 +128,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         role: 'assistant',
         content: `Hi, ${currentUser.fullName}! I'm FinSarthi, your personal AI financial coach. What would you like help with today?`,
       };
-      const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key }));
+      const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
       const promptMessage: Message = {
         id: createId(),
         role: 'assistant',
@@ -170,6 +173,35 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   };
 
+  const handleSaveAdvice = async () => {
+    if (!generatedAdvice || !selectedPromptKey || isAdviceSaved) return;
+
+    try {
+        await createAdviceSessionForCurrentUser({
+            promptKey: selectedPromptKey,
+            formData: collectedAnswers,
+            language: languageCode as LanguageCode,
+            generatedAdvice: generatedAdvice,
+        }, true); // `true` for isLoggedIn
+        
+        toast({ title: "Advice Saved!", description: "You can review it in the Personalized Advice tab." });
+        setIsAdviceSaved(true);
+
+        // Update the message to remove the button and confirm saving
+        setMessages(prev => prev.map(m => {
+            if (m.buttons?.some(b => b.action === 'save_advice')) {
+                return { ...m, content: `${m.content}\n\n(This advice has been saved.)`, buttons: undefined };
+            }
+            return m;
+        }));
+
+    } catch(error) {
+        console.error("Failed to save advice:", error);
+        toast({ title: "Error", description: "Could not save your advice session.", variant: "destructive" });
+    }
+  };
+
+
   const handleQuestionAnswer = async (answer: string) => {
     const userMessage: Message = { role: 'user', content: answer, id: createId() };
     setMessages(prev => [...prev, userMessage]);
@@ -199,7 +231,16 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           formData: newAnswers,
           language: languageCode,
         });
-        const resultMessage: Message = { id: createId(), role: 'assistant', content: adviceResult.advice };
+
+        setGeneratedAdvice(adviceResult.advice); // Store the generated advice
+        setIsAdviceSaved(false); // Reset saved status for new advice
+
+        const resultMessage: Message = { 
+            id: createId(), 
+            role: 'assistant', 
+            content: adviceResult.advice,
+            buttons: [{ label: "Save Advice", value: "save", action: "save_advice" }]
+        };
         setMessages(prev => [...prev.filter(m => m.id !== adviceMessage.id), resultMessage]);
         
         const finalMessage: Message = { id: createId(), role: 'assistant', content: "You can now ask me any follow-up questions." };
@@ -211,10 +252,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       } finally {
         setIsLoading(false);
         setConversationStage("chatting");
-        // Reset guided flow state
-        setSelectedPromptKey(null);
-        setCurrentQuestionIndex(0);
-        setCollectedAnswers({});
       }
     }
   };
@@ -259,6 +296,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const handlePlayPause = (message: Message) => {
     if (currentlyPlayingId === message.id) {
         stopSpeaking();
+        setCurrentlyPlayingId(null);
     } else {
         stopSpeaking(); 
         speak(message.content, locale);
@@ -292,6 +330,14 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         await sendMessage(chatSession.id, currentUser.id, data.query);
         await fetchHumanMessages(); 
       } else {
+        // Reset guided flow state once user starts typing freely
+        if (conversationStage !== "chatting") {
+            setConversationStage("chatting");
+            setSelectedPromptKey(null);
+            setCollectedAnswers({});
+            setCurrentQuestionIndex(0);
+        }
+
         const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
         const input: FinancialCoachInput = {
           language: data.language,
@@ -331,7 +377,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
               <Select
                 onValueChange={(value) => form.setValue("language", value as "English" | "Hindi" | "Marathi")}
                 value={form.getValues('language')}
-                disabled={isLoading || messages.length > 0}
+                disabled={isLoading || messages.length > 0 && conversationStage !== 'chatting'}
               >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Language" />
@@ -400,7 +446,14 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                       {message.buttons && (
                         <div className="flex flex-wrap gap-2 ml-10">
                           {message.buttons.map(button => (
-                            <Button key={button.value} size="sm" variant="outline" onClick={() => handlePromptSelection(button.value)}>
+                            <Button key={button.value} size="sm" variant="outline" 
+                                onClick={() => {
+                                    if (button.action === 'select_prompt') handlePromptSelection(button.value);
+                                    if (button.action === 'save_advice') handleSaveAdvice();
+                                }}
+                                disabled={isAdviceSaved && button.action === 'save_advice'}
+                            >
+                              {button.action === 'save_advice' && <Save className="mr-2 h-4 w-4"/>}
                               {button.label}
                             </Button>
                           ))}
