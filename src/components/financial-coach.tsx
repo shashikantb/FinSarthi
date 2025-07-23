@@ -57,7 +57,6 @@ type Message = {
   buttons?: { label: string; value: string; action?: "select_prompt" }[];
 };
 
-// The form schema no longer needs a language field.
 const formSchema = z.object({
   query: z.string().min(1, "Message cannot be empty."),
 });
@@ -78,6 +77,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const { t, languageCode } = useAppTranslations();
   const { toast } = useToast();
   const isHumanChat = !!(chatSession && chatPartner);
+  const isGuest = currentUser.id === 'guest';
 
   // Guided flow state
   const [conversationStage, setConversationStage] = useState<ConversationStage>(isHumanChat ? "chatting" : "greeting");
@@ -117,10 +117,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
 
   const startNewGuidedFlow = useCallback(() => {
+    const greeting = currentUser.fullName === 'Guest' ? "Hi there!" : `Hi, ${currentUser.fullName}!`;
     const greetingMessage: Message = {
       id: createId(),
       role: 'assistant',
-      content: `Hi, ${currentUser.fullName}! I'm FINmate, your personal AI financial coach. What would you like help with today?`,
+      content: `${greeting} I'm FINmate, your personal AI financial coach. What would you like help with today?`,
     };
     const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
     const promptMessage: Message = {
@@ -145,6 +146,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }, [conversationStage, isHumanChat, startNewGuidedFlow]);
 
   const handlePromptSelection = async (promptKey: string) => {
+    if (isGuest) {
+      toast({ title: "Please Login", description: "You need to log in to generate personalized advice.", variant: "destructive" });
+      return;
+    }
+
     setSelectedPromptKey(promptKey);
     const selectedPrompt = advicePrompts.find(p => p.key === promptKey);
     if (!selectedPrompt) return;
@@ -177,7 +183,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   };
 
   const handleSaveAndEndChat = async () => {
-    if (!generatedAdvice || !selectedPromptKey) return;
+    if (!generatedAdvice || !selectedPromptKey || isGuest) return;
 
     try {
         if (!isAdviceSaved) {
@@ -363,7 +369,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const cardDescription = isHumanChat ? `You are now chatting directly with a user.` : t.coach.chat_description;
 
   return (
-    <Card className="w-full flex flex-col h-[calc(100vh-10rem)]">
+    <Card className="w-full flex flex-col h-[calc(100vh-10rem)] max-h-[700px]">
       <CardHeader className="flex flex-row justify-between items-center border-b">
         <div>
             <CardTitle>{cardTitle}</CardTitle>
@@ -461,11 +467,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 )}
               </div>
             ))}
-            {isLoading && (
+            {isLoading && !isHumanChat && (
               <div className="flex items-start gap-3 justify-start">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback>
-                     {isHumanChat ? chatPartner?.fullName?.[0]?.toUpperCase() : <Bot className="h-5 w-5" />}
+                     <Bot className="h-5 w-5" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="max-w-xs rounded-lg p-3 text-sm md:max-w-md bg-muted">
@@ -482,7 +488,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         </ScrollArea>
       </CardContent>
       <CardFooter className="pt-4 border-t flex flex-col items-stretch gap-2">
-        {!isHumanChat && generatedAdvice && (
+        {!isHumanChat && !isGuest && generatedAdvice && (
           <div className="flex justify-center">
             <Button
               onClick={handleSaveAndEndChat}
@@ -491,7 +497,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
               size="sm"
             >
               <Save className="mr-2 h-4 w-4" />
-              {isAdviceSaved ? "Advice Saved" : "Save Advice and End Chat"}
+              {isAdviceSaved ? "Advice Saved" : "Save Advice and Start New Chat"}
             </Button>
           </div>
         )}
@@ -535,7 +541,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
               size="icon"
               className="shrink-0"
             >
-              {isLoading ? (
+              {isLoading && !isHumanChat ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <Send className="h-5 w-5" />

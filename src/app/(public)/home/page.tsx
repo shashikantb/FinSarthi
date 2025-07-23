@@ -8,6 +8,9 @@ import { ArrowRight, Bot, BarChart2, MessageSquare, Briefcase } from "lucide-rea
 import { AuthDialog } from "@/components/auth-dialog";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { FinancialCoach } from "@/components/financial-coach";
+import type { User } from "@/lib/db/schema";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
   <div className="flex flex-col items-center p-6 text-center bg-card rounded-xl shadow-sm">
@@ -38,6 +41,21 @@ export default function HomePage() {
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const router = useRouter();
   
+  const guestUser: User = {
+      id: "guest",
+      fullName: "Guest",
+      email: null,
+      phone: null,
+      passwordHash: null,
+      age: null,
+      city: null,
+      country: null,
+      gender: null,
+      role: "customer",
+      isAvailable: false,
+      createdAt: new Date(),
+  };
+
   return (
     <div className="flex flex-col bg-background">
       <section className="relative w-full py-20 md:py-32 lg:py-40">
@@ -94,6 +112,20 @@ export default function HomePage() {
                     description="Simplify complex news and financial jargon with our easy-to-use summarizer and translator."
                 />
             </div>
+        </div>
+      </section>
+
+      <section className="w-full py-12 md:py-24 lg:py-32">
+        <div className="container px-4 md:px-6 max-w-4xl mx-auto">
+             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                <div className="space-y-2">
+                    <h2 className="text-3xl font-bold font-headline tracking-tighter sm:text-4xl">Try FINmate Now</h2>
+                    <p className="max-w-[900px] text-muted-foreground md:text-lg lg:text-base xl:text-lg">
+                        Ask our AI a question. No sign-up required.
+                    </p>
+                </div>
+            </div>
+            <FinancialCoach currentUser={guestUser} />
         </div>
       </section>
       
