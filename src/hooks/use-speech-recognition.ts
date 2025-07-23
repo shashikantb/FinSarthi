@@ -1,16 +1,14 @@
 
 // src/hooks/use-speech-recognition.ts
-// This hook uses the browser's built-in Web Speech API for speech-to-text functionality.
-// It does not require any external npm packages.
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
 interface SpeechRecognitionOptions {
-  onTranscript?: (transcript: string) => void;
+  onTranscriptChange?: (transcript: string) => void;
 }
 
-export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions = {}) {
+export function useSpeechRecognition({ onTranscriptChange }: SpeechRecognitionOptions = {}) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -25,21 +23,18 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
     recognitionRef.current = new SpeechRecognition();
     const recognition = recognitionRef.current;
 
-    recognition.continuous = false; // We want to process after each pause
-    recognition.interimResults = false; // We only care about the final result
+    recognition.continuous = false; 
+    recognition.interimResults = false; 
 
     recognition.onresult = (event) => {
       const finalTranscript = event.results[event.results.length - 1][0].transcript.trim();
       setTranscript(finalTranscript);
-      if (onTranscript && finalTranscript) {
-        onTranscript(finalTranscript);
+      if (onTranscriptChange && finalTranscript) {
+        onTranscriptChange(finalTranscript);
       }
-      setIsListening(false); // Stop listening after a result is finalized
     };
 
     recognition.onend = () => {
-      // This can be triggered by speech ending, or by calling .stop()
-      // We set isListening to false here to ensure the state is always correct.
       setIsListening(false);
     };
 
@@ -55,7 +50,7 @@ export function useSpeechRecognition({ onTranscript }: SpeechRecognitionOptions 
         recognitionRef.current.abort();
       }
     };
-  }, [onTranscript]);
+  }, [onTranscriptChange]);
 
   const startListening = useCallback(({lang = 'en-US'} = {}) => {
     if (recognitionRef.current && !isListening) {

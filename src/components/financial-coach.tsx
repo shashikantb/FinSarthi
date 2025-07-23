@@ -94,15 +94,18 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     onEnd: () => setCurrentlyPlayingId(null),
   });
 
-  const { isListening, startListening, stopListening } = useSpeechRecognition({
-    onTranscript: (transcript) => {
-        form.setValue("query", transcript);
-        form.handleSubmit(handleSubmit)(); 
-    }
-  });
+  const { isListening, transcript, startListening, stopListening } = useSpeechRecognition({});
 
   const language = form.watch("language");
   const locale = langToLocale[language as keyof typeof langToLocale] || 'en-US';
+
+  useEffect(() => {
+    if (transcript) {
+        form.setValue("query", transcript);
+        form.handleSubmit(handleSubmit)();
+    }
+  }, [transcript]);
+
 
   const fetchHumanMessages = useCallback(async () => {
     if (!chatSession) return;
@@ -169,8 +172,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     try {
       if (isHumanChat) {
         await sendMessage(chatSession.id, currentUser.id, data.query);
-        // Human chat messages are fetched via polling, so no need to add to state here.
-        await fetchHumanMessages(); // fetch immediately after sending
+        await fetchHumanMessages(); 
       } else {
         const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
         const input: FinancialCoachInput = {
@@ -186,7 +188,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           id: createId(),
         };
         setMessages(currentMessages => [...currentMessages, modelMessage]);
-        // Auto-play TTS for AI coach response
+        
         if (!isHumanChat) {
           handlePlayPause(modelMessage);
         }
@@ -194,14 +196,13 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
       setError(`Failed to get response. ${e.message || ''}`.trim());
-      // On error, remove the optimistic user message that was added.
       setMessages(currentMessages => currentMessages.filter(m => m.id !== userMessage.id)); 
     } finally {
         setIsLoading(false);
     }
   });
 
-  const cardTitle = isHumanChat ? `Chat with ${chatPartner.fullName}` : t.coach.chat_title;
+  const cardTitle = isHumanChat ? `Chat with ${chatPartner?.fullName}` : t.coach.chat_title;
   const cardDescription = isHumanChat ? `You are now chatting directly with a user.` : t.coach.chat_description;
 
   return (
