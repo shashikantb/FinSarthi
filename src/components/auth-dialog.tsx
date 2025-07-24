@@ -84,6 +84,15 @@ export function AuthDialog({ open, onOpenChange, onLoginSuccess }: AuthDialogPro
   const methods = useForm<z.infer<typeof combinedSchema>>({
     resolver: zodResolver(currentSchema),
     mode: "onChange",
+    defaultValues: {
+        identifier: "",
+        otp: "",
+        password: "",
+        fullName: "",
+        age: 0,
+        city: "",
+        country: "",
+    }
   });
 
   const handleIdentifierSubmit: SubmitHandler<z.infer<typeof identifierSchema>> = async (data) => {
