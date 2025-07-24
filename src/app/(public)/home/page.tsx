@@ -22,22 +22,6 @@ const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, titl
   </div>
 )
 
-const HeroIllustration = () => (
-    <div className="relative flex justify-center items-center">
-        <div className="absolute -top-10 -left-10 w-24 h-24 bg-primary/10 rounded-full animate-pulse"></div>
-        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-accent/10 rounded-full animate-pulse delay-500"></div>
-        <div className="relative p-8 bg-card/60 backdrop-blur-sm rounded-full shadow-lg border">
-            <Bot className="h-32 w-32 text-primary" strokeWidth={1.5} />
-            <div className="absolute top-8 -right-4 bg-card p-3 rounded-full shadow-md">
-                <BarChart2 className="h-6 w-6 text-accent"/>
-            </div>
-             <div className="absolute bottom-8 -left-4 bg-card p-3 rounded-full shadow-md">
-                <MessageSquare className="h-6 w-6 text-accent"/>
-            </div>
-        </div>
-    </div>
-)
-
 const sliderImages = [
     { src: 'https://placehold.co/1200x600.png', alt: 'Financial coach advising a client', hint: 'financial advice' },
     { src: 'https://placehold.co/1200x600.png', alt: 'A person creating a budget at a desk', hint: 'budgeting desk' },
@@ -86,25 +70,17 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex items-center justify-center">
-              <HeroIllustration />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-              <Carousel
+               <Carousel
                 opts={{
                     align: "start",
                     loop: true,
                 }}
-                className="w-full"
+                className="w-full max-w-xl"
                 >
                 <CarouselContent>
                     {sliderImages.map((image, index) => (
                     <CarouselItem key={index}>
-                        <div className="relative h-64 md:h-96 rounded-lg overflow-hidden">
+                        <div className="relative h-64 md:h-80 rounded-lg overflow-hidden shadow-2xl">
                             <Image
                                 src={image.src}
                                 alt={image.alt}
@@ -113,8 +89,8 @@ export default function HomePage() {
                                 data-ai-hint={image.hint}
                             />
                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                             <div className="absolute bottom-0 left-0 p-8">
-                                <h3 className="text-2xl font-bold text-white font-headline">{image.alt}</h3>
+                             <div className="absolute bottom-0 left-0 p-6">
+                                <h3 className="text-xl font-bold text-white font-headline">{image.alt}</h3>
                              </div>
                         </div>
                     </CarouselItem>
@@ -123,7 +99,9 @@ export default function HomePage() {
                 <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
                 <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
              </Carousel>
+            </div>
           </div>
+        </div>
       </section>
 
       <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/40">
