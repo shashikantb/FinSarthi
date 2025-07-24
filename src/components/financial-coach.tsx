@@ -152,16 +152,63 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   useEffect(() => {
     startNewFaqFlow();
   }, [startNewFaqFlow]);
+  
+  const callAI = async (query: string) => {
+    setIsLoading(true);
+    setError('');
+    
+    // Add user query to messages for history
+    const userMessage: Message = { role: 'user', content: query, id: createId() };
+    const messagesWithUserQuery = [...messages.map(m => ({ ...m, buttons: undefined })), userMessage];
+    setMessages(messagesWithUserQuery);
+
+    try {
+      if (isHumanChat) {
+        await sendMessage(chatSession!.id, currentUser.id, query);
+        await fetchHumanMessages(); 
+      } else {
+        const historyForAI = messagesWithUserQuery.map(m => ({role: m.role, content: m.content}));
+        
+        const langName = languages[languageCode]?.name || "English";
+        
+        const input: FinancialCoachInput = {
+          language: langName as "English" | "Hindi" | "Marathi" | "German",
+          history: historyForAI,
+          age: currentUser.age ?? undefined,
+          gender: currentUser.gender ?? undefined,
+          city: currentUser.city ?? undefined,
+          country: currentUser.country ?? undefined,
+        };
+        const result = await financialCoach(input);
+        if (!result || !result.response) throw new Error("AI returned an invalid response.");
+        
+        const modelMessage: Message = {
+          role: 'assistant',
+          content: result.response,
+          id: createId(),
+        };
+        setMessages(currentMessages => [...currentMessages, modelMessage]);
+      }
+    } catch (e: any) {
+      console.error("An error occurred during the chat flow:", e);
+      setError(`Failed to get response. ${e.message || ''}`.trim());
+      // Revert adding the user message if AI fails
+      setMessages(messagesWithUserQuery.slice(0, -1));
+    } finally {
+        setIsLoading(false);
+        setIsAwaitingCustomQuery(true); // Allow user to type after AI response
+    }
+  };
 
   const handleOptionSelection = (key: string, label: string) => {
     setIsAwaitingCustomQuery(false);
+    const updatedMessages = messages.map(m => ({ ...m, buttons: undefined }));
+    const userMessage: Message = { id: createId(), role: 'user', content: label };
+    
     const currentOptions = getCurrentOptions();
     const selectedOption = currentOptions.find(p => p.key === key);
     if (!selectedOption) return;
 
-    const updatedMessages = messages.map(m => ({ ...m, buttons: undefined }));
-    const userMessage: Message = { id: createId(), role: 'user', content: label };
-    
     if (selectedOption.subPrompts && selectedOption.subPrompts.length > 0) {
       const newPath = [...promptPath, key];
       setPromptPath(newPath);
@@ -170,11 +217,10 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       const buttons = nextOptions.map(p => ({
           label: p.question?.[languageCode] ?? p.title[languageCode],
           value: p.key,
-          isQuestion: !!p.question,
-          answer: p.answer?.[languageCode]
+          isQuestion: !!p.question
       }));
       
-      const isFinalQuestionLevel = nextOptions.every(p => p.question && p.answer);
+      const isFinalQuestionLevel = nextOptions.every(p => p.question);
       if (isFinalQuestionLevel) {
         buttons.push({ label: 'Any Other Query?', value: 'custom_query', isCustomQuery: true });
       }
@@ -188,21 +234,18 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       setMessages([...updatedMessages, userMessage, nextMessage]);
     }
   };
-
-  const handleQuestionSelection = (label: string, answer: string) => {
-    const updatedMessages = messages.map(m => ({...m, buttons: undefined}));
-    const userMessage: Message = { id: createId(), role: 'user', content: label };
-    const answerMessage: Message = { id: createId(), role: 'assistant', content: answer };
-    setMessages([...updatedMessages, userMessage, answerMessage]);
+  
+  const handleQuestionSelection = (label: string) => {
+    // A question from the menu was selected, send it to the AI.
+    setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
+    callAI(label);
   };
   
   const handleCustomQuerySelected = () => {
     setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
     const userMessage: Message = { id: createId(), role: 'user', content: "Any Other Query?" };
-    setMessages(prev => [...prev, userMessage]);
-
     const promptMessage: Message = { id: createId(), role: 'assistant', content: "Of course. Please type your question below." };
-    setMessages(prev => [...prev, promptMessage]);
+    setMessages(prev => [...prev, userMessage, promptMessage]);
     setIsAwaitingCustomQuery(true);
   }
 
@@ -256,47 +299,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }
 
   const handleSubmit = form.handleSubmit(async (data: FormValues) => {
-    const userMessage: Message = { role: 'user', content: data.query, id: createId() };
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
-    setError('');
     form.reset({ query: '' });
     setIsAwaitingCustomQuery(false);
-  
-    try {
-      if (isHumanChat) {
-        await sendMessage(chatSession.id, currentUser.id, data.query);
-        await fetchHumanMessages(); 
-      } else {
-        const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
-        
-        const langName = languages[languageCode]?.name || "English";
-        
-        const input: FinancialCoachInput = {
-          language: langName as "English" | "Hindi" | "Marathi" | "German",
-          history: historyForAI,
-          age: currentUser.age ?? undefined,
-          gender: currentUser.gender ?? undefined,
-          city: currentUser.city ?? undefined,
-          country: currentUser.country ?? undefined,
-        };
-        const result = await financialCoach(input);
-        if (!result || !result.response) throw new Error("AI returned an invalid response.");
-        
-        const modelMessage: Message = {
-          role: 'assistant',
-          content: result.response,
-          id: createId(),
-        };
-        setMessages(currentMessages => [...currentMessages, modelMessage]);
-      }
-    } catch (e: any) {
-      console.error("An error occurred during the chat flow:", e);
-      setError(`Failed to get response. ${e.message || ''}`.trim());
-      setMessages(currentMessages => currentMessages.filter(m => m.id !== userMessage.id)); 
-    } finally {
-        setIsLoading(false);
-    }
+    callAI(data.query);
   });
 
   const cardTitle = isHumanChat ? `${t.coach.chat_with} ${chatPartner?.fullName}` : t.coach.chat_title;
@@ -367,8 +372,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                                 onClick={() => {
                                     if(button.isCustomQuery) {
                                       handleCustomQuerySelected();
-                                    } else if (button.isQuestion && button.answer) {
-                                      handleQuestionSelection(button.label, button.answer);
+                                    } else if (button.isQuestion) {
+                                      handleQuestionSelection(button.label);
                                     } else {
                                       handleOptionSelection(button.value, button.label);
                                     }
@@ -476,3 +481,5 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
+
+    
