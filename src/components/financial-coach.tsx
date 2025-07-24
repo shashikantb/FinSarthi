@@ -159,11 +159,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     const selectedOption = currentOptions.find(p => p.key === key);
     if (!selectedOption) return;
 
-    // Add user's choice to history and remove buttons from previous message
     const updatedMessages = messages.map(m => ({ ...m, buttons: undefined }));
     const userMessage: Message = { id: createId(), role: 'user', content: label };
     
-    // Check for sub-prompts (it's a category)
     if (selectedOption.subPrompts && selectedOption.subPrompts.length > 0) {
       const newPath = [...promptPath, key];
       setPromptPath(newPath);
@@ -184,7 +182,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       const nextMessage: Message = {
         id: createId(),
         role: 'assistant',
-        content: "Please select an option:", // Generic prompt
+        content: "Please select an option:",
         buttons: buttons,
       };
       setMessages([...updatedMessages, userMessage, nextMessage]);
@@ -192,30 +190,10 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   };
 
   const handleQuestionSelection = (label: string, answer: string) => {
-    // Add user's question to history
     const updatedMessages = messages.map(m => ({...m, buttons: undefined}));
     const userMessage: Message = { id: createId(), role: 'user', content: label };
-
-    // Immediately provide the answer
     const answerMessage: Message = { id: createId(), role: 'assistant', content: answer };
-   
-    // Re-display the same options again for another question
-    const currentOptions = getCurrentOptions();
-    const buttons = currentOptions.map(p => ({
-        label: p.question?.[languageCode] ?? p.title[languageCode],
-        value: p.key,
-        isQuestion: !!p.question,
-        answer: p.answer?.[languageCode]
-    }));
-    buttons.push({ label: 'Any Other Query?', value: 'custom_query', isCustomQuery: true });
-
-    const followUpMessage: Message = {
-        id: createId(),
-        role: 'assistant',
-        content: "Is there anything else I can help you with from this topic?",
-        buttons: buttons
-    };
-    setMessages([...updatedMessages, userMessage, answerMessage, followUpMessage]);
+    setMessages([...updatedMessages, userMessage, answerMessage]);
   };
   
   const handleCustomQuerySelected = () => {
