@@ -169,6 +169,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           id: createId(),
         };
         setMessages(currentMessages => [...currentMessages, modelMessage]);
+        // After getting a response, allow the user to type again
+        setIsAwaitingCustomQuery(true);
       }
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
@@ -189,36 +191,35 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     setPromptPath(newPath);
 
     let currentLevel = advicePrompts as any[];
-    let pathIndex = 0;
-    while(pathIndex < newPath.length) {
-      const p = newPath[pathIndex];
-      const selected = currentLevel.find(i => i.key === p);
-      if (selected && selected.subPrompts) {
-          currentLevel = selected.subPrompts;
-          pathIndex++;
-      } else {
-        break;
-      }
+    let currentSelection = null;
+    for(const p of newPath) {
+        currentSelection = currentLevel.find(i => i.key === p);
+        if (currentSelection && currentSelection.subPrompts) {
+            currentLevel = currentSelection.subPrompts;
+        } else {
+            break;
+        }
     }
 
-    if (currentLevel && currentLevel.length > 0) {
-        const buttons = currentLevel.map(p => ({
-            label: p.question?.[languageCode] ?? p.title[languageCode],
-            value: p.key,
-            isQuestion: !!p.question
-        }));
-        
-        if (currentLevel.some(p => p.question)) {
-           buttons.push({ label: t.coach.any_other_query, value: 'custom_query', isCustomQuery: true });
-        }
+    if (currentSelection && currentSelection.subPrompts) {
+      const buttons = currentSelection.subPrompts.map((p: any) => ({
+        label: p.question?.[languageCode] ?? p.title[languageCode],
+        value: p.key,
+        isQuestion: !!p.question
+      }));
 
-        const nextMessage: Message = {
-            id: createId(),
-            role: 'assistant',
-            content: t.coach.select_option,
-            buttons: buttons,
-        };
-        setMessages(prev => [...prev, nextMessage]);
+      // Only add "Any Other Query?" at the question level (subPrompt2)
+      if (newPath.length >= 2) {
+        buttons.push({ label: t.coach.any_other_query, value: 'custom_query', isCustomQuery: true });
+      }
+
+      const nextMessage: Message = {
+        id: createId(),
+        role: 'assistant',
+        content: t.coach.select_option, // Use a generic prompt
+        buttons: buttons,
+      };
+      setMessages(prev => [...prev, nextMessage]);
     }
   };
 
@@ -354,7 +355,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 )}
               >
                 {message.role === "assistant" && (
-                   <div className="flex flex-col items-start gap-2">
+                   <div className="flex flex-col items-start gap-2 w-full">
                      <div className="flex items-end gap-2">
                         <Avatar className="h-8 w-8">
                             <AvatarFallback>
@@ -385,7 +386,10 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                          )}
                      </div>
                       {message.buttons && (
-                        <div className="flex flex-col items-start gap-2 ml-10 mt-2">
+                        <div className={cn(
+                          "flex gap-2 ml-10 mt-2",
+                          promptPath.length >= 2 ? "flex-col items-start" : "flex-wrap"
+                        )}>
                           {message.buttons.map(button => (
                             <Button key={button.value} size="sm" variant="outline" 
                                 onClick={() => {
