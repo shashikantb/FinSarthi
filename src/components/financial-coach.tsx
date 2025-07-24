@@ -69,6 +69,21 @@ interface FinancialCoachProps {
   chatPartner?: User;
 }
 
+const getPromptsForLevel = (level = 0, path: string[] = []) => {
+    let prompts: any[] = advicePrompts;
+    for (let i = 0; i < path.length; i++) {
+        const key = path[i];
+        const nextPrompt = prompts.find(p => p.key === key);
+        if (nextPrompt && nextPrompt.subPrompts) {
+            prompts = nextPrompt.subPrompts;
+        } else {
+            return []; // Path is invalid
+        }
+    }
+    return prompts;
+}
+
+
 export function FinancialCoach({ currentUser, chatSession, chatPartner }: FinancialCoachProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -81,7 +96,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   // Guided flow state
   const [conversationStage, setConversationStage] = useState<ConversationStage>(isHumanChat ? "chatting" : "greeting");
-  const [selectedPromptKey, setSelectedPromptKey] = useState<string | null>(null);
+  const [promptPath, setPromptPath] = useState<string[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [collectedAnswers, setCollectedAnswers] = useState<Record<string, string>>({});
   const [generatedAdvice, setGeneratedAdvice] = useState<string | null>(null);
@@ -110,12 +125,19 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   
   useEffect(() => {
     if (transcript && !isListening) {
-      // Wait a tick to ensure the input value is set before submitting
       setTimeout(() => form.handleSubmit(handleSubmit)(), 0);
     }
   }, [transcript, isListening, form]);
 
-
+  const getCurrentPrompt = () => {
+    let prompt: any = { subPrompts: advicePrompts };
+    for (const key of promptPath) {
+        prompt = prompt.subPrompts?.find((p: any) => p.key === key);
+        if (!prompt) return null;
+    }
+    return prompt;
+  }
+  
   const startNewGuidedFlow = useCallback(() => {
     const greetingText = isGuest ? t.coach.greeting_guest : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User');
     const greetingMessage: Message = {
@@ -123,7 +145,10 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       role: 'assistant',
       content: greetingText,
     };
-    const promptButtons = advicePrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
+    
+    const topLevelPrompts = getPromptsForLevel(0, []);
+    const promptButtons = topLevelPrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
+
     const promptMessage: Message = {
       id: createId(),
       role: 'assistant',
@@ -132,7 +157,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     };
     setMessages([greetingMessage, promptMessage]);
     setConversationStage("prompt_selection");
-    setSelectedPromptKey(null);
+    setPromptPath([]);
     setCurrentQuestionIndex(0);
     setCollectedAnswers({});
     setGeneratedAdvice(null);
@@ -146,27 +171,43 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }, [conversationStage, isHumanChat, startNewGuidedFlow]);
 
   const handlePromptSelection = async (promptKey: string) => {
-    // Removed the guest check that was blocking the flow
-    setSelectedPromptKey(promptKey);
-    const selectedPrompt = advicePrompts.find(p => p.key === promptKey);
+    const newPath = [...promptPath, promptKey];
+    setPromptPath(newPath);
+
+    const currentPrompt = getCurrentPrompt();
+    const selectedPrompt = currentPrompt?.subPrompts?.find((p: any) => p.key === promptKey);
+    
     if (!selectedPrompt) return;
-
+    
     setMessages(prev => prev.map(m => ({ ...m, buttons: undefined })));
-
     const userSelectionMessage: Message = {
       id: createId(),
       role: 'user',
       content: selectedPrompt.title[languageCode as LanguageCode],
     };
     setMessages(prev => [...prev, userSelectionMessage]);
-
-    setConversationStage("questioning");
-    setCurrentQuestionIndex(0);
-    askQuestion(0, promptKey);
+    
+    if (selectedPrompt.subPrompts) {
+        const promptButtons = selectedPrompt.subPrompts.map((p: any) => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
+        const promptMessage: Message = {
+            id: createId(),
+            role: 'assistant',
+            content: selectedPrompt.description?.[languageCode] || t.coach.prompt_selection_title,
+            buttons: promptButtons,
+        };
+        setMessages(prev => [...prev, promptMessage]);
+    } else if (selectedPrompt.questions) {
+        setConversationStage("questioning");
+        setCurrentQuestionIndex(0);
+        askQuestion(0, newPath);
+    }
   };
 
-  const askQuestion = (qIndex: number, promptKey: string) => {
-    const prompt = advicePrompts.find(p => p.key === promptKey);
+  const askQuestion = (qIndex: number, path: string[]) => {
+    let prompt: any = { subPrompts: advicePrompts };
+    for (const key of path) {
+        prompt = prompt.subPrompts?.find((p: any) => p.key === key);
+    }
     if (prompt && prompt.questions[qIndex]) {
       const question = prompt.questions[qIndex];
       const questionMessage: Message = {
@@ -179,21 +220,22 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   };
 
   const handleSaveAndEndChat = async () => {
-    if (!generatedAdvice || !selectedPromptKey || isGuest) return;
+    if (!generatedAdvice || isGuest) return;
+    const finalPrompt = getCurrentPrompt();
+    if (!finalPrompt || !finalPrompt.key) return;
 
     try {
         if (!isAdviceSaved) {
             await createAdviceSessionForCurrentUser({
-                promptKey: selectedPromptKey,
+                promptKey: finalPrompt.key,
                 formData: collectedAnswers,
                 language: languageCode as LanguageCode,
                 generatedAdvice: generatedAdvice,
-            }, true); // `true` for isLoggedIn
+            }, true);
             
             toast({ title: t.coach.toast_advice_saved_title, description: t.coach.toast_advice_saved_desc });
-            setIsAdviceSaved(true); // Mark as saved
+            setIsAdviceSaved(true);
         }
-        // After saving (or if already saved), reset the flow.
         startNewGuidedFlow();
 
     } catch(error) {
@@ -202,14 +244,12 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   };
 
-
   const handleQuestionAnswer = async (answer: string) => {
     const userMessage: Message = { role: 'user', content: answer, id: createId() };
     setMessages(prev => [...prev, userMessage]);
     
-    if (!selectedPromptKey) return;
-    const prompt = advicePrompts.find(p => p.key === selectedPromptKey);
-    if (!prompt) return;
+    const prompt = getCurrentPrompt();
+    if (!prompt || !prompt.questions) return;
 
     const questionKey = prompt.questions[currentQuestionIndex].key;
     const newAnswers = { ...collectedAnswers, [questionKey]: answer };
@@ -218,7 +258,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     const nextQuestionIndex = currentQuestionIndex + 1;
     if (nextQuestionIndex < prompt.questions.length) {
       setCurrentQuestionIndex(nextQuestionIndex);
-      askQuestion(nextQuestionIndex, selectedPromptKey);
+      askQuestion(nextQuestionIndex, promptPath);
     } else {
       setConversationStage("generating_advice");
       setIsLoading(true);
@@ -227,7 +267,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       
       try {
         const adviceResult = await generatePersonalizedAdvice({
-          promptKey: selectedPromptKey,
+          promptKey: prompt.key,
           formData: newAnswers,
           language: languageCode,
         });
@@ -254,7 +294,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       }
     }
   };
-
 
   const fetchHumanMessages = useCallback(async () => {
     if (!chatSession) return;
@@ -325,7 +364,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       } else {
         if (conversationStage !== "chatting") {
             setConversationStage("chatting");
-            setSelectedPromptKey(null);
+            setPromptPath([]);
             setCollectedAnswers({});
             setCurrentQuestionIndex(0);
         }
@@ -488,7 +527,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           <div className="flex justify-center">
             <Button
               onClick={handleSaveAndEndChat}
-              disabled={isAdviceSaved}
+              disabled={isAdviceSaved || isGuest}
               variant="outline"
               size="sm"
             >
@@ -550,3 +589,5 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
+
+    
