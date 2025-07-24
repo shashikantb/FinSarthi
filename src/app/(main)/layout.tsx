@@ -106,7 +106,7 @@ function MainSidebar() {
   const { state } = useSidebar();
   const { user, logout } = useAuth();
   const { t } = useAppTranslations();
-  router = useRouter();
+  const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
