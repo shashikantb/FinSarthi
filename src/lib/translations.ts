@@ -40,6 +40,7 @@ export const translations = {
       advice: "Advice History",
       regional_coaches: "Regional Coaches",
       contact_us: "Contact Us",
+      end_chat: "End Chat",
     },
     // Home Page
     home: {
@@ -201,6 +202,7 @@ export const translations = {
       advice: "सलाह का इतिहास",
       regional_coaches: "क्षेत्रीय कोच",
       contact_us: "हमसे संपर्क करें",
+      end_chat: "चैट समाप्त करें",
     },
     home: {
         title: "आपका व्यक्तिगत AI वित्तीय कोच",
@@ -354,6 +356,7 @@ export const translations = {
       advice: "सल्ला इतिहास",
       regional_coaches: "प्रादेशिक प्रशिक्षक",
       contact_us: "आमच्याशी संपर्क साधा",
+      end_chat: "चॅट समाप्त करा",
     },
     home: {
         title: "तुमचा वैयक्तिक AI आर्थिक प्रशिक्षक",
@@ -507,6 +510,7 @@ export const translations = {
       advice: "Beratungsverlauf",
       regional_coaches: "Regionale Trainer",
       contact_us: "Kontaktieren Sie uns",
+      end_chat: "Chat beenden",
     },
     home: {
         title: "Ihr persönlicher KI-Finanzcoach",

@@ -79,7 +79,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const [promptPath, setPromptPath] = useState<string[]>([]);
   const [isAwaitingCustomQuery, setIsAwaitingCustomQuery] = useState(false);
   const [isAiResponding, setIsAiResponding] = useState(false);
-
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -113,7 +113,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     setIsAwaitingCustomQuery(false);
     setIsAiResponding(false);
     
-    const greetingText = isHumanChat ? t.coach.start_conversation : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User');
+    const greetingText = isHumanChat ? t.coach.start_conversation : (isAiResponding ? t.coach.greeting_guest : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User'));
     const greetingMessage: Message = { id: createId(), role: 'assistant', content: greetingText };
     
     if (!isHumanChat) {
@@ -128,13 +128,13 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     } else {
       setMessages([greetingMessage]);
     }
-  }, [isHumanChat, t, currentUser.fullName, languageCode]);
+  }, [isHumanChat, t, currentUser.fullName, languageCode, isAiResponding]);
 
   useEffect(() => {
     startNewFaqFlow();
   }, [startNewFaqFlow]);
   
-  const callAI = async (query: string) => {
+  const callAI = async (query: string, isCustomQuery: boolean) => {
     setIsLoading(true);
     setError('');
     setIsAiResponding(true);
@@ -155,11 +155,16 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         const input: FinancialCoachInput = {
           language: langName as "English" | "Hindi" | "Marathi" | "German",
           history: historyForAI,
-          age: currentUser.age ?? undefined,
-          gender: currentUser.gender ?? undefined,
-          city: currentUser.city ?? undefined,
-          country: currentUser.country ?? undefined,
         };
+
+        // Only add user profile data for custom queries
+        if (isCustomQuery) {
+          input.age = currentUser.age ?? undefined;
+          input.gender = currentUser.gender ?? undefined;
+          input.city = currentUser.city ?? undefined;
+          input.country = currentUser.country ?? undefined;
+        }
+
         const result = await financialCoach(input);
         if (!result || !result.response) throw new Error("AI returned an invalid response.");
         
@@ -225,7 +230,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   const handleQuestionSelection = (questionText: string) => {
     setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
-    callAI(questionText);
+    callAI(questionText, false); // This is a pre-defined question, so isCustomQuery is false
   };
   
   const handleCustomQuerySelected = () => {
@@ -284,8 +289,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   const handleSubmit = form.handleSubmit(async (data: FormValues) => {
     form.reset({ query: '' });
-    setIsAwaitingCustomQuery(false);
-    callAI(data.query);
+    callAI(data.query, true); // This is a custom query, so isCustomQuery is true
   });
 
   const handleSaveAndEndChat = async () => {
@@ -338,7 +342,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             {isHumanChat && (
               <Button variant="outline" size="sm" onClick={handleCloseChat}>
                   <LogOut className="mr-2 h-4 w-4"/>
-                  {currentUser.role === 'coach' ? t.coach.close_chat : t.coach.end_chat}
+                  {currentUser.role === 'customer' ? t.nav.end_chat : t.coach.close_chat}
               </Button>
             )}
         </div>
@@ -387,8 +391,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                      </div>
                       {message.buttons && (
                         <div className={cn(
-                          "flex gap-2 ml-10 mt-2",
-                          promptPath.length >= 2 ? "flex-col items-start" : "flex-wrap"
+                          "flex gap-2 ml-10 mt-2 flex-wrap",
                         )}>
                           {message.buttons.map(button => (
                             <Button key={button.value} size="sm" variant="outline" 
