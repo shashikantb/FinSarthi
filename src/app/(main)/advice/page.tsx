@@ -12,6 +12,27 @@ import advicePrompts from "@/lib/advice-prompts.json";
 import { useAppTranslations } from "@/providers/translations-provider";
 import type { LanguageCode } from "@/lib/translations";
 
+function getPromptTitle(promptKey: string, lang: LanguageCode): string {
+    if (promptKey === 'ai_chat_session') {
+        return "AI Chat Session";
+    }
+    // A helper function to recursively search for the prompt
+    const findPrompt = (prompts: any[], key: string): any | undefined => {
+        for (const prompt of prompts) {
+            if (prompt.key === key) return prompt;
+            if (prompt.subPrompts) {
+                const found = findPrompt(prompt.subPrompts, key);
+                if (found) return found;
+            }
+        }
+        return undefined;
+    };
+
+    const promptConfig = findPrompt(advicePrompts, promptKey);
+    return promptConfig?.title?.[lang] || promptKey;
+}
+
+
 export default function AdvicePage() {
   const [adviceHistory, setAdviceHistory] = useState<AdviceSession[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -33,10 +54,7 @@ export default function AdvicePage() {
   }, []);
 
   const handleNewAdvice = (newAdvice: AdviceSession) => {
-    const promptConfig = advicePrompts.find(p => p.key === newAdvice.promptKey);
-    const displayTitle = promptConfig?.title[languageCode] || newAdvice.promptKey;
-
-    setAdviceHistory((prev) => [{ ...newAdvice, promptKey: displayTitle }, ...prev]);
+    setAdviceHistory((prev) => [newAdvice, ...prev]);
     setIsGenerating(false);
   };
 
@@ -73,8 +91,7 @@ export default function AdvicePage() {
             ) : adviceHistory.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
                 {adviceHistory.map((record) => {
-                  const promptConfig = advicePrompts.find(p => p.key === record.promptKey);
-                  const displayTitle = promptConfig ? promptConfig.title[languageCode as keyof typeof promptConfig.title] : record.promptKey;
+                  const displayTitle = getPromptTitle(record.promptKey, languageCode);
                   return (
                     <AccordionItem value={record.id} key={record.id}>
                       <AccordionTrigger>

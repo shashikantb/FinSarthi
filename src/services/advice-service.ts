@@ -3,7 +3,7 @@
 
 import { getDbInstance } from "@/lib/db";
 import { adviceSessions, users, type NewAdviceSession, type AdviceSession as RawAdviceSession } from "@/lib/db/schema";
-import { eq, desc, isNull } from "drizzle-orm";
+import { eq, desc, isNull, and, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 // Redefine AdviceSession locally to remove income/expenses which are no longer part of the flow.
@@ -119,7 +119,10 @@ export async function getLatestAdviceSessionForUser(userId?: string): Promise<Ad
   const [latestSession] = await db
     .select()
     .from(adviceSessions)
-    .where(eq(adviceSessions.userId, targetUserId))
+    .where(and(
+        eq(adviceSessions.userId, targetUserId),
+        ne(adviceSessions.promptKey, 'ai_chat_session')
+    ))
     .orderBy(desc(adviceSessions.createdAt))
     .limit(1);
   

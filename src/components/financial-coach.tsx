@@ -9,13 +9,14 @@ import {
   financialCoach,
   type FinancialCoachInput,
 } from "@/ai/flows/financial-coach";
-import type { ChatMessage, ChatRequest, User } from "@/lib/db/schema";
+import type { ChatMessage, ChatRequest, User, AdviceSession } from "@/lib/db/schema";
 import {
   sendMessage,
   getMessagesForChat,
   updateChatRequestStatus,
   markMessagesAsRead
 } from "@/services/chat-service";
+import { createAdviceSessionForCurrentUser } from "@/services/advice-service";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,7 +34,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut, Play } from "lucide-react";
+import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut, Play, Save } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -66,15 +67,6 @@ interface FinancialCoachProps {
   chatPartner?: User;
 }
 
-type Prompt = {
-    key: string;
-    title: Record<LanguageCode, string>;
-    description?: Record<LanguageCode, string>;
-    subPrompts?: Prompt[];
-    question?: Record<LanguageCode, string>;
-    answer?: Record<LanguageCode, string>;
-};
-
 export function FinancialCoach({ currentUser, chatSession, chatPartner }: FinancialCoachProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -86,6 +78,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   const [promptPath, setPromptPath] = useState<string[]>([]);
   const [isAwaitingCustomQuery, setIsAwaitingCustomQuery] = useState(false);
+  const [isAiResponding, setIsAiResponding] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -114,30 +107,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   }, [transcript, isListening, form]);
 
-  const getCurrentOptions = useCallback((): any[] => {
-    let currentLevel: any = advicePrompts;
-    let pathIndex = 0;
-    while(pathIndex < promptPath.length) {
-        const key = promptPath[pathIndex];
-        const hasSubPrompts = currentLevel[0]?.subPrompts;
-        const levelToSearch = hasSubPrompts ? currentLevel : currentLevel.flatMap((p: any) => p.subPrompts || []);
-        
-        const selected = levelToSearch.find((p: any) => p.key === key);
-
-        if (selected && selected.subPrompts) {
-            currentLevel = selected.subPrompts;
-        } else {
-            return [];
-        }
-        pathIndex++;
-    }
-    return Array.isArray(currentLevel) ? currentLevel : [];
-}, [promptPath]);
-
   const startNewFaqFlow = useCallback(() => {
     setMessages([]);
     setPromptPath([]);
     setIsAwaitingCustomQuery(false);
+    setIsAiResponding(false);
     
     const greetingText = isHumanChat ? t.coach.start_conversation : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User');
     const greetingMessage: Message = { id: createId(), role: 'assistant', content: greetingText };
@@ -163,8 +137,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const callAI = async (query: string) => {
     setIsLoading(true);
     setError('');
+    setIsAiResponding(true);
     
-    // Add user query to messages for history
     const userMessage: Message = { role: 'user', content: query, id: createId() };
     const messagesWithUserQuery = [...messages.map(m => ({ ...m, buttons: undefined })), userMessage];
     setMessages(messagesWithUserQuery);
@@ -199,11 +173,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     } catch (e: any) {
       console.error("An error occurred during the chat flow:", e);
       setError(`Failed to get response. ${e.message || ''}`.trim());
-      // Revert adding the user message if AI fails
       setMessages(messagesWithUserQuery.slice(0, -1));
     } finally {
         setIsLoading(false);
-        setIsAwaitingCustomQuery(true); // Allow user to type after AI response
     }
   };
 
@@ -216,23 +188,27 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     const newPath = [...promptPath, key];
     setPromptPath(newPath);
 
-    let nextLevel = advicePrompts as any[];
-    for (const p of newPath) {
-        const selected = nextLevel.find(i => i.key === p);
-        if (selected && selected.subPrompts) {
-            nextLevel = selected.subPrompts;
-        }
+    let currentLevel = advicePrompts as any[];
+    let pathIndex = 0;
+    while(pathIndex < newPath.length) {
+      const p = newPath[pathIndex];
+      const selected = currentLevel.find(i => i.key === p);
+      if (selected && selected.subPrompts) {
+          currentLevel = selected.subPrompts;
+          pathIndex++;
+      } else {
+        break;
+      }
     }
 
-    if (nextLevel && nextLevel.length > 0) {
-        const buttons = nextLevel.map(p => ({
+    if (currentLevel && currentLevel.length > 0) {
+        const buttons = currentLevel.map(p => ({
             label: p.question?.[languageCode] ?? p.title[languageCode],
             value: p.key,
             isQuestion: !!p.question
         }));
         
-        // Only add "Any Other Query?" if the next level has questions, not more categories.
-        if (nextLevel.some(p => p.question)) {
+        if (currentLevel.some(p => p.question)) {
            buttons.push({ label: t.coach.any_other_query, value: 'custom_query', isCustomQuery: true });
         }
 
@@ -244,12 +220,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         };
         setMessages(prev => [...prev, nextMessage]);
     }
-};
+  };
 
-  const handleQuestionSelection = (label: string) => {
-    // A question from the menu was selected, send it to the AI.
+  const handleQuestionSelection = (questionText: string) => {
     setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
-    callAI(label);
+    callAI(questionText);
   };
   
   const handleCustomQuerySelected = () => {
@@ -280,9 +255,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   }, [isHumanChat, fetchHumanMessages, chatSession, currentUser.id]);
 
-  const languageName = languages[languageCode as keyof typeof languages]?.name || "English";
-  const locale = langToLocale[languageName as keyof typeof langToLocale] || 'en-US';
-
   useEffect(() => {
     if (scrollViewportRef.current) {
         scrollViewportRef.current.scrollTo({
@@ -297,7 +269,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         stopSpeaking();
     } else {
         stopSpeaking();
-        speak(message.content, locale);
+        speak(message.content, langToLocale[languageCode] || 'en-US');
         setCurrentlyPlayingId(message.id);
     }
   };
@@ -315,8 +287,44 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     callAI(data.query);
   });
 
+  const handleSaveAndEndChat = async () => {
+    setIsLoading(true);
+    try {
+      const conversationText = messages
+        .map(m => `${m.role === 'user' ? (currentUser.fullName || 'User') : 'FINmate'}: ${m.content}`)
+        .join('\n\n');
+
+      const sessionData = {
+        promptKey: 'ai_chat_session',
+        formData: { 'conversation': `Chat Session on ${new Date().toLocaleDateString()}`},
+        language: languageCode,
+        generatedAdvice: conversationText,
+      };
+
+      await createAdviceSessionForCurrentUser(sessionData, true);
+
+      toast({
+        title: t.coach.toast_advice_saved_title,
+        description: t.coach.toast_advice_saved_desc,
+      });
+
+      startNewFaqFlow();
+    } catch (error) {
+      console.error("Failed to save chat:", error);
+      toast({
+        title: t.common.error,
+        description: t.coach.toast_advice_save_error,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   const cardTitle = isHumanChat ? `${t.coach.chat_with} ${chatPartner?.fullName}` : t.coach.chat_title;
   const cardDescription = isHumanChat ? t.coach.human_chat_desc : t.coach.chat_description;
+  const isLoggedIn = currentUser.id !== 'guest';
 
   return (
     <Card className="w-full flex flex-col h-[calc(100vh-10rem)] max-h-[700px]">
@@ -326,17 +334,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             <CardDescription>{cardDescription}</CardDescription>
         </div>
         <div className="flex items-center gap-2">
-            {isHumanChat && currentUser.role === 'coach' && (
-                <Button variant="outline" size="sm" onClick={handleCloseChat}>
-                    <LogOut className="mr-2 h-4 w-4"/>
-                    {t.coach.close_chat}
-                </Button>
-            )}
-             {isHumanChat && currentUser.role === 'customer' && (
-                <Button variant="outline" size="sm" onClick={handleCloseChat}>
-                    <LogOut className="mr-2 h-4 w-4"/>
-                    {t.coach.end_chat}
-                </Button>
+            {isHumanChat && (
+              <Button variant="outline" size="sm" onClick={handleCloseChat}>
+                  <LogOut className="mr-2 h-4 w-4"/>
+                  {currentUser.role === 'coach' ? t.coach.close_chat : t.coach.end_chat}
+              </Button>
             )}
         </div>
       </CardHeader>
@@ -444,7 +446,15 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="pt-4 border-t">
+      <CardFooter className="pt-4 border-t flex flex-col items-stretch gap-3">
+        {isLoggedIn && !isHumanChat && isAiResponding && !isLoading && (
+            <div className="flex justify-end">
+                <Button variant="ghost" onClick={handleSaveAndEndChat} disabled={isLoading}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {t.coach.save_and_new_chat_button}
+                </Button>
+            </div>
+        )}
         <Form {...form}>
           <form
             onSubmit={handleSubmit}
@@ -455,8 +465,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                     type="button" 
                     size="icon" 
                     className={cn("shrink-0", isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600')}
-                    onClick={() => isListening ? stopListening() : startListening({ lang: locale })}
-                    disabled={isLoading || !isAwaitingCustomQuery}
+                    onClick={() => isListening ? stopListening() : startListening({ lang: langToLocale[languageCode] || 'en-US' })}
+                    disabled={isLoading}
                 >
                    {isListening ? <Square className="h-5 w-5"/> : <Mic className="h-5 w-5" />}
                    <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
@@ -469,9 +479,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      placeholder={isListening ? "Listening..." : (isAwaitingCustomQuery ? t.coach.placeholder : t.coach.select_option_placeholder)}
+                      placeholder={isListening ? "Listening..." : (isAwaitingCustomQuery || isHumanChat ? t.coach.placeholder : t.coach.select_option_placeholder)}
                       {...field}
-                      disabled={isLoading || isListening || !isAwaitingCustomQuery}
+                      disabled={isLoading || isListening || (!isAwaitingCustomQuery && !isHumanChat)}
                       autoComplete="off"
                     />
                   </FormControl>
@@ -481,7 +491,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             />
             <Button
               type="submit"
-              disabled={isLoading || !isAwaitingCustomQuery}
+              disabled={isLoading || (!isAwaitingCustomQuery && !isHumanChat)}
               size="icon"
               className="shrink-0"
             >
