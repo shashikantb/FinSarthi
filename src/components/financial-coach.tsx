@@ -84,10 +84,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const { toast } = useToast();
   const isHumanChat = !!(chatSession && chatPartner);
 
-  // New state for FAQ flow
   const [promptPath, setPromptPath] = useState<string[]>([]);
   const [isAwaitingCustomQuery, setIsAwaitingCustomQuery] = useState(false);
-
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -136,8 +134,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     
     const greetingText = isHumanChat ? t.coach.start_conversation : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User');
     const greetingMessage: Message = { id: createId(), role: 'assistant', content: greetingText };
-    setMessages(prev => [...prev, greetingMessage]);
-
+    
     if (!isHumanChat) {
       const topLevelOptions = advicePrompts;
       const optionsMessage: Message = {
@@ -146,7 +143,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         content: "What can I help you with today?",
         buttons: topLevelOptions.map(p => ({ label: p.title[languageCode], value: p.key })),
       };
-      setMessages(prev => [...prev, optionsMessage]);
+      setMessages([greetingMessage, optionsMessage]);
+    } else {
+      setMessages([greetingMessage]);
     }
   }, [isHumanChat, t, currentUser.fullName, languageCode]);
 
@@ -154,7 +153,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     startNewFaqFlow();
   }, [startNewFaqFlow]);
 
-  const handleOptionSelection = (key: string) => {
+  const handleOptionSelection = (key: string, label: string) => {
     setIsAwaitingCustomQuery(false);
     const currentOptions = getCurrentOptions();
     const selectedOption = currentOptions.find(p => p.key === key);
@@ -162,7 +161,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
     // Add user's choice to history and remove buttons from previous message
     setMessages(prev => prev.map(m => ({ ...m, buttons: undefined })));
-    const userMessage: Message = { id: createId(), role: 'user', content: selectedOption.title[languageCode] };
+    const userMessage: Message = { id: createId(), role: 'user', content: label };
     setMessages(prev => [...prev, userMessage]);
 
     // Check for sub-prompts (it's a category)
@@ -172,13 +171,16 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
       const nextOptions = selectedOption.subPrompts;
       const buttons = nextOptions.map(p => ({
-          label: p.question?.[languageCode] ?? p.title?.[languageCode],
+          label: p.question?.[languageCode] ?? p.title[languageCode],
           value: p.key,
           isQuestion: !!p.question,
           answer: p.answer?.[languageCode]
       }));
-      // Add "Any Other Query?" option
-      buttons.push({ label: 'Any Other Query?', value: 'custom_query', isCustomQuery: true });
+      
+      const isFinalQuestionLevel = nextOptions.every(p => p.question && p.answer);
+      if (isFinalQuestionLevel) {
+        buttons.push({ label: 'Any Other Query?', value: 'custom_query', isCustomQuery: true });
+      }
       
       const nextMessage: Message = {
         id: createId(),
@@ -200,7 +202,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     const answerMessage: Message = { id: createId(), role: 'assistant', content: answer };
     setMessages(prev => [...prev, answerMessage]);
 
-    // Follow up with the same options again
+    // Re-display the same options again for another question
     const currentOptions = getCurrentOptions();
     const buttons = currentOptions.map(p => ({
         label: p.question?.[languageCode] ?? p.title[languageCode],
@@ -213,7 +215,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     const followUpMessage: Message = {
         id: createId(),
         role: 'assistant',
-        content: "Is there anything else I can help you with from this topic?",
+        content: "Please select another question or type your own.",
         buttons: buttons
     };
     setMessages(prev => [...prev, followUpMessage]);
@@ -393,7 +395,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                                     } else if (button.isQuestion && button.answer) {
                                       handleQuestionSelection(button.label, button.answer);
                                     } else {
-                                      handleOptionSelection(button.value);
+                                      handleOptionSelection(button.value, button.label);
                                     }
                                 }}
                             >
@@ -499,5 +501,3 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
-
-    
