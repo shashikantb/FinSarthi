@@ -115,9 +115,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }, [transcript, isListening, form]);
 
   const getCurrentOptions = useCallback((): Prompt[] => {
-    let currentLevel: Prompt[] = advicePrompts;
+    let currentLevel: any = advicePrompts;
     for (const key of promptPath) {
-        const nextLevel = currentLevel.find(p => p.key === key)?.subPrompts;
+        const nextLevel = currentLevel.find((p: any) => p.key === key)?.subPrompts;
         if (nextLevel) {
             currentLevel = nextLevel;
         } else {
@@ -140,7 +140,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       const optionsMessage: Message = {
         id: createId(),
         role: 'assistant',
-        content: "What can I help you with today?",
+        content: topLevelOptions[0].description?.[languageCode] ?? "What can I help you with today?",
         buttons: topLevelOptions.map(p => ({ label: p.title[languageCode], value: p.key })),
       };
       setMessages([greetingMessage, optionsMessage]);
@@ -160,10 +160,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     if (!selectedOption) return;
 
     // Add user's choice to history and remove buttons from previous message
-    setMessages(prev => prev.map(m => ({ ...m, buttons: undefined })));
+    const updatedMessages = messages.map(m => ({ ...m, buttons: undefined }));
     const userMessage: Message = { id: createId(), role: 'user', content: label };
-    setMessages(prev => [...prev, userMessage]);
-
+    
     // Check for sub-prompts (it's a category)
     if (selectedOption.subPrompts && selectedOption.subPrompts.length > 0) {
       const newPath = [...promptPath, key];
@@ -185,23 +184,21 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       const nextMessage: Message = {
         id: createId(),
         role: 'assistant',
-        content: selectedOption.description?.[languageCode] || `Here are some topics under "${selectedOption.title[languageCode]}":`,
+        content: "Please select an option:", // Generic prompt
         buttons: buttons,
       };
-      setMessages(prev => [...prev, nextMessage]);
+      setMessages([...updatedMessages, userMessage, nextMessage]);
     }
   };
 
   const handleQuestionSelection = (label: string, answer: string) => {
     // Add user's question to history
-    setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
+    const updatedMessages = messages.map(m => ({...m, buttons: undefined}));
     const userMessage: Message = { id: createId(), role: 'user', content: label };
-    setMessages(prev => [...prev, userMessage]);
 
     // Immediately provide the answer
     const answerMessage: Message = { id: createId(), role: 'assistant', content: answer };
-    setMessages(prev => [...prev, answerMessage]);
-
+   
     // Re-display the same options again for another question
     const currentOptions = getCurrentOptions();
     const buttons = currentOptions.map(p => ({
@@ -215,10 +212,10 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     const followUpMessage: Message = {
         id: createId(),
         role: 'assistant',
-        content: "Please select another question or type your own.",
+        content: "Is there anything else I can help you with from this topic?",
         buttons: buttons
     };
-    setMessages(prev => [...prev, followUpMessage]);
+    setMessages([...updatedMessages, userMessage, answerMessage, followUpMessage]);
   };
   
   const handleCustomQuerySelected = () => {
