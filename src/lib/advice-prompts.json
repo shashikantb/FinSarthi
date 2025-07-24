@@ -1,6 +1,178 @@
 
 [
   {
+    "key": "money_management_basics",
+    "title": {
+      "en": "Money Management Basics",
+      "hi": "धन प्रबंधन की मूल बातें",
+      "mr": "पैसा व्यवस्थापन मूलभूत तत्त्वे",
+      "de": "Grundlagen des Geldmanagements"
+    },
+    "description": {
+      "en": "Learn the fundamentals of managing your money effectively.",
+      "hi": "अपने पैसे का प्रभावी ढंग से प्रबंधन करने के fundamentals सीखें।",
+      "mr": "आपल्या पैशाचे प्रभावीपणे व्यवस्थापन करण्याचे मूलभूत तत्त्वे शिका.",
+      "de": "Lernen Sie die Grundlagen des effektiven Geldmanagements."
+    },
+    "subPrompts": [
+      {
+        "key": "budgeting_and_expense_tracking",
+        "title": {
+          "en": "Budgeting and Expense Tracking",
+          "hi": "बजट और व्यय ट्रैकिंग",
+          "mr": "बजेट आणि खर्च ट्रॅकिंग",
+          "de": "Budgetierung und Kostenverfolgung"
+        },
+        "subPrompts": [
+          {
+            "key": "create_simple_budget",
+            "question": { "en": "How can I create a simple budget to track my income and expenses?", "hi": "मैं अपनी आय और व्यय को ट्रैक करने के लिए एक सरल बजट कैसे बना सकता हूं?", "mr": "मी माझे उत्पन्न आणि खर्च ट्रॅक करण्यासाठी एक साधा बजेट कसा तयार करू शकेन?", "de": "Wie kann ich ein einfaches Budget erstellen, um meine Einnahmen und Ausgaben zu verfolgen?" }
+          },
+          {
+            "key": "categorize_expenses",
+            "question": { "en": "How do I categorize my expenses - Differentiating between fixed and variable expenses?", "hi": "मैं अपने खर्चों को कैसे वर्गीकृत करूं - निश्चित और परिवर्तनीय खर्चों के बीच अंतर करना?", "mr": "मी माझे खर्च कसे वर्गीकृत करू - निश्चित आणि परिवर्तनीय खर्चांमध्ये फरक कसा करावा?", "de": "Wie kategorisiere ich meine Ausgaben - Unterscheidung zwischen fixen und variablen Kosten?" }
+          },
+          {
+            "key": "what_is_emergency_fund",
+            "question": { "en": "What is an emergency fund, and why is it important?", "hi": "आपातकालीन निधि क्या है, और यह क्यों महत्वपूर्ण है?", "mr": "आपत्कालीन निधी म्हणजे काय, आणि तो महत्त्वाचा का आहे?", "de": "Was ist ein Notfallfonds und warum ist er wichtig?" }
+          },
+          {
+            "key": "free_budget_tools",
+            "question": { "en": "Are there any free tools or apps that can help me manage my budget and track my spending?", "hi": "क्या कोई मुफ्त उपकरण या ऐप हैं जो मुझे मेरे बजट का प्रबंधन करने और मेरे खर्च को ट्रैक करने में मदद कर सकते हैं?", "mr": "माझे बजेट व्यवस्थापित करण्यास आणि माझ्या खर्चाचा मागोवा घेण्यास मदत करणारे कोणतेही विनामूल्य साधने किंवा अॅप्स आहेत का?", "de": "Gibt es kostenlose Tools oder Apps, die mir bei der Verwaltung meines Budgets und der Verfolgung meiner Ausgaben helfen können?" }
+          },
+          {
+            "key": "review_adjust_budget",
+            "question": { "en": "How often should I review and adjust my budget?", "hi": "मुझे अपने बजट की समीक्षा और समायोजन कितनी बार करना चाहिए?", "mr": "मी माझे बजेट किती वेळा पुनरावलोकन आणि समायोजित करावे?", "de": "Wie oft sollte ich mein Budget überprüfen und anpassen?" }
+          }
+        ]
+      },
+      {
+        "key": "debt_management",
+        "title": {
+          "en": "Debt Management",
+          "hi": "ऋण प्रबंधन",
+          "mr": "कर्ज व्यवस्थापन",
+          "de": "Schuldenmanagement"
+        },
+        "subPrompts": [
+          {
+            "key": "types_of_debt",
+            "question": { "en": "What are the different types of debt, and how do they impact my financial health?", "hi": "विभिन्न प्रकार के ऋण क्या हैं, और वे मेरे वित्तीय स्वास्थ्य को कैसे प्रभावित करते हैं?", "mr": "कर्जाचे विविध प्रकार कोणते आहेत, आणि ते माझ्या आर्थिक आरोग्यावर कसा परिणाम करतात?", "de": "Welche verschiedenen Arten von Schulden gibt es und wie wirken sie sich auf meine finanzielle Gesundheit aus?" }
+          },
+          {
+            "key": "debt_payoff_strategies",
+            "question": { "en": "What strategies can I use to pay off debt effectively?", "hi": "ऋण को प्रभावी ढंग से चुकाने के लिए मैं किन रणनीतियों का उपयोग कर सकता हूं?", "mr": "कर्ज प्रभावीपणे फेडण्यासाठी मी कोणत्या धोरणांचा वापर करू शकेन?", "de": "Welche Strategien kann ich anwenden, um Schulden effektiv abzuzahlen?" }
+          },
+          {
+            "key": "avoid_debt",
+            "question": { "en": "How can I avoid getting into too much debt?", "hi": "मैं बहुत अधिक कर्ज में पड़ने से कैसे बच सकता हूं?", "mr": "मी जास्त कर्जात जाण्यापासून कसे वाचू शकेन?", "de": "Wie kann ich vermeiden, zu viele Schulden zu machen?" }
+          },
+          {
+            "key": "struggling_with_payments",
+            "question": { "en": "What should I do if I'm struggling to make my debt payments?", "hi": "यदि मैं अपने ऋण भुगतान करने के लिए संघर्ष कर रहा हूं तो मुझे क्या करना चाहिए?", "mr": "जर मला माझे कर्ज हप्ते भरण्यास त्रास होत असेल तर मी काय करावे?", "de": "Was soll ich tun, wenn ich Schwierigkeiten habe, meine Schulden zu bezahlen?" }
+          },
+          {
+            "key": "debt_consolidation",
+            "question": { "en": "How does debt consolidation work, and is it a good option for me?", "hi": "ऋण समेकन कैसे काम करता है, और क्या यह मेरे लिए एक अच्छा विकल्प है?", "mr": "कर्ज एकत्रीकरण कसे कार्य करते, आणि ते माझ्यासाठी एक चांगला पर्याय आहे का?", "de": "Wie funktioniert eine Schuldenkonsolidierung und ist sie eine gute Option für mich?" }
+          }
+        ]
+      },
+      {
+        "key": "financial_goal_setting",
+        "title": {
+          "en": "Financial Goal Setting",
+          "hi": "वित्तीय लक्ष्य निर्धारण",
+          "mr": "आर्थिक ध्येय निश्चिती",
+          "de": "Finanzielle Zielsetzung"
+        },
+        "subPrompts": [
+          {
+            "key": "set_realistic_goals",
+            "question": { "en": "How do I set realistic financial goals (e.g., buying a home, retirement)?", "hi": "मैं यथार्थवादी वित्तीय लक्ष्य कैसे निर्धारित करूं (जैसे, घर खरीदना, सेवानिवृत्ति)?", "mr": "मी वास्तविक आर्थिक ध्येये कशी सेट करू (उदा. घर खरेदी करणे, निवृत्ती)?", "de": "Wie setze ich realistische finanzielle Ziele (z. B. Hauskauf, Ruhestand)?" }
+          },
+          {
+            "key": "goal_horizons",
+            "question": { "en": "What's the difference between short-term, medium-term, and long-term financial goals?", "hi": "अल्पावधि, मध्यावधि और दीर्घावधि वित्तीय लक्ष्यों के बीच क्या अंतर है?", "mr": "अल्पकालीन, मध्यम-मुदती आणि दीर्घकालीन आर्थिक ध्येयांमध्ये काय फरक आहे?", "de": "Was ist der Unterschied zwischen kurz-, mittel- und langfristigen finanziellen Zielen?" }
+          },
+          {
+            "key": "prioritize_goals",
+            "question": { "en": "How can I prioritize my financial goals?", "hi": "मैं अपने वित्तीय लक्ष्यों को कैसे प्राथमिकता दे सकता हूं?", "mr": "मी माझ्या आर्थिक ध्येयांना प्राधान्य कसे देऊ शकेन?", "de": "Wie kann ich meine finanziellen Ziele priorisieren?" }
+          },
+          {
+            "key": "retirement_planning_india",
+            "question": { "en": "What steps should I take to plan for my retirement in India?", "hi": "भारत में अपनी सेवानिवृत्ति की योजना बनाने के लिए मुझे क्या कदम उठाने चाहिए?", "mr": "भारतात माझ्या निवृत्तीचे नियोजन करण्यासाठी मी कोणती पावले उचलावी?", "de": "Welche Schritte sollte ich unternehmen, um meinen Ruhestand in Indien zu planen?" }
+          },
+          {
+            "key": "government_planning_support",
+            "question": { "en": "Are there any government initiatives that support long-term financial planning for citizens?", "hi": "क्या नागरिकों के लिए दीर्घकालिक वित्तीय नियोजन का समर्थन करने वाली कोई सरकारी पहल है?", "mr": "नागरिकांसाठी दीर्घकालीन आर्थिक नियोजनास समर्थन देणारी कोणतीही सरकारी उपक्रम आहेत का?", "de": "Gibt es Regierungsinitiativen, die die langfristige Finanzplanung für Bürger unterstützen?" }
+          }
+        ]
+      },
+      {
+        "key": "saving_and_emergency_funds",
+        "title": {
+          "en": "Saving and Emergency Funds",
+          "hi": "बचत और आपातकालीन निधि",
+          "mr": "बचत आणि आपत्कालीन निधी",
+          "de": "Sparen und Notfallfonds"
+        },
+        "subPrompts": [
+          {
+            "key": "why_save_regularly",
+            "question": { "en": "Understanding why regular saving is crucial for financial stability.", "hi": "वित्तीय स्थिरता के लिए नियमित बचत क्यों महत्वपूर्ण है, यह समझना।", "mr": "आर्थिक स्थिरतेसाठी नियमित बचत का महत्त्वाची आहे हे समजून घेणे.", "de": "Verstehen, warum regelmäßiges Sparen für die finanzielle Stabilität entscheidend ist." }
+          },
+          {
+            "key": "best_emergency_accounts",
+            "question": { "en": "What are the best types of accounts or instruments to keep emergency savings in?", "hi": "आपातकालीन बचत रखने के लिए सबसे अच्छे प्रकार के खाते या उपकरण कौन से हैं?", "mr": "आपत्कालीन बचत ठेवण्यासाठी सर्वोत्तम प्रकारचे खाते किंवा साधने कोणती आहेत?", "de": "Welche Arten von Konten oder Instrumenten eignen sich am besten für Notfallersparnisse?" }
+          },
+          {
+            "key": "emergency_fund_impact",
+            "question": { "en": "How does having an emergency fund impact financial stress and decision-making?", "hi": "आपातकालीन निधि होने से वित्तीय तनाव और निर्णय लेने पर क्या प्रभाव पड़ता है?", "mr": "आपत्कालीन निधी असल्यामुळे आर्थिक तणाव आणि निर्णय घेण्यावर कसा परिणाम होतो?", "de": "Wie wirkt sich ein Notfallfonds auf finanziellen Stress und Entscheidungsfindung aus?" }
+          },
+          {
+            "key": "start_emergency_fund_limited_income",
+            "question": { "en": "How can someone start building an emergency fund if they have limited income?", "hi": "सीमित आय होने पर कोई आपातकालीन निधि का निर्माण कैसे शुरू कर सकता है?", "mr": "मर्यादित उत्पन्न असताना कोणी आपत्कालीन निधी कसा तयार करू शकतो?", "de": "Wie kann jemand mit begrenztem Einkommen einen Notfallfonds aufbauen?" }
+          },
+          {
+            "key": "risks_no_emergency_fund",
+            "question": { "en": "What are the risks of not having an emergency fund?", "hi": "आपातकालीन निधि न होने के क्या जोखिम हैं?", "mr": "आपत्कालीन निधी नसण्याचे धोके काय आहेत?", "de": "Welche Risiken bestehen, wenn man keinen Notfallfonds hat?" }
+          }
+        ]
+      },
+      {
+        "key": "technology_in_money_management",
+        "title": {
+          "en": "Using Technology in Money Management",
+          "hi": "धन प्रबंधन में प्रौद्योगिकी का उपयोग",
+          "mr": "पैसा व्यवस्थापनात तंत्रज्ञानाचा वापर",
+          "de": "Einsatz von Technologie im Geldmanagement"
+        },
+        "subPrompts": [
+          {
+            "key": "online_vs_traditional_banking",
+            "question": { "en": "What are the advantages of using online and mobile banking over traditional banking?", "hi": "पारंपरिक बैंकिंग पर ऑनलाइन और मोबाइल बैंकिंग का उपयोग करने के क्या फायदे हैं?", "mr": "पारंपारिक बँकिंगपेक्षा ऑनलाइन आणि मोबाइल बँकिंग वापरण्याचे काय फायदे आहेत?", "de": "Was sind die Vorteile von Online- und Mobile-Banking gegenüber traditionellem Banking?" }
+          },
+          {
+            "key": "digital_wallets_improve_transactions",
+            "question": { "en": "How do digital wallets and payment systems improve financial transactions?", "hi": "डिजिटल वॉलेट और भुगतान प्रणालियाँ वित्तीय लेनदेन को कैसे बेहतर बनाती हैं?", "mr": "डिजिटल वॉलेट आणि पेमेंट सिस्टम आर्थिक व्यवहार कसे सुधारतात?", "de": "Wie verbessern digitale Geldbörsen und Zahlungssysteme Finanztransaktionen?" }
+          },
+          {
+            "key": "financial_planning_software",
+            "question": { "en": "How can financial planning software assist in setting and achieving long-term financial goals?", "hi": "वित्तीय नियोजन सॉफ्टवेयर दीर्घकालिक वित्तीय लक्ष्यों को निर्धारित करने और प्राप्त करने में कैसे सहायता कर सकता है?", "mr": "आर्थिक नियोजन सॉफ्टवेअर दीर्घकालीन आर्थिक ध्येये निश्चित करण्यात आणि साध्य करण्यात कशी मदत करू शकते?", "de": "Wie kann Finanzplanungssoftware bei der Festlegung und Erreichung langfristiger finanzieller Ziele helfen?" }
+          },
+          {
+            "key": "choosing_personal_finance_app",
+            "question": { "en": "What features should you look for when choosing a personal finance app?", "hi": "व्यक्तिगत वित्त ऐप चुनते समय आपको किन विशेषताओं पर ध्यान देना चाहिए?", "mr": "वैयक्तिक वित्त अॅप निवडताना आपण कोणत्या वैशिष्ट्यांचा शोध घ्यावा?", "de": "Welche Funktionen sollten Sie bei der Auswahl einer persönlichen Finanz-App beachten?" }
+          },
+          {
+            "key": "technology_prevent_fraud",
+            "question": { "en": "How can technology help in preventing financial fraud and identity theft?", "hi": "प्रौद्योगिकी वित्तीय धोखाधड़ी और पहचान की चोरी को रोकने में कैसे मदद कर सकती है?", "mr": "तंत्रज्ञान आर्थिक फसवणूक आणि ओळख चोरी रोखण्यात कशी मदत करू शकते?", "de": "Wie kann Technologie helfen, Finanzbetrug und Identitätsdiebstahl zu verhindern?" }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "key": "banking_fundamentals",
     "title": {
       "en": "Banking Fundamentals",
@@ -16,7 +188,7 @@
     },
     "subPrompts": [
       {
-        "key": "types_of_accounts",
+        "key": "types_of_bank_accounts",
         "title": {
           "en": "Types of Bank Accounts",
           "hi": "बैंक खातों के प्रकार",
@@ -25,39 +197,29 @@
         },
         "subPrompts": [
           {
-            "key": "savings_account",
-            "question": {
-              "en": "What is a savings account, and what are its key features?",
-              "hi": "बचत खाता क्या है, और इसकी मुख्य विशेषताएं क्या हैं?",
-              "mr": "बचत खाते म्हणजे काय, आणि त्याची मुख्य वैशिष्ट्ये कोणती आहेत?",
-              "de": "Was ist ein Sparkonto und was sind seine Hauptmerkmale?"
-            },
-            "answer": {
-              "en": "A savings account is a bank account designed for individuals to save money and earn interest. Key features include low or no minimum balance requirements, interest on deposits (typically 3-4% in India), and easy access to funds via withdrawals or debit cards.",
-              "hi": "बचत खाता व्यक्तियों के लिए पैसे बचाने और ब्याज अर्जित करने के लिए डिज़ाइन किया गया एक बैंक खाता है। मुख्य विशेषताओं में कम या कोई न्यूनतम शेष राशि की आवश्यकता नहीं, जमा पर ब्याज (आमतौर पर भारत में 3-4%), और निकासी या डेबिट कार्ड के माध्यम से धन तक आसान पहुंच शामिल है।",
-              "mr": "बचत खाते हे व्यक्तींना पैसे वाचवण्यासाठी आणि व्याज मिळवण्यासाठी तयार केलेले बँक खाते आहे. मुख्य वैशिष्ट्यांमध्ये कमी किंवा किमान शिल्लक आवश्यकता नसणे, ठेवींवर व्याज (भारतात साधारणपणे ३-४%) आणि पैसे काढणे किंवा डेबिट कार्डद्वारे निधीमध्ये सहज प्रवेश यांचा समावेश आहे.",
-              "de": "Ein Sparkonto ist ein Bankkonto, das für Einzelpersonen konzipiert ist, um Geld zu sparen und Zinsen zu verdienen. Zu den Hauptmerkmalen gehören niedrige oder keine Mindestguthabenanforderungen, Zinsen auf Einlagen (in der Regel 3-4% in Indien) und ein einfacher Zugang zu Geldern durch Abhebungen oder Debitkarten."
-            }
+            "key": "what_is_savings_account",
+            "question": { "en": "What is a savings account, and what are its key features?", "hi": "बचत खाता क्या है, और इसकी मुख्य विशेषताएं क्या हैं?", "mr": "बचत खाते म्हणजे काय, आणि त्याची मुख्य वैशिष्ट्ये कोणती आहेत?", "de": "Was ist ein Sparkonto und was sind seine Hauptmerkmale?" }
           },
           {
             "key": "savings_vs_current",
-            "question": {
-              "en": "What's the difference between a savings account and a current account?",
-              "hi": "बचत खाते और चालू खाते में क्या अंतर है?",
-              "mr": "बचत खाते आणि चालू खात्यात काय फरक आहे?",
-              "de": "Was ist der Unterschied zwischen einem Sparkonto und einem Girokonto?"
-            },
-            "answer": {
-              "en": "A savings account is for personal savings with interest earnings and limited transactions, while a current account is for businesses or frequent transactions, offering no interest and higher transaction limits but often requiring a higher minimum balance.",
-              "hi": "बचत खाता व्यक्तिगत बचत के लिए है जिसमें ब्याज मिलता है और सीमित लेनदेन होते हैं, जबकि चालू खाता व्यवसायों या लगातार लेनदेन के लिए होता है, जिसमें कोई ब्याज नहीं मिलता है और उच्च लेनदेन सीमा होती है, लेकिन अक्सर उच्च न्यूनतम शेष राशि की आवश्यकता होती है।",
-              "mr": "बचत खाते वैयक्तिक बचतीसाठी असून त्यात व्याज मिळते आणि मर्यादित व्यवहार होतात, तर चालू खाते व्यवसाय किंवा वारंवार व्यवहारांसाठी असते, ज्यात व्याज मिळत नाही आणि उच्च व्यवहार मर्यादा असते परंतु अनेकदा जास्त किमान शिल्लक आवश्यक असते.",
-              "de": "Ein Sparkonto ist für persönliche Ersparnisse mit Zinserträgen und begrenzten Transaktionen, während ein Girokonto für Unternehmen oder häufige Transaktionen gedacht ist, keine Zinsen bietet und höhere Transaktionslimits hat, aber oft ein höheres Mindestguthaben erfordert."
-            }
+            "question": { "en": "What's the difference between a savings account and a current account?", "hi": "बचत खाते और चालू खाते में क्या अंतर है?", "mr": "बचत खाते आणि चालू खात्यात काय फरक आहे?", "de": "Was ist der Unterschied zwischen einem Sparkonto und einem Girokonto?" }
+          },
+          {
+            "key": "zero_balance_accounts",
+            "question": { "en": "What is a zero-balance or no-frills accounts?", "hi": "शून्य-शेष या नो-फ्रिल्स खाते क्या हैं?", "mr": "शून्य-बॅलन्स किंवा नो-फ्रिल्स खाती म्हणजे काय?", "de": "Was ist ein Nullsaldo- oder No-Frills-Konto?" }
+          },
+          {
+            "key": "deposit_vs_savings",
+            "question": { "en": "What features distinguish a deposit account from a regular savings account?", "hi": "जमा खाते को नियमित बचत खाते से कौन सी विशेषताएं अलग करती हैं?", "mr": "ठेव खात्याला नियमित बचत खात्यापेक्षा कोणती वैशिष्ट्ये वेगळी करतात?", "de": "Welche Merkmale unterscheiden ein Einlagenkonto von einem normalen Sparkonto?" }
+          },
+          {
+            "key": "best_interest_rate_accounts",
+            "question": { "en": "What types of accounts offer the best interest rates?", "hi": "किस प्रकार के खाते सर्वोत्तम ब्याज दरें प्रदान करते हैं?", "mr": "कोणत्या प्रकारचे खाते सर्वोत्तम व्याज दर देतात?", "de": "Welche Kontotypen bieten die besten Zinssätze?" }
           }
         ]
       },
       {
-        "key": "banking_services",
+        "key": "banking_services_transactions",
         "title": {
           "en": "Banking Services & Transactions",
           "hi": "बैंकिंग सेवाएं और लेनदेन",
@@ -66,19 +228,1493 @@
         },
         "subPrompts": [
           {
-            "key": "deposit_withdraw",
-            "question": {
-              "en": "How do I deposit and withdraw money from my bank account?",
-              "hi": "मैं अपने बैंक खाते से पैसे कैसे जमा और निकालूं?",
-              "mr": "मी माझ्या बँक खात्यातून पैसे कसे जमा करू आणि काढू?",
-              "de": "Wie zahle ich Geld auf mein Bankkonto ein und hebe es ab?"
-            },
-            "answer": {
-              "en": "Deposits can be made via cash or cheque at a bank branch, ATM, or online transfer. Withdrawals are done using ATMs, debit cards, cheques, or online banking, with limits varying by account type.",
-              "hi": "जमा नकद या चेक के माध्यम से बैंक शाखा, एटीएम, या ऑनलाइन हस्तांतरण के माध्यम से किया जा सकता है। निकासी एटीएम, डेबिट कार्ड, चेक, या ऑनलाइन बैंकिंग का उपयोग करके की जाती है, जिसकी सीमाएं खाते के प्रकार के अनुसार अलग-अलग होती हैं।",
-              "mr": "ठेवी बँक शाखा, एटीएम किंवा ऑनलाइन हस्तांतरणाद्वारे रोख किंवा धनादेशाद्वारे करता येतात. पैसे काढणे एटीएम, डेबिट कार्ड, धनादेश किंवा ऑनलाइन बँकिंगद्वारे केले जाते, ज्याची मर्यादा खात्याच्या प्रकारानुसार बदलते.",
-              "de": "Einzahlungen können per Bargeld oder Scheck in einer Bankfiliale, am Geldautomaten oder per Online-Überweisung getätigt werden. Abhebungen erfolgen über Geldautomaten, Debitkarten, Schecks oder Online-Banking, wobei die Limits je nach Kontotyp variieren."
-            }
+            "key": "deposit_withdraw_money",
+            "question": { "en": "How do I deposit and withdraw money from my bank account?", "hi": "मैं अपने बैंक खाते से पैसे कैसे जमा और निकालूं?", "mr": "मी माझ्या बँक खात्यातून पैसे कसे जमा करू आणि काढू?", "de": "Wie zahle ich Geld auf mein Bankkonto ein und hebe es ab?" }
+          },
+          {
+            "key": "digital_money_transfer",
+            "question": { "en": "What are the different ways to transfer money digitally (e.g., NEFT, RTGS, IMPS in India)?", "hi": "डिजिटली पैसे ट्रांसफर करने के विभिन्न तरीके क्या हैं (जैसे, भारत में NEFT, RTGS, IMPS)?", "mr": "डिजिटली पैसे हस्तांतरित करण्याचे विविध मार्ग कोणते आहेत (उदा. भारतात NEFT, RTGS, IMPS)?", "de": "Welche verschiedenen Möglichkeiten gibt es, Geld digital zu überweisen (z. B. NEFT, RTGS, IMPS in Indien)?" }
+          },
+          {
+            "key": "what_is_atm",
+            "question": { "en": "What is an ATM, and what are its common functions?", "hi": "एटीएम क्या है, और इसके सामान्य कार्य क्या हैं?", "mr": "एटीएम म्हणजे काय, आणि त्याची सामान्य कार्ये कोणती आहेत?", "de": "Was ist ein Geldautomat und welche allgemeinen Funktionen hat er?" }
+          },
+          {
+            "key": "manage_account_online",
+            "question": { "en": "How can I manage my bank account online or through mobile banking apps?", "hi": "मैं अपना बैंक खाता ऑनलाइन या मोबाइल बैंकिंग ऐप के माध्यम से कैसे प्रबंधित कर सकता हूं?", "mr": "मी माझे बँक खाते ऑनलाइन किंवा मोबाइल बँकिंग अॅप्सद्वारे कसे व्यवस्थापित करू शकेन?", "de": "Wie kann ich mein Bankkonto online oder über Mobile-Banking-Apps verwalten?" }
+          },
+          {
+            "key": "common_banking_fees",
+            "question": { "en": "What are the fees associated with common banking transactions, and how can I minimize them?", "hi": "आम बैंकिंग लेनदेन से जुड़े शुल्क क्या हैं, और मैं उन्हें कैसे कम कर सकता हूं?", "mr": "सामान्य बँकिंग व्यवहारांशी संबंधित शुल्क कोणते आहेत, आणि मी ते कसे कमी करू शकेन?", "de": "Welche Gebühren fallen bei gängigen Bankgeschäften an und wie kann ich sie minimieren?" }
+          }
+        ]
+      },
+      {
+        "key": "bank_account_security",
+        "title": {
+          "en": "Bank Account Security",
+          "hi": "बैंक खाता सुरक्षा",
+          "mr": "बँक खाते सुरक्षा",
+          "de": "Sicherheit von Bankkonten"
+        },
+        "subPrompts": [
+          {
+            "key": "info_not_to_share",
+            "question": { "en": "What information should I never share with anyone related to my bank account?", "hi": "मुझे अपने बैंक खाते से संबंधित कौन सी जानकारी कभी किसी से साझा नहीं करनी चाहिए?", "mr": "मी माझ्या बँक खात्याशी संबंधित कोणती माहिती कधीही कोणाशीही शेअर करू नये?", "de": "Welche Informationen zu meinem Bankkonto sollte ich niemals mit jemandem teilen?" }
+          },
+          {
+            "key": "protect_debit_credit_card",
+            "question": { "en": "How can I protect my debit/credit card from unauthorized use?", "hi": "मैं अपने डेबिट/क्रेडिट कार्ड को अनधिकृत उपयोग से कैसे बचा सकता हूं?", "mr": "मी माझे डेबिट/क्रेडिट कार्ड अनधिकृत वापरापासून कसे वाचवू शकेन?", "de": "Wie kann ich meine Debit-/Kreditkarte vor unbefugter Nutzung schützen?" }
+          },
+          {
+            "key": "suspect_fraudulent_activity",
+            "question": { "en": "What should I do if I suspect fraudulent activity on my bank account?", "hi": "अगर मुझे अपने बैंक खाते में धोखाधड़ी की गतिविधि का संदेह हो तो मुझे क्या करना चाहिए?", "mr": "जर मला माझ्या बँक खात्यावर फसवणुकीचा संशय आला तर मी काय करावे?", "de": "Was soll ich tun, wenn ich betrügerische Aktivitäten auf meinem Bankkonto vermute?" }
+          },
+          {
+            "key": "what_is_kyc",
+            "question": { "en": "What is KYC (Know Your Customer), and why is it important for banking?", "hi": "केवाईसी (अपने ग्राहक को जानें) क्या है, और यह बैंकिंग के लिए क्यों महत्वपूर्ण है?", "mr": "केवायसी (आपल्या ग्राहकाला जाणून घ्या) म्हणजे काय, आणि ते बँकिंगसाठी का महत्त्वाचे आहे?", "de": "Was ist KYC (Know Your Customer) und warum ist es für das Bankwesen wichtig?" }
+          },
+          {
+            "key": "security_regulations_in_banking",
+            "question": { "en": "Are there any specific security features or regulations in banking that protect consumers?", "hi": "क्या बैंकिंग में कोई विशिष्ट सुरक्षा सुविधाएँ या नियम हैं जो उपभोक्ताओं की रक्षा करते हैं?", "mr": "बँकिंगमध्ये ग्राहकांचे संरक्षण करणारी कोणतीही विशिष्ट सुरक्षा वैशिष्ट्ये किंवा नियम आहेत का?", "de": "Gibt es spezielle Sicherheitsmerkmale oder Vorschriften im Bankwesen, die die Verbraucher schützen?" }
+          }
+        ]
+      },
+      {
+        "key": "digital_banking",
+        "title": {
+          "en": "Digital Banking",
+          "hi": "डिजिटल बैंकिंग",
+          "mr": "डिजिटल बँकिंग",
+          "de": "Digitales Banking"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_digital_banking",
+            "question": { "en": "What is digital banking, and how does it differ from traditional banking?", "hi": "डिजिटल बैंकिंग क्या है, और यह पारंपरिक बैंकिंग से कैसे अलग है?", "mr": "डिजिटल बँकिंग म्हणजे काय, आणि ते पारंपरिक बँकिंगपेक्षा कसे वेगळे आहे?", "de": "Was ist digitales Banking und wie unterscheidet es sich vom traditionellen Banking?" }
+          },
+          {
+            "key": "benefits_of_digital_banking",
+            "question": { "en": "What are the benefits of using digital banking services?", "hi": "डिजिटल बैंकिंग सेवाओं का उपयोग करने के क्या लाभ हैं?", "mr": "डिजिटल बँकिंग सेवा वापरण्याचे काय फायदे आहेत?", "de": "Was sind die Vorteile der Nutzung digitaler Bankdienstleistungen?" }
+          },
+          {
+            "key": "challenges_in_digital_banking",
+            "question": { "en": "What are the common challenges people face when adopting digital banking, and how can they be overcome?", "hi": "डिजिटल बैंकिंग अपनाते समय लोगों को किन आम चुनौतियों का सामना करना पड़ता है, और उन्हें कैसे दूर किया जा सकता है?", "mr": "डिजिटल बँकिंगचा अवलंब करताना लोकांना कोणत्या सामान्य आव्हानांना सामोरे जावे लागते, आणि त्यावर कशी मात करता येते?", "de": "Welchen allgemeinen Herausforderungen stehen die Menschen bei der Einführung des digitalen Bankings gegenüber und wie können sie überwunden werden?" }
+          },
+          {
+            "key": "government_initiatives_for_digital_banking",
+            "question": { "en": "Are there government initiatives to promote digital banking among the unbanked?", "hi": "क्या बैंक रहित लोगों के बीच डिजिटल बैंकिंग को बढ़ावा देने के लिए सरकारी पहल हैं?", "mr": "बँकिंग सेवांपासून वंचित असलेल्या लोकांमध्ये डिजिटल बँकिंगला प्रोत्साहन देण्यासाठी सरकारी उपक्रम आहेत का?", "de": "Gibt es Regierungsinitiativen zur Förderung des digitalen Bankings bei Menschen ohne Bankkonto?" }
+          },
+          {
+            "key": "regulation_of_digital_banking",
+            "question": { "en": "How is digital banking regulated to ensure consumer protection and trust?", "hi": "उपभोक्ता संरक्षण और विश्वास सुनिश्चित करने के लिए डिजिटल बैंकिंग को कैसे विनियमित किया जाता है?", "mr": "ग्राहक संरक्षण आणि विश्वास सुनिश्चित करण्यासाठी डिजिटल बँकिंगचे नियमन कसे केले जाते?", "de": "Wie wird das digitale Banking reguliert, um Verbraucherschutz und Vertrauen zu gewährleisten?" }
+          }
+        ]
+      },
+      {
+        "key": "role_of_banks_in_financial_inclusion",
+        "title": {
+          "en": "Role of Banks in Financial Inclusion",
+          "hi": "वित्तीय समावेशन में बैंकों की भूमिका",
+          "mr": "आर्थिक समावेशात बँकांची भूमिका",
+          "de": "Rolle der Banken bei der finanziellen Inklusion"
+        },
+        "subPrompts": [
+          {
+            "key": "how_banks_contribute_to_financial_inclusion",
+            "question": { "en": "How do banks contribute to financial inclusion in a country?", "hi": "एक देश में वित्तीय समावेशन में बैंक कैसे योगदान करते हैं?", "mr": "एका देशात आर्थिक समावेशात बँका कशा प्रकारे योगदान देतात?", "de": "Wie tragen Banken zur finanziellen Inklusion in einem Land bei?" }
+          },
+          {
+            "key": "what_are_business_correspondents",
+            "question": { "en": "What are Business Correspondents (BCs)?", "hi": "बिजनेस कॉरेस्पोंडेंट (बीसी) क्या हैं?", "mr": "व्यवसाय प्रतिनिधी (बीसी) म्हणजे काय?", "de": "Was sind Geschäftskorrespondenten (BCs)?" }
+          },
+          {
+            "key": "government_mandates_for_financial_inclusion",
+            "question": { "en": "Are there specific government mandates or incentives for banks to expand financial inclusion ?", "hi": "क्या बैंकों के लिए वित्तीय समावेशन का विस्तार करने के लिए विशिष्ट सरकारी आदेश या प्रोत्साहन हैं?", "mr": "बँकांना आर्थिक समावेशाचा विस्तार करण्यासाठी विशिष्ट सरकारी आदेश किंवा प्रोत्साहन आहेत का?", "de": "Gibt es spezielle staatliche Auflagen oder Anreize für Banken, die finanzielle Inklusion zu erweitern?" }
+          },
+          {
+            "key": "how_regulatory_bodies_encourage_financial_inclusion",
+            "question": { "en": "How do regulatory bodies encourage banks to support financial inclusion?", "hi": "नियामक निकाय बैंकों को वित्तीय समावेशन का समर्थन करने के लिए कैसे प्रोत्साहित करते हैं?", "mr": "नियामक संस्था बँकांना आर्थिक समावेशाला समर्थन देण्यासाठी कसे प्रोत्साहन देतात?", "de": "Wie ermutigen Regulierungsbehörden Banken, die finanzielle Inklusion zu unterstützen?" }
+          },
+          {
+            "key": "how_to_access_banking_services",
+            "question": { "en": "How to Access Banking Services", "hi": "बैंकिंग सेवाओं तक कैसे पहुंचें", "mr": "बँकिंग सेवांमध्ये प्रवेश कसा करावा", "de": "Wie man auf Bankdienstleistungen zugreift" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "loans_and_credit_management",
+    "title": {
+      "en": "Loans & Credit Management",
+      "hi": "ऋण और क्रेडिट प्रबंधन",
+      "mr": "कर्ज आणि क्रेडिट व्यवस्थापन",
+      "de": "Kredite & Kreditmanagement"
+    },
+    "description": {
+      "en": "Understand loans, credit scores, and how to manage them wisely.",
+      "hi": "ऋण, क्रेडिट स्कोर को समझें, और उन्हें बुद्धिमानी से कैसे प्रबंधित करें।",
+      "mr": "कर्ज, क्रेडिट स्कोअर समजून घ्या आणि ते हुशारीने कसे व्यवस्थापित करावे.",
+      "de": "Verstehen Sie Kredite, Kredit-Scores und wie Sie sie klug verwalten."
+    },
+    "subPrompts": [
+      {
+        "key": "types_of_loans",
+        "title": {
+          "en": "Types of Loans",
+          "hi": "ऋण के प्रकार",
+          "mr": "कर्जाचे प्रकार",
+          "de": "Kreditarten"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_personal_loan",
+            "question": { "en": "What is a personal loan, and what are its typical uses?", "hi": "व्यक्तिगत ऋण क्या है, और इसके विशिष्ट उपयोग क्या हैं?", "mr": "वैयक्तिक कर्ज म्हणजे काय, आणि त्याचे सामान्य उपयोग काय आहेत?", "de": "Was ist ein Privatkredit und wofür wird er normalerweise verwendet?" }
+          },
+          {
+            "key": "secured_vs_unsecured_loan",
+            "question": { "en": "What's the difference between a secured and an unsecured loan?", "hi": "एक सुरक्षित और एक असुरक्षित ऋण के बीच क्या अंतर है?", "mr": "सुरक्षित आणि असुरक्षित कर्जामध्ये काय फरक आहे?", "de": "Was ist der Unterschied zwischen einem besicherten und einem unbesicherten Kredit?" }
+          },
+          {
+            "key": "what_is_home_loan",
+            "question": { "en": "What is a home loan or mortgage, and what factors affect its eligibility?", "hi": "एक गृह ऋण या बंधक क्या है, और इसकी पात्रता को कौन से कारक प्रभावित करते हैं?", "mr": "गृह कर्ज किंवा गहाणखत म्हणजे काय, आणि त्याच्या पात्रतेवर कोणते घटक परिणाम करतात?", "de": "Was ist ein Wohnungsbaudarlehen oder eine Hypothek und welche Faktoren beeinflussen die Anspruchsberechtigung?" }
+          },
+          {
+            "key": "business_vs_personal_loans",
+            "question": { "en": "How do business loans differ from personal loans, and what are some types available ?", "hi": "व्यावसायिक ऋण व्यक्तिगत ऋणों से कैसे भिन्न होते हैं, और कुछ उपलब्ध प्रकार क्या हैं?", "mr": "व्यावसायिक कर्ज वैयक्तिक कर्जांपेक्षा कसे वेगळे असतात, आणि काही उपलब्ध प्रकार कोणते आहेत?", "de": "Wie unterscheiden sich Geschäftskredite von Privatkrediten und welche Arten gibt es?" }
+          },
+          {
+            "key": "government_backed_loan_schemes",
+            "question": { "en": "Are there specific government-backed loan schemes for small businesses or individuals ?", "hi": "क्या छोटे व्यवसायों या व्यक्तियों के लिए विशिष्ट सरकारी समर्थित ऋण योजनाएं हैं?", "mr": "लहान व्यवसाय किंवा व्यक्तींसाठी विशिष्ट सरकारी-समर्थित कर्ज योजना आहेत का?", "de": "Gibt es spezielle staatlich geförderte Kreditprogramme für kleine Unternehmen oder Einzelpersonen?" }
+          }
+        ]
+      },
+      {
+        "key": "understanding_interest_rates_emis",
+        "title": {
+          "en": "Understanding Interest Rates & EMIs",
+          "hi": "ब्याज दरें और ईएमआई को समझना",
+          "mr": "व्याज दर आणि ईएमआय समजून घेणे",
+          "de": "Verständnis von Zinssätzen & EMIs"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_interest_rate",
+            "question": { "en": "What is an interest rate, and how does it affect the total cost of a loan?", "hi": "ब्याज दर क्या है, और यह ऋण की कुल लागत को कैसे प्रभावित करती है?", "mr": "व्याज दर म्हणजे काय, आणि ते कर्जाच्या एकूण खर्चावर कसा परिणाम करते?", "de": "Was ist ein Zinssatz und wie wirkt er sich auf die Gesamtkosten eines Kredits aus?" }
+          },
+          {
+            "key": "what_is_emi",
+            "question": { "en": "What is an EMI (Equated Monthly Installment), and how is it calculated?", "hi": "ईएमआई (समान मासिक किस्त) क्या है, और इसकी गणना कैसे की जाती है?", "mr": "ईएमआय (समान मासिक हप्ता) म्हणजे काय, आणि त्याची गणना कशी केली जाते?", "de": "Was ist eine EMI (gleichbleibende monatliche Rate) und wie wird sie berechnet?" }
+          },
+          {
+            "key": "fixed_vs_floating_interest",
+            "question": { "en": "What's the difference between fixed and floating interest rates on loans?", "hi": "ऋणों पर निश्चित और फ्लोटिंग ब्याज दरों के बीच क्या अंतर है?", "mr": "कर्जावरील निश्चित आणि फ्लोटिंग व्याज दरांमध्ये काय फरक आहे?", "de": "Was ist der Unterschied zwischen festen und variablen Zinssätzen bei Krediten?" }
+          },
+          {
+            "key": "compare_loan_offers",
+            "question": { "en": "How can I compare different loan offers to get the best terms?", "hi": "सर्वोत्तम शर्तें प्राप्त करने के लिए मैं विभिन्न ऋण प्रस्तावों की तुलना कैसे कर सकता हूं?", "mr": "सर्वोत्तम अटी मिळवण्यासाठी मी विविध कर्ज ऑफरची तुलना कशी करू शकेन?", "de": "Wie kann ich verschiedene Kreditangebote vergleichen, um die besten Konditionen zu erhalten?" }
+          },
+          {
+            "key": "central_bank_policy_influence",
+            "question": { "en": "Does the Central Bank's interest rate policy influence loan rates?", "hi": "क्या सेंट्रल बैंक की ब्याज दर नीति ऋण दरों को प्रभावित करती है?", "mr": "सेंट्रल बँकेचे व्याज दर धोरण कर्ज दरांवर परिणाम करते का?", "de": "Beeinflusst die Zinspolitik der Zentralbank die Kreditzinsen?" }
+          }
+        ]
+      },
+      {
+        "key": "credit_score_history",
+        "title": {
+          "en": "Credit Score & History",
+          "hi": "क्रेडिट स्कोर और इतिहास",
+          "mr": "क्रेडिट स्कोअर आणि इतिहास",
+          "de": "Kredit-Score & Verlauf"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_credit_score",
+            "question": { "en": "What is a credit score, and why is it important?", "hi": "क्रेडिट स्कोर क्या है, और यह क्यों महत्वपूर्ण है?", "mr": "क्रेडिट स्कोअर म्हणजे काय, आणि तो महत्त्वाचा का आहे?", "de": "Was ist ein Kredit-Score und warum ist er wichtig?" }
+          },
+          {
+            "key": "how_credit_score_calculated",
+            "question": { "en": "how credit score is calculated ?", "hi": "क्रेडिट स्कोर की गणना कैसे की जाती है?", "mr": "क्रेडिट स्कोअर कसा मोजला जातो?", "de": "Wie wird der Kredit-Score berechnet?" }
+          },
+          {
+            "key": "check_credit_score",
+            "question": { "en": "How can I check my credit score , and is it free?", "hi": "मैं अपना क्रेडिट स्कोर कैसे जांच सकता हूं, और क्या यह मुफ्त है?", "mr": "मी माझा क्रेडिट स्कोअर कसा तपासू शकेन, आणि तो विनामूल्य आहे का?", "de": "Wie kann ich meinen Kredit-Score überprüfen und ist das kostenlos?" }
+          },
+          {
+            "key": "factors_influencing_credit_score",
+            "question": { "en": "What factors influence my credit score positively and negatively?", "hi": "कौन से कारक मेरे क्रेडिट स्कोर को सकारात्मक और नकारात्मक रूप से प्रभावित करते हैं?", "mr": "कोणते घटक माझ्या क्रेडिट स्कोअरवर सकारात्मक आणि नकारात्मक परिणाम करतात?", "de": "Welche Faktoren beeinflussen meinen Kredit-Score positiv und negativ?" }
+          },
+          {
+            "key": "improve_credit_score",
+            "question": { "en": "How can I improve my credit score over time?", "hi": "मैं समय के साथ अपना क्रेडिट स्कोर कैसे सुधार सकता हूं?", "mr": "मी माझा क्रेडिट स्कोअर कालांतराने कसा सुधारू शकेन?", "de": "Wie kann ich meinen Kredit-Score im Laufe der Zeit verbessern?" }
+          }
+        ]
+      },
+      {
+        "key": "loan_terms_and_conditions",
+        "title": {
+          "en": "Loan Terms and Conditions",
+          "hi": "ऋण नियम और शर्तें",
+          "mr": "कर्जाच्या अटी आणि नियम",
+          "de": "Kreditbedingungen"
+        },
+        "subPrompts": [
+          {
+            "key": "factors_determining_loan_eligibility",
+            "question": { "en": "What factors determine loan eligibility?", "hi": "कौन से कारक ऋण पात्रता निर्धारित करते हैं?", "mr": "कर्ज पात्रता ठरवणारे घटक कोणते आहेत?", "de": "Welche Faktoren bestimmen die Kreditwürdigkeit?" }
+          },
+          {
+            "key": "how_interest_rates_calculated",
+            "question": { "en": "How are interest rates calculated on different types of loans?", "hi": "विभिन्न प्रकार के ऋणों पर ब्याज दरों की गणना कैसे की जाती है?", "mr": "विविध प्रकारच्या कर्जांवर व्याजदर कसे मोजले जातात?", "de": "Wie werden die Zinssätze für verschiedene Kreditarten berechnet?" }
+          },
+          {
+            "key": "difference_between_secured_unsecured_loans",
+            "question": { "en": "What is the difference between secured and unsecured loans?", "hi": "सुरक्षित और असुरक्षित ऋणों के बीच क्या अंतर है?", "mr": "सुरक्षित आणि असुरक्षित कर्जांमध्ये काय फरक आहे?", "de": "Was ist der Unterschied zwischen besicherten und unbesicherten Krediten?" }
+          },
+          {
+            "key": "loan_repayment_schedule",
+            "question": { "en": "What is a loan repayment schedule, and how is it structured?", "hi": "एक ऋण चुकौती अनुसूची क्या है, और इसे कैसे संरचित किया जाता है?", "mr": "कर्ज परतफेड वेळापत्रक म्हणजे काय, आणि ते कसे संरचित केले जाते?", "de": "Was ist ein Kredittilgungsplan und wie ist er strukturiert?" }
+          },
+          {
+            "key": "hidden_fees_in_loans",
+            "question": { "en": "What hidden fees or charges should borrowers be aware of when taking a loan?", "hi": "ऋण लेते समय उधारकर्ताओं को किन छिपे हुए शुल्कों या शुल्कों से अवगत होना चाहिए?", "mr": "कर्ज घेताना कर्जदारांनी कोणत्या छुप्या शुल्कांपासून किंवा शुल्कांपासून सावध रहावे?", "de": "Auf welche versteckten Gebühren oder Kosten sollten Kreditnehmer bei der Aufnahme eines Kredits achten?" }
+          }
+        ]
+      },
+      {
+        "key": "government_loan_credit_schemes",
+        "title": {
+          "en": "Government Loan & Credit Schemes",
+          "hi": "सरकारी ऋण और क्रेडिट योजनाएं",
+          "mr": "सरकारी कर्ज आणि क्रेडिट योजना",
+          "de": "Staatliche Kredit- & Kreditprogramme"
+        },
+        "subPrompts": [
+          {
+            "key": "what_are_government_loan_schemes",
+            "question": { "en": "What are government loan and credit schemes, and what purposes do they serve", "hi": "सरकारी ऋण और क्रेडिट योजनाएं क्या हैं, और वे किन उद्देश्यों की पूर्ति करती हैं", "mr": "सरकारी कर्ज आणि क्रेडिट योजना काय आहेत, आणि त्या कोणत्या उद्देशांसाठी आहेत", "de": "Was sind staatliche Kredit- und Kreditprogramme und welchen Zwecken dienen sie?" }
+          },
+          {
+            "key": "key_government_schemes_for_financial_inclusion",
+            "question": { "en": "What are some key government schemes related to loans for financial inclusion?", "hi": "वित्तीय समावेशन के लिए ऋण से संबंधित कुछ प्रमुख सरकारी योजनाएं क्या हैं?", "mr": "आर्थिक समावेशासाठी कर्जाशी संबंधित काही प्रमुख सरकारी योजना कोणत्या आहेत?", "de": "Welche wichtigen staatlichen Programme gibt es im Zusammenhang mit Krediten zur finanziellen Inklusion?" }
+          },
+          {
+            "key": "how_to_apply_for_government_loan",
+            "question": { "en": "How can I apply for a loan under government schemes ?", "hi": "मैं सरकारी योजनाओं के तहत ऋण के लिए कैसे आवेदन कर सकता हूं?", "mr": "मी सरकारी योजनांतर्गत कर्जासाठी अर्ज कसा करू शकेन?", "de": "Wie kann ich einen Kredit im Rahmen staatlicher Programme beantragen?" }
+          },
+          {
+            "key": "initiatives_for_vulnerable_groups",
+            "question": { "en": "Are there specific initiatives to improve access to credit for vulnerable groups or startups?", "hi": "क्या कमजोर समूहों या स्टार्टअप के लिए ऋण तक पहुंच में सुधार के लिए विशिष्ट पहल हैं?", "mr": "दुर्बळ गट किंवा स्टार्टअप्ससाठी क्रेडिटमध्ये प्रवेश सुधारण्यासाठी विशिष्ट उपक्रम आहेत का?", "de": "Gibt es spezielle Initiativen zur Verbesserung des Kreditzugangs für schutzbedürftige Gruppen oder Start-ups?" }
+          },
+          {
+            "key": "common_government_loan_schemes",
+            "question": { "en": "What are some common government loan schemes available for agriculture, small businesses, and education?", "hi": "कृषि, छोटे व्यवसायों और शिक्षा के लिए उपलब्ध कुछ सामान्य सरकारी ऋण योजनाएं क्या हैं?", "mr": "शेती, लहान व्यवसाय आणि शिक्षणासाठी उपलब्ध काही सामान्य सरकारी कर्ज योजना कोणत्या आहेत?", "de": "Welche gängigen staatlichen Kreditprogramme gibt es für Landwirtschaft, kleine Unternehmen und Bildung?" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "digital_payments",
+    "title": {
+      "en": "Digital Payments",
+      "hi": "डिजिटल भुगतान",
+      "mr": "डिजिटल पेमेंट",
+      "de": "Digitale Zahlungen"
+    },
+    "description": {
+      "en": "Navigate the world of digital payments safely and effectively.",
+      "hi": "डिजिटल भुगतान की दुनिया में सुरक्षित और प्रभावी ढंग से नेविगेट करें।",
+      "mr": "डिजिटल पेमेंटच्या जगात सुरक्षितपणे आणि प्रभावीपणे नेव्हिगेट करा.",
+      "de": "Navigieren Sie sicher und effektiv durch die Welt der digitalen Zahlungen."
+    },
+    "subPrompts": [
+      {
+        "key": "understanding_digital_payment_methods",
+        "title": {
+          "en": "Understanding Digital Payment Methods",
+          "hi": "डिजिटल भुगतान विधियों को समझना",
+          "mr": "डिजिटल पेमेंट पद्धती समजून घेणे",
+          "de": "Verständnis digitaler Zahlungsmethoden"
+        },
+        "subPrompts": [
+          {
+            "key": "common_digital_payment_methods",
+            "question": { "en": "What are the most common digital payment methods available?", "hi": "उपलब्ध सबसे आम डिजिटल भुगतान विधियां कौन सी हैं?", "mr": "उपलब्ध सर्वात सामान्य डिजिटल पेमेंट पद्धती कोणत्या आहेत?", "de": "Welche sind die gängigsten digitalen Zahlungsmethoden?" }
+          },
+          {
+            "key": "how_upi_works",
+            "question": { "en": "How does UPI (Unified Payments Interface) work, and why is it so popular ?", "hi": "यूपीआई (एकीकृत भुगतान इंटरफेस) कैसे काम करता है, और यह इतना लोकप्रिय क्यों है?", "mr": "यूपीआय (युनिफाइड पेमेंट्स इंटरफेस) कसे कार्य करते, आणि ते इतके लोकप्रिय का आहे?", "de": "Wie funktioniert UPI (Unified Payments Interface) und warum ist es so beliebt?" }
+          },
+          {
+            "key": "security_of_digital_payments",
+            "question": { "en": "How secure are digital payments compared to cash transactions?", "hi": "नकद लेनदेन की तुलना में डिजिटल भुगतान कितने सुरक्षित हैं?", "mr": "रोख व्यवहारांच्या तुलनेत डिजिटल पेमेंट किती सुरक्षित आहेत?", "de": "Wie sicher sind digitale Zahlungen im Vergleich zu Bargeldtransaktionen?" }
+          },
+          {
+            "key": "net_banking_vs_mobile_banking",
+            "question": { "en": "What is the difference between Net Banking and Mobile Banking?", "hi": "नेट बैंकिंग और मोबाइल बैंकिंग में क्या अंतर है?", "mr": "नेट बँकिंग आणि मोबाइल बँकिंगमध्ये काय फरक आहे?", "de": "Was ist der Unterschied zwischen Net Banking und Mobile Banking?" }
+          },
+          {
+            "key": "digital_payments_without_internet",
+            "question": { "en": "Can digital payments be made without an internet connection?", "hi": "क्या बिना इंटरनेट कनेक्शन के डिजिटल भुगतान किया जा सकता है?", "mr": "इंटरनेट कनेक्शनशिवाय डिजिटल पेमेंट करता येते का?", "de": "Können digitale Zahlungen ohne Internetverbindung getätigt werden?" }
+          }
+        ]
+      },
+      {
+        "key": "benefits_of_digital_payments",
+        "title": {
+          "en": "Benefits of Digital Payments",
+          "hi": "डिजिटल भुगतान के लाभ",
+          "mr": "डिजिटल पेमेंटचे फायदे",
+          "de": "Vorteile digitaler Zahlungen"
+        },
+        "subPrompts": [
+          {
+            "key": "advantages_of_digital_payments",
+            "question": { "en": "What are the main advantages of using digital payments over cash?", "hi": "नकद पर डिजिटल भुगतान का उपयोग करने के मुख्य लाभ क्या हैं?", "mr": "रोखीपेक्षा डिजिटल पेमेंट वापरण्याचे मुख्य फायदे कोणते आहेत?", "de": "Was sind die Hauptvorteile der Nutzung digitaler Zahlungen gegenüber Bargeld?" }
+          },
+          {
+            "key": "security_features_of_digital_payments",
+            "question": { "en": "What security features protect digital payment transactions?", "hi": "कौन सी सुरक्षा सुविधाएँ डिजिटल भुगतान लेनदेन की रक्षा करती हैं?", "mr": "कोणती सुरक्षा वैशिष्ट्ये डिजिटल पेमेंट व्यवहारांचे संरक्षण करतात?", "de": "Welche Sicherheitsmerkmale schützen digitale Zahlungstransaktionen?" }
+          },
+          {
+            "key": "wrong_digital_payment",
+            "question": { "en": "What happens if a digital payment is made to the wrong recipient?", "hi": "यदि गलत प्राप्तकर्ता को डिजिटल भुगतान किया जाता है तो क्या होता है?", "mr": "जर चुकीच्या प्राप्तकर्त्याला डिजिटल पेमेंट केले गेले तर काय होते?", "de": "Was passiert, wenn eine digitale Zahlung an den falschen Empfänger geht?" }
+          },
+          {
+            "key": "rewards_cashback_programs",
+            "question": { "en": "Do digital payments offer any rewards or cashback programs?", "hi": "क्या डिजिटल भुगतान कोई पुरस्कार या कैशबैक कार्यक्रम प्रदान करते हैं?", "mr": "डिजिटल पेमेंट काही बक्षिसे किंवा कॅशबॅक प्रोग्राम देतात का?", "de": "Bieten digitale Zahlungen Prämien- oder Cashback-Programme an?" }
+          },
+          {
+            "key": "transparency_in_financial_transactions",
+            "question": { "en": "How do digital payments promote transparency in financial transactions?", "hi": "डिजिटल भुगतान वित्तीय लेनदेन में पारदर्शिता को कैसे बढ़ावा देते हैं?", "mr": "डिजिटल पेमेंट आर्थिक व्यवहारांमध्ये पारदर्शकता कशी वाढवतात?", "de": "Wie fördern digitale Zahlungen die Transparenz bei Finanztransaktionen?" }
+          }
+        ]
+      },
+      {
+        "key": "digital_payment_security",
+        "title": {
+          "en": "Digital Payment Security",
+          "hi": "डिजिटल भुगतान सुरक्षा",
+          "mr": "डिजिटल पेमेंट सुरक्षा",
+          "de": "Sicherheit digitaler Zahlungen"
+        },
+        "subPrompts": [
+          {
+            "key": "common_security_measures",
+            "question": { "en": "What are common security measures for digital payments (e.g., OTP, PIN, biometric authentication)?", "hi": "डिजिटल भुगतान के लिए सामान्य सुरक्षा उपाय क्या हैं (जैसे, ओटीपी, पिन, बायोमेट्रिक प्रमाणीकरण)?", "mr": "डिजिटल पेमेंटसाठी सामान्य सुरक्षा उपाय कोणते आहेत (उदा. ओटीपी, पिन, बायोमेट्रिक ऑथेंटिकेशन)?", "de": "Was sind gängige Sicherheitsmaßnahmen für digitale Zahlungen (z. B. OTP, PIN, biometrische Authentifizierung)?" }
+          },
+          {
+            "key": "protect_from_digital_payment_fraud",
+            "question": { "en": "How can I protect myself from digital payment fraud?", "hi": "मैं खुद को डिजिटल भुगतान धोखाधड़ी से कैसे बचा सकता हूं?", "mr": "मी स्वतःला डिजिटल पेमेंट फसवणुकीपासून कसे वाचवू शकेन?", "de": "Wie kann ich mich vor Betrug bei digitalen Zahlungen schützen?" }
+          },
+          {
+            "key": "wrong_or_fraudulent_transaction",
+            "question": { "en": "What should I do if I make a wrong digital payment or a fraudulent transaction occurs?", "hi": "यदि मैं गलत डिजिटल भुगतान करता हूं या कोई धोखाधड़ी वाला लेनदेन होता है तो मुझे क्या करना चाहिए?", "mr": "जर मी चुकीचे डिजिटल पेमेंट केले किंवा फसवणुकीचा व्यवहार झाला तर मी काय करावे?", "de": "Was soll ich tun, wenn ich eine falsche digitale Zahlung tätige oder eine betrügerische Transaktion auftritt?" }
+          },
+          {
+            "key": "save_card_details_online",
+            "question": { "en": "Is it safe to save my card details on online payment platforms?", "hi": "क्या ऑनलाइन भुगतान प्लेटफार्मों पर मेरे कार्ड का विवरण सहेजना सुरक्षित है?", "mr": "ऑनलाइन पेमेंट प्लॅटफॉर्मवर माझे कार्ड तपशील सेव्ह करणे सुरक्षित आहे का?", "de": "Ist es sicher, meine Kartendaten auf Online-Zahlungsplattformen zu speichern?" }
+          },
+          {
+            "key": "consumer_protection_laws",
+            "question": { "en": "Are there specific consumer protection laws related to digital payment security?", "hi": "क्या डिजिटल भुगतान सुरक्षा से संबंधित विशिष्ट उपभोक्ता संरक्षण कानून हैं?", "mr": "डिजिटल पेमेंट सुरक्षेशी संबंधित विशिष्ट ग्राहक संरक्षण कायदे आहेत का?", "de": "Gibt es spezielle Verbraucherschutzgesetze im Zusammenhang mit der Sicherheit digitaler Zahlungen?" }
+          }
+        ]
+      },
+      {
+        "key": "qr_codes_contactless_payments",
+        "title": {
+          "en": "QR Codes and Contactless Payments",
+          "hi": "क्यूआर कोड और संपर्क रहित भुगतान",
+          "mr": "क्यूआर कोड आणि संपर्कहीन पेमेंट",
+          "de": "QR-Codes und kontaktlose Zahlungen"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_qr_code",
+            "question": { "en": "What is a QR code, and how is it used for digital payments?", "hi": "क्यूआर कोड क्या है, और इसका उपयोग डिजिटल भुगतान के लिए कैसे किया जाता है?", "mr": "क्यूआर कोड म्हणजे काय, आणि तो डिजिटल पेमेंटसाठी कसा वापरला जातो?", "de": "Was ist ein QR-Code und wie wird er für digitale Zahlungen verwendet?" }
+          },
+          {
+            "key": "how_contactless_payments_work",
+            "question": { "en": "How do contactless payments work, and where can I use them?", "hi": "संपर्क रहित भुगतान कैसे काम करते हैं, और मैं उनका उपयोग कहां कर सकता हूं?", "mr": "संपर्कहीन पेमेंट कसे कार्य करतात, आणि मी ते कुठे वापरू शकेन?", "de": "Wie funktionieren kontaktlose Zahlungen und wo kann ich sie verwenden?" }
+          },
+          {
+            "key": "advantages_of_qr_codes",
+            "question": { "en": "What are the advantages of using QR codes for payments compared to traditional card swipes?", "hi": "पारंपरिक कार्ड स्वाइप की तुलना में भुगतान के लिए क्यूआर कोड का उपयोग करने के क्या फायदे हैं?", "mr": "पारंपारिक कार्ड स्वाइपच्या तुलनेत पेमेंटसाठी क्यूआर कोड वापरण्याचे काय फायदे आहेत?", "de": "Was sind die Vorteile der Verwendung von QR-Codes für Zahlungen im Vergleich zu herkömmlichen Kartendurchzügen?" }
+          },
+          {
+            "key": "security_considerations_for_qr_codes",
+            "question": { "en": "What are the security considerations for using QR codes and contactless payments?", "hi": "क्यूआर कोड और संपर्क रहित भुगतान का उपयोग करने के लिए सुरक्षा विचार क्या हैं?", "mr": "क्यूआर कोड आणि संपर्कहीन पेमेंट वापरण्यासाठी सुरक्षा विचार काय आहेत?", "de": "Welche Sicherheitsaspekte sind bei der Verwendung von QR-Codes und kontaktlosen Zahlungen zu beachten?" }
+          },
+          {
+            "key": "how_qr_code_payments_work",
+            "question": { "en": "How do QR code payments work for both merchants and customers?", "hi": "क्यूआर कोड भुगतान व्यापारियों और ग्राहकों दोनों के लिए कैसे काम करते हैं?", "mr": "क्यूआर कोड पेमेंट व्यापारी आणि ग्राहक दोघांसाठी कसे कार्य करतात?", "de": "Wie funktionieren QR-Code-Zahlungen sowohl für Händler als auch für Kunden?" }
+          }
+        ]
+      },
+      {
+        "key": "government_initiatives_for_digital_payments",
+        "title": {
+          "en": "Government Initiatives for Digital Payments",
+          "hi": "डिजिटल भुगतान के लिए सरकारी पहल",
+          "mr": "डिजिटल पेमेंटसाठी सरकारी उपक्रम",
+          "de": "Regierungsinitiativen für digitale Zahlungen"
+        },
+        "subPrompts": [
+          {
+            "key": "government_initiatives_promote_digital_payments",
+            "question": { "en": "What government initiatives promote digital payments, especially in rural areas?", "hi": "कौन सी सरकारी पहल डिजिटल भुगतान को बढ़ावा देती है, खासकर ग्रामीण क्षेत्रों में?", "mr": "कोणते सरकारी उपक्रम डिजिटल पेमेंटला प्रोत्साहन देतात, विशेषतः ग्रामीण भागात?", "de": "Welche Regierungsinitiativen fördern digitale Zahlungen, insbesondere in ländlichen Gebieten?" }
+          },
+          {
+            "key": "what_is_bhim_upi_app",
+            "question": { "en": "what is BHIM UPI app?", "hi": "भीम यूपीआई ऐप क्या है?", "mr": "भीम यूपीआय अॅप काय आहे?", "de": "Was ist die BHIM UPI App?" }
+          },
+          {
+            "key": "government_policies_for_merchants",
+            "question": { "en": "Are there government policies or subsidies to encourage merchants to accept digital payments?", "hi": "क्या व्यापारियों को डिजिटल भुगतान स्वीकार करने के लिए प्रोत्साहित करने के लिए सरकारी नीतियां या सब्सिडी हैं?", "mr": "व्यापाऱ्यांना डिजिटल पेमेंट स्वीकारण्यास प्रोत्साहित करण्यासाठी सरकारी धोरणे किंवा सबसिडी आहेत का?", "de": "Gibt es staatliche Richtlinien oder Subventionen, um Händler zu ermutigen, digitale Zahlungen zu akzeptieren?" }
+          },
+          {
+            "key": "steps_for_digital_payments_in_rural_areas",
+            "question": { "en": "What steps are taken to ensure digital payments are accessible in rural and remote areas?", "hi": "ग्रामीण और दूरदराज के क्षेत्रों में डिजिटल भुगतान सुलभ हो, यह सुनिश्चित करने के लिए क्या कदम उठाए जाते हैं?", "mr": "ग्रामीण आणि दुर्गम भागात डिजिटल पेमेंट उपलब्ध असल्याची खात्री करण्यासाठी कोणती पावले उचलली जातात?", "de": "Welche Maßnahmen werden ergriffen, um sicherzustellen, dass digitale Zahlungen in ländlichen und abgelegenen Gebieten zugänglich sind?" }
+          },
+          {
+            "key": "government_consumer_protection",
+            "question": { "en": "How does the government handle consumer protection in digital payments?", "hi": "सरकार डिजिटल भुगतान में उपभोक्ता संरक्षण को कैसे संभालती है?", "mr": "सरकार डिजिटल पेमेंटमध्ये ग्राहक संरक्षणाची हाताळणी कशी करते?", "de": "Wie geht die Regierung mit dem Verbraucherschutz bei digitalen Zahlungen um?" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "insurance_fundamentals",
+    "title": {
+      "en": "Insurance Fundamentals",
+      "hi": "बीमा की मूल बातें",
+      "mr": "विमा मूलभूत तत्त्वे",
+      "de": "Grundlagen der Versicherung"
+    },
+    "description": {
+      "en": "Learn the basics of insurance and how to protect yourself.",
+      "hi": "बीमा की मूल बातें जानें और खुद को कैसे सुरक्षित रखें।",
+      "mr": "विम्याची मूलभूत तत्त्वे जाणून घ्या आणि स्वतःचे संरक्षण कसे करावे.",
+      "de": "Lernen Sie die Grundlagen der Versicherung und wie Sie sich schützen können."
+    },
+    "subPrompts": [
+      {
+        "key": "introduction_to_insurance",
+        "title": {
+          "en": "Introduction to Insurance",
+          "hi": "बीमा का परिचय",
+          "mr": "विम्याची ओळख",
+          "de": "Einführung in die Versicherung"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_insurance",
+            "question": { "en": "What is insurance, and why is it important for individuals and families?", "hi": "बीमा क्या है, और यह व्यक्तियों और परिवारों के लिए क्यों महत्वपूर्ण है?", "mr": "विमा म्हणजे काय, आणि तो व्यक्ती आणि कुटुंबांसाठी का महत्त्वाचा आहे?", "de": "Was ist eine Versicherung und warum ist sie für Einzelpersonen und Familien wichtig?" }
+          },
+          {
+            "key": "how_insurance_works",
+            "question": { "en": "How does insurance work?", "hi": "बीमा कैसे काम करता है?", "mr": "विमा कसा कार्य करतो?", "de": "Wie funktioniert eine Versicherung?" }
+          },
+          {
+            "key": "what_is_a_premium",
+            "question": { "en": "What is a premium, and how is it determined?", "hi": "प्रीमियम क्या है, और यह कैसे निर्धारित किया जाता है?", "mr": "प्रीमियम म्हणजे काय, आणि तो कसा ठरवला जातो?", "de": "Was ist eine Prämie und wie wird sie bestimmt?" }
+          },
+          {
+            "key": "what_is_a_policy_document",
+            "question": { "en": "What is a policy document, and why should I read it carefully?", "hi": "एक पॉलिसी दस्तावेज़ क्या है, और मुझे इसे ध्यान से क्यों पढ़ना चाहिए?", "mr": "पॉलिसी दस्तऐवज म्हणजे काय, आणि मी तो काळजीपूर्वक का वाचावा?", "de": "Was ist ein Versicherungsdokument und warum sollte ich es sorgfältig lesen?" }
+          },
+          {
+            "key": "government_bodies_regulating_insurance",
+            "question": { "en": "Are there government bodies that regulate the insurance sector?", "hi": "क्या बीमा क्षेत्र को विनियमित करने वाले सरकारी निकाय हैं?", "mr": "विमा क्षेत्राचे नियमन करणाऱ्या सरकारी संस्था आहेत का?", "de": "Gibt es staatliche Stellen, die den Versicherungssektor regulieren?" }
+          }
+        ]
+      },
+      {
+        "key": "types_of_insurance",
+        "title": {
+          "en": "Types of Insurance",
+          "hi": "बीमा के प्रकार",
+          "mr": "विम्याचे प्रकार",
+          "de": "Versicherungsarten"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_life_insurance",
+            "question": { "en": "What is life insurance, and who needs it?", "hi": "जीवन बीमा क्या है, और इसकी आवश्यकता किसे है?", "mr": "जीवन विमा म्हणजे काय, आणि त्याची गरज कोणाला आहे?", "de": "Was ist eine Lebensversicherung und wer braucht sie?" }
+          },
+          {
+            "key": "types_of_health_insurance",
+            "question": { "en": "What are the different types of health insurance plans available ?", "hi": "उपलब्ध विभिन्न प्रकार की स्वास्थ्य बीमा योजनाएं क्या हैं?", "mr": "उपलब्ध विविध प्रकारच्या आरोग्य विमा योजना कोणत्या आहेत?", "de": "Welche verschiedenen Arten von Krankenversicherungsplänen gibt es?" }
+          },
+          {
+            "key": "what_is_vehicle_insurance",
+            "question": { "en": "What is Vehical insurance, and is it compulsory ?", "hi": "वाहन बीमा क्या है, और क्या यह अनिवार्य है?", "mr": "वाहन विमा म्हणजे काय, आणि तो अनिवार्य आहे का?", "de": "Was ist eine Fahrzeugversicherung und ist sie obligatorisch?" }
+          },
+          {
+            "key": "what_is_general_insurance",
+            "question": { "en": "What is general insurance, and what are some common examples?", "hi": "सामान्य बीमा क्या है, और इसके कुछ सामान्य उदाहरण क्या हैं?", "mr": "सामान्य विमा म्हणजे काय, आणि त्याची काही सामान्य उदाहरणे कोणती आहेत?", "de": "Was ist eine allgemeine Versicherung und was sind einige gängige Beispiele?" }
+          },
+          {
+            "key": "government_social_security_schemes",
+            "question": { "en": "Are there specific social security or health insurance schemes offered by governments?", "hi": "क्या सरकारों द्वारा विशिष्ट सामाजिक सुरक्षा या स्वास्थ्य बीमा योजनाएं प्रदान की जाती हैं?", "mr": "सरकारद्वारे विशिष्ट सामाजिक सुरक्षा किंवा आरोग्य विमा योजना दिल्या जातात का?", "de": "Gibt es spezielle Sozialversicherungs- oder Krankenversicherungssysteme, die von Regierungen angeboten werden?" }
+          }
+        ]
+      },
+      {
+        "key": "claim_process",
+        "title": {
+          "en": "Claim Process",
+          "hi": "दावा प्रक्रिया",
+          "mr": "दावा प्रक्रिया",
+          "de": "Schadensprozess"
+        },
+        "subPrompts": [
+          {
+            "key": "steps_to_file_claim",
+            "question": { "en": "What steps should I take to file an insurance claim?", "hi": "एक बीमा दावा दायर करने के लिए मुझे क्या कदम उठाने चाहिए?", "mr": "विमा दावा दाखल करण्यासाठी मी कोणती पावले उचलावी?", "de": "Welche Schritte sollte ich unternehmen, um einen Versicherungsanspruch geltend zu machen?" }
+          },
+          {
+            "key": "documents_for_claim",
+            "question": { "en": "What documents are typically required for an insurance claim?", "hi": "एक बीमा दावे के लिए आमतौर पर कौन से दस्तावेजों की आवश्यकता होती है?", "mr": "विमा दाव्यासाठी सामान्यतः कोणत्या कागदपत्रांची आवश्यकता असते?", "de": "Welche Dokumente werden in der Regel für einen Versicherungsanspruch benötigt?" }
+          },
+          {
+            "key": "reasons_for_claim_rejection",
+            "question": { "en": "What are common reasons why an insurance claim might be rejected?", "hi": "एक बीमा दावा क्यों खारिज किया जा सकता है, इसके सामान्य कारण क्या हैं?", "mr": "विमा दावा का नाकारला जाऊ शकतो, याची सामान्य कारणे कोणती आहेत?", "de": "Was sind häufige Gründe, warum ein Versicherungsanspruch abgelehnt werden könnte?" }
+          },
+          {
+            "key": "ensure_smooth_claim_process",
+            "question": { "en": "How can I ensure a smooth and timely claim settlement process?", "hi": "मैं एक सहज और समय पर दावा निपटान प्रक्रिया कैसे सुनिश्चित कर सकता हूं?", "mr": "मी एक सुरळीत आणि वेळेवर दावा निपटारा प्रक्रिया कशी सुनिश्चित करू शकेन?", "de": "Wie kann ich einen reibungslosen und rechtzeitigen Schadensregulierungsprozess sicherstellen?" }
+          },
+          {
+            "key": "regulatory_body_for_claims",
+            "question": { "en": "Is there a regulatory body for consumer protection regarding insurance claims?", "hi": "क्या बीमा दावों के संबंध में उपभोक्ता संरक्षण के लिए कोई नियामक निकाय है?", "mr": "विमा दाव्यांसंबंधी ग्राहक संरक्षणासाठी कोणतीही नियामक संस्था आहे का?", "de": "Gibt es eine Regulierungsbehörde für den Verbraucherschutz bei Versicherungsansprüchen?" }
+          }
+        ]
+      },
+      {
+        "key": "government_insurance_schemes_india",
+        "title": {
+          "en": "Government Insurance Schemes (India)",
+          "hi": "सरकारी बीमा योजनाएं (भारत)",
+          "mr": "सरकारी विमा योजना (भारत)",
+          "de": "Staatliche Versicherungssysteme (Indien)"
+        },
+        "subPrompts": [
+          {
+            "key": "government_backed_schemes",
+            "question": { "en": "What are the Government backed insurance scheme in my country?", "hi": "मेरे देश में सरकार समर्थित बीमा योजनाएं क्या हैं?", "mr": "माझ्या देशात सरकार-समर्थित विमा योजना कोणत्या आहेत?", "de": "Was sind die staatlich geförderten Versicherungssysteme in meinem Land?" }
+          },
+          {
+            "key": "eligibility_enrollment_process",
+            "question": { "en": "What is the Eligibility and Enrollment Process for the Government backed insurance scheme in my country?", "hi": "मेरे देश में सरकार समर्थित बीमा योजना के लिए पात्रता और नामांकन प्रक्रिया क्या है?", "mr": "माझ्या देशात सरकार-समर्थित विमा योजनेसाठी पात्रता आणि नावनोंदणी प्रक्रिया काय आहे?", "de": "Was ist das Zulassungs- und Anmeldeverfahren für das staatlich geförderte Versicherungssystem in meinem Land?" }
+          },
+          {
+            "key": "premiums_for_schemes",
+            "question": { "en": "What are Premiums ?", "hi": "प्रीमियम क्या हैं?", "mr": "प्रीमियम काय आहेत?", "de": "Was sind Prämien?" }
+          },
+          {
+            "key": "benefits_of_schemes",
+            "question": { "en": "What are the benefits of Government backed insurance scheme in my country?", "hi": "मेरे देश में सरकार समर्थित बीमा योजना के क्या लाभ हैं?", "mr": "माझ्या देशात सरकार-समर्थित विमा योजनेचे फायदे काय आहेत?", "de": "Was sind die Vorteile des staatlich geförderten Versicherungssystems in meinem Land?" }
+          },
+          {
+            "key": "claim_process_payouts",
+            "question": { "en": "What is a Claim Process and Payouts in the Government backed insurance scheme in my country?", "hi": "मेरे देश में सरकार समर्थित बीमा योजना में दावा प्रक्रिया और भुगतान क्या है?", "mr": "माझ्या देशात सरकार-समर्थित विमा योजनेत दावा प्रक्रिया आणि पेआउट काय आहे?", "de": "Was ist ein Schadensprozess und Auszahlungen im staatlich geförderten Versicherungssystem in meinem Land?" }
+          }
+        ]
+      },
+      {
+        "key": "insurance_for_financial_inclusion",
+        "title": {
+          "en": "Importance of Insurance for Financial Inclusion",
+          "hi": "वित्तीय समावेशन के लिए बीमा का महत्व",
+          "mr": "आर्थिक समावेशासाठी विम्याचे महत्त्व",
+          "de": "Bedeutung der Versicherung für die finanzielle Inklusion"
+        },
+        "subPrompts": [
+          {
+            "key": "insurance_for_low_income",
+            "question": { "en": "How does access to affordable insurance contribute to financial stability for low-income households?", "hi": "कम आय वाले परिवारों के लिए सस्ती बीमा तक पहुंच वित्तीय स्थिरता में कैसे योगदान करती है?", "mr": "कमी उत्पन्न असलेल्या कुटुंबांसाठी स्वस्त विम्याची उपलब्धता आर्थिक स्थिरतेत कसे योगदान देते?", "de": "Wie trägt der Zugang zu erschwinglichen Versicherungen zur finanziellen Stabilität von einkommensschwachen Haushalten bei?" }
+          },
+          {
+            "key": "what_is_microinsurance",
+            "question": { "en": "What is microinsurance, and how does it cater to the financially vulnerable?", "hi": "माइक्रोइंश्योरेंस क्या है, और यह वित्तीय रूप से कमजोर लोगों की जरूरतों को कैसे पूरा करता है?", "mr": "मायक्रोइन्शुरन्स म्हणजे काय, आणि ते आर्थिकदृष्ट्या दुर्बळांना कसे मदत करते?", "de": "Was ist Mikroversicherung und wie richtet sie sich an finanziell schwache Personen?" }
+          },
+          {
+            "key": "challenges_in_providing_insurance",
+            "question": { "en": "Are there specific challenges in providing insurance to unbanked or rural populations ?", "hi": "क्या बैंक रहित या ग्रामीण आबादी को बीमा प्रदान करने में विशिष्ट चुनौतियां हैं?", "mr": "बँकिंग सेवांपासून वंचित किंवा ग्रामीण लोकसंख्येला विमा प्रदान करण्यात विशिष्ट आव्हाने आहेत का?", "de": "Gibt es besondere Herausforderungen bei der Bereitstellung von Versicherungen für Bevölkerungsgruppen ohne Bankverbindung oder in ländlichen Gebieten?" }
+          },
+          {
+            "key": "how_insurance_helps_low_income",
+            "question": { "en": "How does insurance help low-income individuals and families manage financial risks?", "hi": "बीमा कम आय वाले व्यक्तियों और परिवारों को वित्तीय जोखिमों का प्रबंधन करने में कैसे मदद करता है?", "mr": "विमा कमी उत्पन्न असलेल्या व्यक्ती आणि कुटुंबांना आर्थिक जोखीम व्यवस्थापित करण्यास कशी मदत करतो?", "de": "Wie hilft eine Versicherung einkommensschwachen Einzelpersonen und Familien, finanzielle Risiken zu managen?" }
+          },
+          {
+            "key": "relevant_insurance_for_vulnerable",
+            "question": { "en": "What types of insurance are most relevant for financially vulnerable populations?", "hi": "वित्तीय रूप से कमजोर आबादी के लिए कौन से प्रकार के बीमा सबसे अधिक प्रासंगिक हैं?", "mr": "आर्थिकदृष्ट्या दुर्बळ लोकसंख्येसाठी कोणते विमा प्रकार सर्वात संबंधित आहेत?", "de": "Welche Versicherungsarten sind für finanziell schwache Bevölkerungsgruppen am relevantesten?" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "investment_basics",
+    "title": {
+      "en": "Investment Basics",
+      "hi": "निवेश की मूल बातें",
+      "mr": "गुंतवणूक मूलभूत तत्त्वे",
+      "de": "Grundlagen der Geldanlage"
+    },
+    "description": {
+      "en": "Learn the fundamentals of investing to grow your wealth.",
+      "hi": "अपनी संपत्ति बढ़ाने के लिए निवेश के fundamentals सीखें।",
+      "mr": "तुमची संपत्ती वाढवण्यासाठी गुंतवणुकीची मूलभूत तत्त्वे शिका.",
+      "de": "Lernen Sie die Grundlagen des Investierens, um Ihr Vermögen zu vermehren."
+    },
+    "subPrompts": [
+      {
+        "key": "introduction_to_investment",
+        "title": {
+          "en": "Introduction to Investment",
+          "hi": "निवेश का परिचय",
+          "mr": "गुंतवणुकीची ओळख",
+          "de": "Einführung in die Geldanlage"
+        },
+        "subPrompts": [
+          {
+            "key": "saving_vs_investing",
+            "question": { "en": "What is the basic difference between saving and investing?", "hi": "बचत और निवेश के बीच मूल अंतर क्या है?", "mr": "बचत आणि गुंतवणूक यात काय फरक आहे?", "de": "Was ist der grundlegende Unterschied zwischen Sparen und Investieren?" }
+          },
+          {
+            "key": "why_invest",
+            "question": { "en": "Why should I consider investing my money instead of just saving it?", "hi": "मुझे सिर्फ बचत करने के बजाय अपने पैसे का निवेश करने पर क्यों विचार करना चाहिए?", "mr": "मी फक्त बचत करण्याऐवजी माझे पैसे गुंतवण्याचा विचार का करावा?", "de": "Warum sollte ich erwägen, mein Geld zu investieren, anstatt es nur zu sparen?" }
+          },
+          {
+            "key": "risk_and_return",
+            "question": { "en": "What is the concept of 'risk and return' in investing?", "hi": "निवेश में 'जोखिम और वापसी' की अवधारणा क्या है?", "mr": "गुंतवणुकीत 'जोखीम आणि परतावा' ही संकल्पना काय आहे?", "de": "Was ist das Konzept von 'Risiko und Rendite' beim Investieren?" }
+          },
+          {
+            "key": "diversification",
+            "question": { "en": "What is diversification, and why is it important for an investment portfolio?", "hi": "विविधीकरण क्या है, और यह एक निवेश पोर्टफोलियो के लिए क्यों महत्वपूर्ण है?", "mr": "विविधता म्हणजे काय, आणि ती गुंतवणूक पोर्टफोलिओसाठी का महत्त्वाची आहे?", "de": "Was ist Diversifikation und warum ist sie für ein Anlageportfolio wichtig?" }
+          },
+          {
+            "key": "start_investing_small",
+            "question": { "en": "How can I start investing with a small amount of money in my country?", "hi": "मैं अपने देश में थोड़ी सी राशि के साथ निवेश कैसे शुरू कर सकता हूं?", "mr": "मी माझ्या देशात थोड्या पैशाने गुंतवणूक कशी सुरू करू शकेन?", "de": "Wie kann ich in meinem Land mit einem kleinen Geldbetrag anfangen zu investieren?" }
+          }
+        ]
+      },
+      {
+        "key": "types_of_investments",
+        "title": {
+          "en": "Types of Investments",
+          "hi": "निवेश के प्रकार",
+          "mr": "गुंतवणुकीचे प्रकार",
+          "de": "Anlagearten"
+        },
+        "subPrompts": [
+          {
+            "key": "mutual_funds",
+            "question": { "en": "What are mutual funds, and how do they work?", "hi": "म्यूचुअल फंड क्या हैं, और वे कैसे काम करते हैं?", "mr": "म्युच्युअल फंड म्हणजे काय, आणि ते कसे कार्य करतात?", "de": "Was sind Investmentfonds und wie funktionieren sie?" }
+          },
+          {
+            "key": "stocks_equities",
+            "question": { "en": "What are stocks (equities), and what are the risks and potential returns associated with them?", "hi": "स्टॉक (इक्विटी) क्या हैं, और उनसे जुड़े जोखिम और संभावित रिटर्न क्या हैं?", "mr": "स्टॉक (इक्विटी) म्हणजे काय, आणि त्यांच्याशी संबंधित जोखीम आणि संभाव्य परतावा काय आहे?", "de": "Was sind Aktien (Equities) und welche Risiken und potenziellen Renditen sind damit verbunden?" }
+          },
+          {
+            "key": "bonds_debt_instruments",
+            "question": { "en": "What are bonds (debt instruments), and how do they differ from stocks?", "hi": "बॉन्ड (ऋण साधन) क्या हैं, और वे स्टॉक से कैसे भिन्न होते हैं?", "mr": "बॉण्ड (कर्ज साधने) म्हणजे काय, आणि ते स्टॉकपेक्षा कसे वेगळे आहेत?", "de": "Was sind Anleihen (Schuldinstrumente) und wie unterscheiden sie sich von Aktien?" }
+          },
+          {
+            "key": "popular_long_term_savings_option",
+            "question": { "en": "What is a popular long-term savings option?", "hi": "एक लोकप्रिय दीर्घकालिक बचत विकल्प क्या है?", "mr": "एक लोकप्रिय दीर्घकालीन बचत पर्याय कोणता आहे?", "de": "Was ist eine beliebte langfristige Sparoption?" }
+          },
+          {
+            "key": "government_backed_savings_products",
+            "question": { "en": "What are the government-backed savings products for individuals?", "hi": "व्यक्तियों के लिए सरकारी समर्थित बचत उत्पाद क्या हैं?", "mr": "व्यक्तींसाठी सरकारी-समर्थित बचत उत्पादने कोणती आहेत?", "de": "Was sind die staatlich geförderten Sparprodukte für Einzelpersonen?" }
+          }
+        ]
+      },
+      {
+        "key": "investment_planning",
+        "title": {
+          "en": "Investment Planning",
+          "hi": "निवेश योजना",
+          "mr": "गुंतवणूक नियोजन",
+          "de": "Anlageplanung"
+        },
+        "subPrompts": [
+          {
+            "key": "determine_investment_goals",
+            "question": { "en": "How do I determine my investment goals?", "hi": "मैं अपने निवेश लक्ष्यों को कैसे निर्धारित करूं?", "mr": "मी माझे गुंतवणुकीचे ध्येय कसे ठरवू?", "de": "Wie bestimme ich meine Anlageziele?" }
+          },
+          {
+            "key": "asset_allocation",
+            "question": { "en": "What is asset allocation, and how does it relate to my investment strategy?", "hi": "संपत्ति आवंटन क्या है, और यह मेरी निवेश रणनीति से कैसे संबंधित है?", "mr": "मालमत्ता वाटप म्हणजे काय, आणि ते माझ्या गुंतवणूक धोरणाशी कसे संबंधित आहे?", "de": "Was ist Vermögensallokation und wie hängt sie mit meiner Anlagestrategie zusammen?" }
+          },
+          {
+            "key": "when_to_start_investing",
+            "question": { "en": "When should I start investing for long-term goals like retirement?", "hi": "मुझे सेवानिवृत्ति जैसे दीर्घकालिक लक्ष्यों के लिए निवेश कब शुरू करना चाहिए?", "mr": "मी निवृत्तीसारख्या दीर्घकालीन ध्येयांसाठी गुंतवणूक कधी सुरू करावी?", "de": "Wann sollte ich anfangen, für langfristige Ziele wie den Ruhestand zu investieren?" }
+          },
+          {
+            "key": "monitor_investments",
+            "question": { "en": "How can I monitor my investments and make adjustments to my portfolio?", "hi": "मैं अपने निवेशों की निगरानी कैसे कर सकता हूं और अपने पोर्टफोलियो में समायोजन कैसे कर सकता हूं?", "mr": "मी माझ्या गुंतवणुकीवर कसे लक्ष ठेवू शकेन आणि माझ्या पोर्टफोलिओमध्ये बदल कसे करू शकेन?", "de": "Wie kann ich meine Anlagen überwachen und Anpassungen an meinem Portfolio vornehmen?" }
+          },
+          {
+            "key": "government_incentives_for_investing",
+            "question": { "en": "Are there specific government incentives for long-term investing or pension contributions in my country?", "hi": "क्या मेरे देश में दीर्घकालिक निवेश या पेंशन योगदान के लिए विशिष्ट सरकारी प्रोत्साहन हैं?", "mr": "माझ्या देशात दीर्घकालीन गुंतवणूक किंवा पेन्शन योगदानासाठी विशिष्ट सरकारी प्रोत्साहन आहेत का?", "de": "Gibt es in meinem Land spezielle staatliche Anreize für langfristige Investitionen oder Pensionsbeiträge?" }
+          }
+        ]
+      },
+      {
+        "key": "government_investment_schemes",
+        "title": {
+          "en": "Government Investment Schemes",
+          "hi": "सरकारी निवेश योजनाएं",
+          "mr": "सरकारी गुंतवणूक योजना",
+          "de": "Staatliche Investitionsprogramme"
+        },
+        "subPrompts": [
+          {
+            "key": "government_backed_investment_schemes",
+            "question": { "en": "What are the government backed investment schemes in my country?", "hi": "मेरे देश में सरकार समर्थित निवेश योजनाएं क्या हैं?", "mr": "माझ्या देशात सरकार-समर्थित गुंतवणूक योजना कोणत्या आहेत?", "de": "Was sind die staatlich geförderten Investitionsprogramme in meinem Land?" }
+          },
+          {
+            "key": "scheme_for_children_education",
+            "question": { "en": "Is there any governement backed scheme that benefits children's education?", "hi": "क्या कोई सरकारी समर्थित योजना है जो बच्चों की शिक्षा को लाभ पहुंचाती है?", "mr": "मुलांच्या शिक्षणाला फायदा देणारी कोणतीही सरकारी-समर्थित योजना आहे का?", "de": "Gibt es ein staatlich gefördertes Programm, das die Bildung von Kindern fördert?" }
+          },
+          {
+            "key": "sovereign_gold_bond",
+            "question": { "en": "is there any Sovereign gold bold available in my country ?", "hi": "क्या मेरे देश में कोई सॉवरेन गोल्ड बोल्ड उपलब्ध है?", "mr": "माझ्या देशात कोणतेही सार्वभौम सुवर्णरोखे उपलब्ध आहे का?", "de": "Gibt es in meinem Land eine Sovereign Gold Anleihe?" }
+          },
+          {
+            "key": "schemes_for_small_savings",
+            "question": { "en": "Are there any government-backed schemes for small savings that offer guaranteed returns?", "hi": "क्या छोटी बचत के लिए कोई सरकारी समर्थित योजनाएं हैं जो गारंटीड रिटर्न प्रदान करती हैं?", "mr": "लहान बचतीसाठी कोणत्याही सरकारी-समर्थित योजना आहेत का ज्या हमी परतावा देतात?", "de": "Gibt es staatlich geförderte Programme für kleine Ersparnisse, die garantierte Renditen bieten?" }
+          },
+          {
+            "key": "find_reliable_information",
+            "question": { "en": "How can I find reliable information about these government investment schemes?", "hi": "मैं इन सरकारी निवेश योजनाओं के बारे में विश्वसनीय जानकारी कैसे प्राप्त कर सकता हूं?", "mr": "मी या सरकारी गुंतवणूक योजनांबद्दल विश्वसनीय माहिती कशी शोधू शकेन?", "de": "Wie kann ich zuverlässige Informationen über diese staatlichen Investitionsprogramme finden?" }
+          }
+        ]
+      },
+      {
+        "key": "basic_investment_principles",
+        "title": {
+          "en": "Basic Investment Principles",
+          "hi": "बुनियादी निवेश सिद्धांत",
+          "mr": "मूलभूत गुंतवणूक तत्त्वे",
+          "de": "Grundlegende Anlageprinzipien"
+        },
+        "subPrompts": [
+          {
+            "key": "meaning_of_basic_investment_principles",
+            "question": { "en": "What is the meaning of Basic Investment Principles", "hi": "बुनियादी निवेश सिद्धांतों का क्या अर्थ है", "mr": "मूलभूत गुंतवणूक तत्त्वांचा अर्थ काय आहे", "de": "Was bedeuten die grundlegenden Anlageprinzipien?" }
+          },
+          {
+            "key": "meaning_of_risk_and_return",
+            "question": { "en": "what is the meaning of Risk and return in investment?", "hi": "निवेश में जोखिम और वापसी का क्या अर्थ है?", "mr": "गुंतवणुकीत जोखीम आणि परतावा याचा अर्थ काय?", "de": "Was bedeutet Risiko und Rendite bei einer Investition?" }
+          },
+          {
+            "key": "how_to_diversify_investments",
+            "question": { "en": "How should I diversify my investments?", "hi": "मुझे अपने निवेश में विविधता कैसे लानी चाहिए?", "mr": "मी माझ्या गुंतवणुकीत विविधता कशी आणावी?", "de": "Wie sollte ich meine Investitionen diversifizieren?" }
+          },
+          {
+            "key": "how_to_start_investing_with_small_amounts",
+            "question": { "en": "How to Start Investing with Small Amounts", "hi": "छोटी राशियों के साथ निवेश कैसे शुरू करें", "mr": "लहान रकमेसह गुंतवणूक कशी सुरू करावी", "de": "Wie man mit kleinen Beträgen zu investieren beginnt" }
+          },
+          {
+            "key": "what_are_liquid_funds",
+            "question": { "en": "what is the meaning of liquid funds?", "hi": "लिक्विड फंड का क्या अर्थ है?", "mr": "लिक्विड फंडचा अर्थ काय आहे?", "de": "Was bedeutet liquide Mittel?" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "tax_awareness",
+    "title": {
+      "en": "Tax Awareness",
+      "hi": "कर जागरूकता",
+      "mr": "कर जागरूकता",
+      "de": "Steuerbewusstsein"
+    },
+    "description": {
+      "en": "Understand the basics of taxes and how to manage them.",
+      "hi": "करों की मूल बातें समझें और उन्हें कैसे प्रबंधित करें।",
+      "mr": "करांची मूलभूत तत्त्वे समजून घ्या आणि ते कसे व्यवस्थापित करावे.",
+      "de": "Verstehen Sie die Grundlagen von Steuern und wie man sie verwaltet."
+    },
+    "subPrompts": [
+      {
+        "key": "basic_tax_concepts",
+        "title": {
+          "en": "Basic Tax Concepts",
+          "hi": "बुनियादी कर अवधारणाएं",
+          "mr": "मूलभूत कर संकल्पना",
+          "de": "Grundlegende Steuerkonzepte"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_income_tax",
+            "question": { "en": "What is income tax, and why do I have to pay it?", "hi": "आयकर क्या है, और मुझे इसे क्यों देना पड़ता है?", "mr": "आयकर म्हणजे काय, आणि मला तो का भरावा लागतो?", "de": "Was ist Einkommensteuer und warum muss ich sie bezahlen?" }
+          },
+          {
+            "key": "what_is_tax_id_number",
+            "question": { "en": "What is a tax idenitification number?", "hi": "एक कर पहचान संख्या क्या है?", "mr": "कर ओळख क्रमांक म्हणजे काय?", "de": "Was ist eine Steueridentifikationsnummer?" }
+          },
+          {
+            "key": "direct_vs_indirect_taxes",
+            "question": { "en": "What is the difference between direct and indirect taxes?", "hi": "प्रत्यक्ष और अप्रत्यक्ष करों के बीच क्या अंतर है?", "mr": "प्रत्यक्ष आणि अप्रत्यक्ष करांमध्ये काय फरक आहे?", "de": "Was ist der Unterschied zwischen direkten und indirekten Steuern?" }
+          },
+          {
+            "key": "what_is_tax_slab",
+            "question": { "en": "What is a tax slab, and how does it apply to my income?", "hi": "एक कर स्लैब क्या है, और यह मेरी आय पर कैसे लागू होता है?", "mr": "कर स्लॅब म्हणजे काय, आणि तो माझ्या उत्पन्नावर कसा लागू होतो?", "de": "Was ist eine Steuerklasse und wie gilt sie für mein Einkommen?" }
+          },
+          {
+            "key": "tax_year_fiscal_year",
+            "question": { "en": "How does a tax year or fiscal year typically run in my country?", "hi": "मेरे देश में एक कर वर्ष या वित्तीय वर्ष आमतौर पर कैसे चलता है?", "mr": "माझ्या देशात कर वर्ष किंवा आर्थिक वर्ष सामान्यतः कसे चालते?", "de": "Wie läuft ein Steuerjahr oder Geschäftsjahr in meinem Land normalerweise ab?" }
+          }
+        ]
+      },
+      {
+        "key": "income_tax_filing",
+        "title": {
+          "en": "Income Tax Filing",
+          "hi": "आयकर दाखिल करना",
+          "mr": "आयकर भरणे",
+          "de": "Einkommensteuererklärung"
+        },
+        "subPrompts": [
+          {
+            "key": "itr_filing_deadline",
+            "question": { "en": "When is the deadline for filing income tax returns (ITR) in my country?", "hi": "मेरे देश में आयकर रिटर्न (आईटीआर) दाखिल करने की समय सीमा कब है?", "mr": "माझ्या देशात आयकर रिटर्न (आयटीआर) भरण्याची अंतिम मुदत कधी आहे?", "de": "Wann ist die Frist für die Einreichung von Einkommensteuererklärungen (ITR) in meinem Land?" }
+          },
+          {
+            "key": "documents_for_itr",
+            "question": { "en": "What documents do I need to prepare before filing my ITR?", "hi": "मेरा आईटीआर दाखिल करने से पहले मुझे कौन से दस्तावेज तैयार करने की आवश्यकता है?", "mr": "माझा आयटीआर भरण्यापूर्वी मला कोणती कागदपत्रे तयार करण्याची आवश्यकता आहे?", "de": "Welche Dokumente muss ich vor der Einreichung meiner ITR vorbereiten?" }
+          },
+          {
+            "key": "ways_to_file_itr",
+            "question": { "en": "What are the different ways I can file my income tax return (e.g., online, through a tax professional)?", "hi": "मैं अपना आयकर रिटर्न दाखिल करने के विभिन्न तरीके क्या हैं (जैसे, ऑनलाइन, एक कर पेशेवर के माध्यम से)?", "mr": "मी माझा आयकर रिटर्न भरण्याचे विविध मार्ग कोणते आहेत (उदा. ऑनलाइन, कर व्यावसायिकाद्वारे)?", "de": "Auf welche verschiedenen Arten kann ich meine Einkommensteuererklärung einreichen (z. B. online, über einen Steuerberater)?" }
+          },
+          {
+            "key": "missed_itr_deadline",
+            "question": { "en": "What happens if I miss the ITR filing deadline?", "hi": "यदि मैं आईटीआर दाखिल करने की समय सीमा चूक जाता हूं तो क्या होता है?", "mr": "जर मी आयटीआर भरण्याची अंतिम मुदत चुकवली तर काय होते?", "de": "Was passiert, wenn ich die Frist für die ITR-Einreichung verpasse?" }
+          },
+          {
+            "key": "platforms_for_tax_filing",
+            "question": { "en": "Are there common digital platforms or government portals for tax filing in my country?", "hi": "क्या मेरे देश में कर दाखिल करने के लिए सामान्य डिजिटल प्लेटफॉर्म या सरकारी पोर्टल हैं?", "mr": "माझ्या देशात कर भरण्यासाठी सामान्य डिजिटल प्लॅटफॉर्म किंवा सरकारी पोर्टल आहेत का?", "de": "Gibt es in meinem Land gängige digitale Plattformen oder Regierungsportale für die Steuererklärung?" }
+          }
+        ]
+      },
+      {
+        "key": "tax_awareness_for_businesses",
+        "title": {
+          "en": "Tax Awareness for Businesses",
+          "hi": "व्यवसायों के लिए कर जागरूकता",
+          "mr": "व्यवसायांसाठी कर जागरूकता",
+          "de": "Steuerbewusstsein für Unternehmen"
+        },
+        "subPrompts": [
+          {
+            "key": "common_taxes_for_businesses",
+            "question": { "en": "What are the common types of taxes that businesses are required to pay?", "hi": "व्यवसायों को भुगतान करने के लिए आवश्यक सामान्य प्रकार के कर क्या हैं?", "mr": "व्यवसायांना भरावे लागणारे सामान्य प्रकारचे कर कोणते आहेत?", "de": "Welche gängigen Steuerarten müssen Unternehmen zahlen?" }
+          },
+          {
+            "key": "corporate_vs_personal_tax",
+            "question": { "en": "How does corporate income tax differ from personal income tax?", "hi": "कॉर्पोरेट आयकर व्यक्तिगत आयकर से कैसे भिन्न होता है?", "mr": "कॉर्पोरेट आयकर वैयक्तिक आयकरापेक्षा कसा वेगळा आहे?", "de": "Wie unterscheidet sich die Körperschaftsteuer von der Einkommensteuer?" }
+          },
+          {
+            "key": "what_is_tax_compliance",
+            "question": { "en": "What is tax compliance, and why is it important for businesses?", "hi": "कर अनुपालन क्या है, और यह व्यवसायों के लिए क्यों महत्वपूर्ण है?", "mr": "कर अनुपालन म्हणजे काय, आणि ते व्यवसायांसाठी का महत्त्वाचे आहे?", "de": "Was ist Steuerkonformität und warum ist sie für Unternehmen wichtig?" }
+          },
+          {
+            "key": "consequences_of_non_compliance",
+            "question": { "en": "What are the consequences of failing to comply with tax regulations?", "hi": "कर नियमों का पालन करने में विफल रहने के क्या परिणाम हैं?", "mr": "कर नियमांचे पालन न केल्यास काय परिणाम होतात?", "de": "Was sind die Konsequenzen der Nichteinhaltung von Steuervorschriften?" }
+          },
+          {
+            "key": "reporting_requirements_for_businesses",
+            "question": { "en": "What are the reporting requirements for businesses in terms of tax filing?", "hi": "कर दाखिल करने के मामले में व्यवसायों के लिए रिपोर्टिंग आवश्यकताएं क्या हैं?", "mr": "कर भरण्याच्या बाबतीत व्यवसायांसाठी रिपोर्टिंग आवश्यकता काय आहेत?", "de": "Was sind die Berichtspflichten für Unternehmen in Bezug auf die Steuererklärung?" }
+          }
+        ]
+      },
+      {
+        "key": "ethics_and_social_responsibility",
+        "title": {
+          "en": "Ethics and Social Responsibility in Taxation",
+          "hi": "कराधान में नैतिकता और सामाजिक जिम्मेदारी",
+          "mr": "कर आकारणीत नैतिकता आणि सामाजिक जबाबदारी",
+          "de": "Ethik und soziale Verantwortung bei der Besteuerung"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_tax_ethics",
+            "question": { "en": "What does tax ethics mean, and why is it important for individuals and corporations?", "hi": "कर नैतिकता का क्या अर्थ है, और यह व्यक्तियों और निगमों के लिए क्यों महत्वपूर्ण है?", "mr": "कर नैतिकता म्हणजे काय, आणि ते व्यक्ती आणि कॉर्पोरेशनसाठी का महत्त्वाचे आहे?", "de": "Was bedeutet Steuerethik und warum ist sie für Einzelpersonen und Unternehmen wichtig?" }
+          },
+          {
+            "key": "taxes_as_social_responsibility",
+            "question": { "en": "How can paying taxes be considered a form of social responsibility?", "hi": "कर का भुगतान करना सामाजिक जिम्मेदारी का एक रूप कैसे माना जा सकता है?", "mr": "कर भरणे हे सामाजिक जबाबदारीचे एक रूप कसे मानले जाऊ शकते?", "de": "Wie kann das Zahlen von Steuern als eine Form der sozialen Verantwortung betrachtet werden?" }
+          },
+          {
+            "key": "tax_evasion_vs_avoidance",
+            "question": { "en": "What are the ethical implications of tax evasion versus tax avoidance?", "hi": "कर चोरी बनाम कर परिहार के नैतिक निहितार्थ क्या हैं?", "mr": "कर चुकवणे विरुद्ध कर टाळणे यांचे नैतिक परिणाम काय आहेत?", "de": "Was sind die ethischen Implikationen von Steuerhinterziehung im Vergleich zur Steuervermeidung?" }
+          },
+          {
+            "key": "government_role_in_fair_taxation",
+            "question": { "en": "What role do governments play in ensuring fair and ethical taxation?", "hi": "निष्पक्ष और नैतिक कराधान सुनिश्चित करने में सरकारें क्या भूमिका निभाती हैं?", "mr": "न्यायी आणि नैतिक कर आकारणी सुनिश्चित करण्यात सरकारांची काय भूमिका आहे?", "de": "Welche Rolle spielen Regierungen bei der Gewährleistung einer fairen und ethischen Besteuerung?" }
+          },
+          {
+            "key": "tax_revenues_for_social_welfare",
+            "question": { "en": "In what ways can tax revenues be used to promote social welfare and reduce inequality?", "hi": "कर राजस्व का उपयोग सामाजिक कल्याण को बढ़ावा देने और असमानता को कम करने के लिए किन तरीकों से किया जा सकता है?", "mr": "कर महसुलाचा उपयोग सामाजिक कल्याणाला प्रोत्साहन देण्यासाठी आणि असमानता कमी करण्यासाठी कोणत्या मार्गांनी केला जाऊ शकतो?", "de": "Auf welche Weise können Steuereinnahmen zur Förderung des Sozialwohls und zur Verringerung der Ungleichheit verwendet werden?" }
+          }
+        ]
+      },
+      {
+        "key": "tax_awareness_for_financial_inclusion",
+        "title": {
+          "en": "Tax Awareness for Financial Inclusion",
+          "hi": "वित्तीय समावेशन के लिए कर जागरूकता",
+          "mr": "आर्थिक समावेशासाठी कर जागरूकता",
+          "de": "Steuerbewusstsein für die finanzielle Inklusion"
+        },
+        "subPrompts": [
+          {
+            "key": "importance_of_tax_awareness",
+            "question": { "en": "Why is tax awareness important for individuals, especially those new to formal financial systems?", "hi": "व्यक्तियों के लिए कर जागरूकता क्यों महत्वपूर्ण है, खासकर उन लोगों के लिए जो औपचारिक वित्तीय प्रणालियों में नए हैं?", "mr": "व्यक्तींसाठी कर जागरूकता का महत्त्वाची आहे, विशेषतः जे औपचारिक आर्थिक प्रणालींमध्ये नवीन आहेत त्यांच्यासाठी?", "de": "Warum ist Steuerbewusstsein für Einzelpersonen wichtig, insbesondere für diejenigen, die neu in formellen Finanzsystemen sind?" }
+          },
+          {
+            "key": "government_initiatives_for_tax_education",
+            "question": { "en": "Are there government initiatives in my country to educate citizens about tax laws and compliance?", "hi": "क्या मेरे देश में नागरिकों को कर कानूनों और अनुपालन के बारे में शिक्षित करने के लिए सरकारी पहल हैं?", "mr": "माझ्या देशात नागरिकांना कर कायदे आणि अनुपालनाबद्दल शिक्षित करण्यासाठी सरकारी उपक्रम आहेत का?", "de": "Gibt es in meinem Land Regierungsinitiativen zur Aufklärung der Bürger über Steuergesetze und -konformität?" }
+          },
+          {
+            "key": "tax_concepts_in_financial_planning",
+            "question": { "en": "How can understanding basic tax concepts help individuals in financial planning?", "hi": "बुनियादी कर अवधारणाओं को समझना व्यक्तियों को वित्तीय नियोजन में कैसे मदद कर सकता है?", "mr": "मूलभूत कर संकल्पना समजून घेणे व्यक्तींना आर्थिक नियोजनात कशी मदत करू शकते?", "de": "Wie kann das Verständnis grundlegender Steuerkonzepte Einzelpersonen bei der Finanzplanung helfen?" }
+          },
+          {
+            "key": "promoting_financial_literacy",
+            "question": { "en": "Does ny country promote financial literacy, including tax awareness, for citizens?", "hi": "क्या मेरा देश नागरिकों के लिए कर जागरूकता सहित वित्तीय साक्षरता को बढ़ावा देता है?", "mr": "माझा देश नागरिकांसाठी कर जागरूकतेसह आर्थिक साक्षरतेला प्रोत्साहन देतो का?", "de": "Fördert mein Land die finanzielle Bildung, einschließlich des Steuerbewusstseins, für die Bürger?" }
+          },
+          {
+            "key": "consequences_of_not_paying_taxes",
+            "question": { "en": "What are the consequences of not paying taxes or engaging in tax evasion?", "hi": "कर का भुगतान न करने या कर चोरी में संलग्न होने के क्या परिणाम हैं?", "mr": "कर न भरणे किंवा कर चुकवेगिरीत गुंतण्याचे काय परिणाम आहेत?", "de": "Was sind die Konsequenzen, wenn man keine Steuern zahlt oder sich an Steuerhinterziehung beteiligt?" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "fraud_awareness",
+    "title": {
+      "en": "Fraud Awareness",
+      "hi": "धोखाधड़ी जागरूकता",
+      "mr": "फसवणूक जागरूकता",
+      "de": "Betrugsprävention"
+    },
+    "description": {
+      "en": "Learn to recognize and protect yourself from financial fraud.",
+      "hi": "वित्तीय धोखाधड़ी को पहचानना और खुद को उससे बचाना सीखें।",
+      "mr": "आर्थिक फसवणूक ओळखायला शिका आणि स्वतःचे संरक्षण करा.",
+      "de": "Lernen Sie, Finanzbetrug zu erkennen und sich davor zu schützen."
+    },
+    "subPrompts": [
+      {
+        "key": "common_fraud_types",
+        "title": {
+          "en": "Common Fraud Types",
+          "hi": "सामान्य धोखाधड़ी प्रकार",
+          "mr": "सामान्य फसवणूक प्रकार",
+          "de": "Häufige Betrugsarten"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_phishing",
+            "question": { "en": "What is phishing, and how can I identify a phishing attempt?", "hi": "फ़िशिंग क्या है, और मैं एक फ़िशिंग प्रयास की पहचान कैसे कर सकता हूं?", "mr": "फिशिंग म्हणजे काय, आणि मी फिशिंगचा प्रयत्न कसा ओळखू शकेन?", "de": "Was ist Phishing und wie kann ich einen Phishing-Versuch erkennen?" }
+          },
+          {
+            "key": "lottery_scam",
+            "question": { "en": "What is a 'lottery scam' or 'prize fraud,' and why should I be cautious?", "hi": "एक 'लॉटरी घोटाला' या 'पुरस्कार धोखाधड़ी' क्या है, और मुझे सतर्क क्यों रहना चाहिए?", "mr": "'लॉटरी घोटाळा' किंवा 'बक्षीस फसवणूक' म्हणजे काय, आणि मी सावध का रहावे?", "de": "Was ist ein 'Lotteriebetrug' oder 'Gewinnbetrug' und warum sollte ich vorsichtig sein?" }
+          },
+          {
+            "key": "what_is_identity_theft",
+            "question": { "en": "What is identity theft, and what are its potential consequences?", "hi": "पहचान की चोरी क्या है, और इसके संभावित परिणाम क्या हैं?", "mr": "ओळख चोरी म्हणजे काय, आणि त्याचे संभाव्य परिणाम काय आहेत?", "de": "Was ist Identitätsdiebstahl und was sind seine potenziellen Folgen?" }
+          },
+          {
+            "key": "common_credit_card_frauds",
+            "question": { "en": "What are common credit card frauds, and how do they occur?", "hi": "सामान्य क्रेडिट कार्ड धोखाधड़ी क्या हैं, और वे कैसे होती हैं?", "mr": "सामान्य क्रेडिट कार्ड फसवणूक काय आहेत, आणि त्या कशा होतात?", "de": "Was sind häufige Kreditkartenbetrügereien und wie kommen sie zustande?" }
+          },
+          {
+            "key": "prevalent_scams_in_country",
+            "question": { "en": "Are there specific types of financial scams prevalent in my country that I should be aware of?", "hi": "क्या मेरे देश में प्रचलित विशिष्ट प्रकार की वित्तीय घोटाले हैं जिनसे मुझे अवगत होना चाहिए?", "mr": "माझ्या देशात प्रचलित असलेल्या विशिष्ट प्रकारच्या आर्थिक घोटाळ्यांबद्दल मला माहिती असावी का?", "de": "Gibt es bestimmte Arten von Finanzbetrügereien, die in meinem Land verbreitet sind und über die ich Bescheid wissen sollte?" }
+          }
+        ]
+      },
+      {
+        "key": "recognizing_red_flags",
+        "title": {
+          "en": "Recognizing Red Flags",
+          "hi": "खतरे के संकेतों को पहचानना",
+          "mr": "धोक्याची चिन्हे ओळखणे",
+          "de": "Warnsignale erkennen"
+        },
+        "subPrompts": [
+          {
+            "key": "scam_call_red_flags",
+            "question": { "en": "What are some red flags that indicate a call or message might be a scam?", "hi": "कुछ खतरे के संकेत क्या हैं जो यह दर्शाते हैं कि एक कॉल या संदेश एक घोटाला हो सकता है?", "mr": "कॉल किंवा संदेश घोटाळा असू शकतो हे दर्शवणारी काही धोक्याची चिन्हे कोणती आहेत?", "de": "Was sind einige Warnsignale, die darauf hindeuten, dass ein Anruf oder eine Nachricht ein Betrug sein könnte?" }
+          },
+          {
+            "key": "verify_legitimacy",
+            "question": { "en": "How can I verify the legitimacy of a call or message claiming to be from my bank or a government agency?", "hi": "मैं अपने बैंक या एक सरकारी एजेंसी से होने का दावा करने वाले एक कॉल या संदेश की वैधता को कैसे सत्यापित कर सकता हूं?", "mr": "मी माझ्या बँक किंवा सरकारी एजन्सीकडून असल्याचा दावा करणाऱ्या कॉल किंवा संदेशाची वैधता कशी सत्यापित करू शकेन?", "de": "Wie kann ich die Legitimität eines Anrufs oder einer Nachricht überprüfen, die angeblich von meiner Bank oder einer Regierungsbehörde stammt?" }
+          },
+          {
+            "key": "suspicious_offers",
+            "question": { "en": "Why should I be suspicious of unsolicited offers of 'too good to be true' investment opportunities?", "hi": "'सच होने के लिए बहुत अच्छा' निवेश के अवसरों के अनचाहे प्रस्तावों के प्रति मुझे क्यों संदिग्ध होना चाहिए?", "mr": "'सत्य असण्यापलीकडे चांगले' गुंतवणुकीच्या संधींच्या अवांछित ऑफरबद्दल मी का संशयी असावे?", "de": "Warum sollte ich bei unaufgeforderten Angeboten von 'zu gut, um wahr zu sein'-Anlagemöglichkeiten misstrauisch sein?" }
+          },
+          {
+            "key": "suspicious_website",
+            "question": { "en": "What should I do if a website looks suspicious or asks for too much personal information?", "hi": "यदि कोई वेबसाइट संदिग्ध लगती है या बहुत अधिक व्यक्तिगत जानकारी मांगती है तो मुझे क्या करना चाहिए?", "mr": "जर एखादी वेबसाइट संशयास्पद वाटत असेल किंवा खूप जास्त वैयक्तिक माहिती विचारत असेल तर मी काय करावे?", "de": "Was soll ich tun, wenn eine Website verdächtig aussieht oder zu viele persönliche Informationen verlangt?" }
+          },
+          {
+            "key": "differentiate_legitimate_fraudulent",
+            "question": { "en": "How can I differentiate between a legitimate government scheme and a fraudulent one?", "hi": "मैं एक वैध सरकारी योजना और एक धोखाधड़ी वाली योजना के बीच अंतर कैसे कर सकता हूं?", "mr": "मी एक कायदेशीर सरकारी योजना आणि फसवणुकीच्या योजनेत फरक कसा करू शकेन?", "de": "Wie kann ich zwischen einem legitimen Regierungsprogramm und einem betrügerischen unterscheiden?" }
+          }
+        ]
+      },
+      {
+        "key": "protecting_your_information",
+        "title": {
+          "en": "Protecting Your Information",
+          "hi": "अपनी जानकारी की सुरक्षा करना",
+          "mr": "आपल्या माहितीचे संरक्षण करणे",
+          "de": "Schutz Ihrer Informationen"
+        },
+        "subPrompts": [
+          {
+            "key": "strong_passwords",
+            "question": { "en": "What are best practices for creating strong and secure passwords?", "hi": "मजबूत और सुरक्षित पासवर्ड बनाने के लिए सर्वोत्तम अभ्यास क्या हैं?", "mr": "मजबूत आणि सुरक्षित पासवर्ड तयार करण्यासाठी सर्वोत्तम पद्धती कोणत्या आहेत?", "de": "Was sind die besten Praktiken zum Erstellen starker und sicherer Passwörter?" }
+          },
+          {
+            "key": "different_passwords",
+            "question": { "en": "Why is it important to use different passwords for different online accounts?", "hi": "विभिन्न ऑनलाइन खातों के लिए अलग-अलग पासवर्ड का उपयोग करना क्यों महत्वपूर्ण है?", "mr": "वेगवेगळ्या ऑनलाइन खात्यांसाठी वेगवेगळे पासवर्ड वापरणे का महत्त्वाचे आहे?", "de": "Warum ist es wichtig, für verschiedene Online-Konten unterschiedliche Passwörter zu verwenden?" }
+          },
+          {
+            "key": "dispose_financial_documents",
+            "question": { "en": "How can I safely dispose of financial documents to prevent identity theft?", "hi": "पहचान की चोरी को रोकने के لیے मैं वित्तीय दस्तावेजों का सुरक्षित रूप से निपटान कैसे कर सकता हूं?", "mr": "ओळख चोरी टाळण्यासाठी मी आर्थिक कागदपत्रांची सुरक्षितपणे विल्हेवाट कशी लावू शकेन?", "de": "Wie kann ich Finanzdokumente sicher entsorgen, um Identitätsdiebstahl zu verhindern?" }
+          },
+          {
+            "key": "what_is_2fa",
+            "question": { "en": "What is two-factor authentication (2FA) or multi-factor authentication (MFA), and why should I enable it?", "hi": "दो-कारक प्रमाणीकरण (2FA) या बहु-कारक प्रमाणीकरण (MFA) क्या है, और मुझे इसे क्यों सक्षम करना चाहिए?", "mr": "टू-फॅक्टर ऑथेंटिकेशन (2FA) किंवा मल्टी-फॅक्टर ऑथेंटिकेशन (MFA) म्हणजे काय, आणि मी ते का सक्षम करावे?", "de": "Was ist Zwei-Faktor-Authentifizierung (2FA) oder Multi-Faktor-Authentifizierung (MFA) und warum sollte ich sie aktivieren?" }
+          },
+          {
+            "key": "report_cyber_fraud",
+            "question": { "en": "Are there official government sources in my country to report cyber fraud or financial scams?", "hi": "क्या मेरे देश में साइबर धोखाधड़ी या वित्तीय घोटालों की रिपोर्ट करने के लिए आधिकारिक सरकारी स्रोत हैं?", "mr": "माझ्या देशात सायबर फसवणूक किंवा आर्थिक घोटाळ्यांची तक्रार करण्यासाठी अधिकृत सरकारी स्रोत आहेत का?", "de": "Gibt es in meinem Land offizielle Regierungsquellen, um Cyberbetrug oder Finanzbetrug zu melden?" }
+          }
+        ]
+      },
+      {
+        "key": "reporting_fraud",
+        "title": {
+          "en": "Reporting Fraud",
+          "hi": "धोखाधड़ी की रिपोर्टिंग",
+          "mr": "फसवणुकीची तक्रार करणे",
+          "de": "Betrug melden"
+        },
+        "subPrompts": [
+          {
+            "key": "first_step_after_fraud",
+            "question": { "en": "What is the first step I should take if I realize I've been a victim of financial fraud?", "hi": "यदि मुझे पता चलता है कि मैं वित्तीय धोखाधड़ी का शिकार हुआ हूं तो मुझे पहला कदम क्या उठाना चाहिए?", "mr": "जर मला कळले की मी आर्थिक फसवणुकीचा बळी ठरलो आहे, तर मी पहिले पाऊल काय उचलावे?", "de": "Was ist der erste Schritt, den ich unternehmen sollte, wenn ich merke, dass ich Opfer von Finanzbetrug geworden bin?" }
+          },
+          {
+            "key": "report_fraud_to_police",
+            "question": { "en": "How do I report financial fraud to the police in my country?", "hi": "मैं अपने देश में पुलिस को वित्तीय धोखाधड़ी की रिपोर्ट कैसे करूं?", "mr": "मी माझ्या देशात पोलिसांना आर्थिक फसवणुकीची तक्रार कशी करू?", "de": "Wie melde ich Finanzbetrug der Polizei in meinem Land?" }
+          },
+          {
+            "key": "importance_of_acting_quickly",
+            "question": { "en": "Why is it crucial to act quickly when reporting financial fraud?", "hi": "वित्तीय धोखाधड़ी की रिपोर्ट करते समय जल्दी से कार्य करना क्यों महत्वपूर्ण है?", "mr": "आर्थिक फसवणुकीची तक्रार करताना त्वरित कारवाई करणे का महत्त्वाचे आहे?", "de": "Warum ist es entscheidend, schnell zu handeln, wenn man Finanzbetrug meldet?" }
+          },
+          {
+            "key": "information_to_gather",
+            "question": { "en": "What information should I gather before reporting a fraud incident?", "hi": "एक धोखाधड़ी की घटना की रिपोर्ट करने से पहले मुझे कौन सी जानकारी एकत्र करनी चाहिए?", "mr": "फसवणुकीच्या घटनेची तक्रार करण्यापूर्वी मी कोणती माहिती गोळा करावी?", "de": "Welche Informationen sollte ich sammeln, bevor ich einen Betrugsvorfall melde?" }
+          },
+          {
+            "key": "national_hotlines_for_fraud",
+            "question": { "en": "Specify national hotlines or online platforms for reporting financial fraud?", "hi": "वित्तीय धोखाधड़ी की रिपोर्ट करने के लिए राष्ट्रीय हॉटलाइन या ऑनलाइन प्लेटफॉर्म निर्दिष्ट करें?", "mr": "आर्थिक फसवणुकीची तक्रार करण्यासाठी राष्ट्रीय हॉटलाइन किंवा ऑनलाइन प्लॅटफॉर्म निर्दिष्ट करा?", "de": "Geben Sie nationale Hotlines oder Online-Plattformen zur Meldung von Finanzbetrug an?" }
+          }
+        ]
+      },
+      {
+        "key": "fraud_awareness_financial_inclusion",
+        "title": {
+          "en": "Fraud Awareness & Financial Inclusion",
+          "hi": "धोखाधड़ी जागरूकता और वित्तीय समावेशन",
+          "mr": "फसवणूक जागरूकता आणि आर्थिक समावेशन",
+          "de": "Betrugsprävention & finanzielle Inklusion"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_financial_inclusion",
+            "question": { "en": "What is financial inclusion, and why is it important for underserved communities?", "hi": "वित्तीय समावेशन क्या है, और यह वंचित समुदायों के लिए क्यों महत्वपूर्ण है?", "mr": "आर्थिक समावेशन म्हणजे काय, आणि ते वंचित समुदायांसाठी का महत्त्वाचे आहे?", "de": "Was ist finanzielle Inklusion und warum ist sie für unterversorgte Gemeinschaften wichtig?" }
+          },
+          {
+            "key": "incorporate_fraud_awareness",
+            "question": { "en": "How can financial inclusion initiatives incorporate fraud awareness education?", "hi": "वित्तीय समावेशन पहल धोखाधड़ी जागरूकता शिक्षा को कैसे शामिल कर सकती हैं?", "mr": "आर्थिक समावेशन उपक्रम फसवणूक जागरूकता शिक्षणाचा समावेश कसा करू शकतात?", "de": "Wie können Initiativen zur finanziellen Inklusion Aufklärung über Betrug einbeziehen?" }
+          },
+          {
+            "key": "role_of_community_leaders",
+            "question": { "en": "What role can local community leaders or NGOs play in spreading fraud awareness in rural areas?", "hi": "ग्रामीण क्षेत्रों में धोखाधड़ी जागरूकता फैलाने में स्थानीय समुदाय के नेता या गैर सरकारी संगठन क्या भूमिका निभा सकते हैं?", "mr": "ग्रामीण भागात फसवणूक जागरूकता पसरवण्यात स्थानिक समुदाय नेते किंवा स्वयंसेवी संस्था कोणती भूमिका बजावू शकतात?", "de": "Welche Rolle können lokale Gemeindevorsteher oder NGOs bei der Verbreitung von Betrugsaufklärung in ländlichen Gebieten spielen?" }
+          },
+          {
+            "key": "support_safe_access_to_services",
+            "question": { "en": "How can governments and NGOs support safe access to financial services?", "hi": "सरकारें और गैर सरकारी संगठन वित्तीय सेवाओं तक सुरक्षित पहुंच का समर्थन कैसे कर सकते हैं?", "mr": "सरकार आणि स्वयंसेवी संस्था आर्थिक सेवांमध्ये सुरक्षित प्रवेशासाठी कशी मदत करू शकतात?", "de": "Wie können Regierungen und NGOs den sicheren Zugang zu Finanzdienstleistungen unterstützen?" }
+          },
+          {
+            "key": "identity_theft_concern",
+            "question": { "en": "Why is identity theft a major concern in promoting financial inclusion?", "hi": "वित्तीय समावेशन को बढ़ावा देने में पहचान की चोरी एक बड़ी चिंता क्यों है?", "mr": "आर्थिक समावेशनाला प्रोत्साहन देताना ओळख चोरी ही एक मोठी चिंता का आहे?", "de": "Warum ist Identitätsdiebstahl ein großes Problem bei der Förderung der finanziellen Inklusion?" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "wealth_building",
+    "title": {
+      "en": "Wealth Building",
+      "hi": "धन निर्माण",
+      "mr": "संपत्ती निर्माण",
+      "de": "Vermögensaufbau"
+    },
+    "description": {
+      "en": "Strategies and principles for long-term wealth creation.",
+      "hi": "दीर्घकालिक धन निर्माण के लिए रणनीतियाँ और सिद्धांत।",
+      "mr": "दीर्घकालीन संपत्ती निर्मितीसाठी धोरणे आणि तत्त्वे.",
+      "de": "Strategien und Prinzipien für den langfristigen Vermögensaufbau."
+    },
+    "subPrompts": [
+      {
+        "key": "foundations_of_wealth_building",
+        "title": {
+          "en": "Foundations of Wealth Building",
+          "hi": "धन निर्माण की नींव",
+          "mr": "संपत्ती निर्मितीची पायाभरणी",
+          "de": "Grundlagen des Vermögensaufbaus"
+        },
+        "subPrompts": [
+          {
+            "key": "saving_vs_wealth_building",
+            "question": { "en": "What is the fundamental difference between saving and true wealth building?", "hi": "बचत और सच्चे धन निर्माण के बीच मौलिक अंतर क्या है?", "mr": "बचत आणि खरी संपत्ती निर्माण यात काय फरक आहे?", "de": "Was ist der grundlegende Unterschied zwischen Sparen und echtem Vermögensaufbau?" }
+          },
+          {
+            "key": "financial_literacy_for_wealth",
+            "question": { "en": "Why is financial literacy a crucial component of wealth building?", "hi": "धन निर्माण का एक महत्वपूर्ण घटक वित्तीय साक्षरता क्यों है?", "mr": "आर्थिक साक्षरता संपत्ती निर्मितीचा एक महत्त्वाचा घटक का आहे?", "de": "Warum ist Finanzkompetenz ein entscheidender Bestandteil des Vermögensaufbaus?" }
+          },
+          {
+            "key": "time_value_of_money",
+            "question": { "en": "How does the concept of 'time value of money' relate to building wealth?", "hi": "'पैसे का समय मूल्य' की अवधारणा धन निर्माण से कैसे संबंधित है?", "mr": "'पैशाचे वेळेचे मूल्य' ही संकल्पना संपत्ती निर्मितीशी कशी संबंधित आहे?", "de": "Wie hängt das Konzept des 'Zeitwerts des Geldes' mit dem Vermögensaufbau zusammen?" }
+          },
+          {
+            "key": "inflation_and_wealth",
+            "question": { "en": "What role does inflation play in wealth building, and how can I counter its effects?", "hi": "धन निर्माण में मुद्रास्फीति क्या भूमिका निभाती है, और मैं इसके प्रभावों का मुकाबला कैसे कर सकता हूं?", "mr": "संपत्ती निर्मितीत महागाईची काय भूमिका आहे, आणि मी तिच्या प्रभावांचा कसा सामना करू शकेन?", "de": "Welche Rolle spielt die Inflation beim Vermögensaufbau und wie kann ich ihren Auswirkungen entgegenwirken?" }
+          },
+          {
+            "key": "government_initiatives_for_wealth",
+            "question": { "en": "Are there specific government initiatives in my country to promote wealth creation among common citizens?", "hi": "क्या मेरे देश में आम नागरिकों के बीच धन निर्माण को बढ़ावा देने के लिए विशिष्ट सरकारी पहल हैं?", "mr": "माझ्या देशात सामान्य नागरिकांमध्ये संपत्ती निर्मितीला प्रोत्साहन देण्यासाठी विशिष्ट सरकारी उपक्रम आहेत का?", "de": "Gibt es in meinem Land spezielle staatliche Initiativen zur Förderung des Vermögensaufbaus bei den Bürgern?" }
+          }
+        ]
+      },
+      {
+        "key": "investment_avenues_for_wealth",
+        "title": {
+          "en": "Investment Avenues for Wealth Creation",
+          "hi": "धन निर्माण के लिए निवेश के रास्ते",
+          "mr": "संपत्ती निर्मितीसाठी गुंतवणुकीचे मार्ग",
+          "de": "Investitionsmöglichkeiten zur Vermögensbildung"
+        },
+        "subPrompts": [
+          {
+            "key": "equity_for_wealth",
+            "question": { "en": "How can investing in equity contribute to long-term wealth building ?", "hi": "इक्विटी में निवेश दीर्घकालिक धन निर्माण में कैसे योगदान कर सकता है?", "mr": "इक्विटीमध्ये गुंतवणूक करणे दीर्घकालीन संपत्ती निर्मितीमध्ये कसे योगदान देऊ शकते?", "de": "Wie kann die Investition in Aktien zum langfristigen Vermögensaufbau beitragen?" }
+          },
+          {
+            "key": "real_estate_for_wealth",
+            "question": { "en": "What role do real estate investments play in wealth accumulation?", "hi": "धन संचय में अचल संपत्ति निवेश क्या भूमिका निभाते हैं?", "mr": "संपत्ती संचयात रिअल इस्टेट गुंतवणुकीची काय भूमिका आहे?", "de": "Welche Rolle spielen Immobilieninvestitionen beim Vermögensaufbau?" }
+          },
+          {
+            "key": "mutual_funds_for_wealth",
+            "question": { "en": "What are mutual funds, and how can they be used for diversified wealth building?", "hi": "म्यूचुअल फंड क्या हैं, और उनका उपयोग विविध धन निर्माण के लिए कैसे किया जा सकता है?", "mr": "म्युच्युअल फंड म्हणजे काय, आणि त्यांचा उपयोग विविध संपत्ती निर्मितीसाठी कसा केला जाऊ शकतो?", "de": "Was sind Investmentfonds und wie können sie für den diversifizierten Vermögensaufbau genutzt werden?" }
+          },
+          {
+            "key": "gold_for_wealth",
+            "question": { "en": "How can investing in gold be part of a wealth-building strategy?", "hi": "सोने में निवेश एक धन-निर्माण रणनीति का हिस्सा कैसे हो सकता है?", "mr": "सोन्यात गुंतवणूक करणे संपत्ती-निर्मितीच्या धोरणाचा भाग कसा असू शकतो?", "de": "Wie kann die Investition in Gold Teil einer Vermögensaufbaustrategie sein?" }
+          },
+          {
+            "key": "tax_efficient_investments",
+            "question": { "en": "Are there tax-efficient investment vehicles commonly used for long-term wealth building ?", "hi": "क्या दीर्घकालिक धन निर्माण के लिए आमतौर पर उपयोग किए जाने वाले कर-कुशल निवेश वाहन हैं?", "mr": "दीर्घकालीन संपत्ती निर्मितीसाठी सामान्यतः वापरले जाणारे कर-कार्यक्षम गुंतवणूक साधने आहेत का?", "de": "Gibt es steuereffiziente Anlageinstrumente, die üblicherweise für den langfristigen Vermögensaufbau verwendet werden?" }
+          }
+        ]
+      },
+      {
+        "key": "advanced_investment_strategies",
+        "title": {
+          "en": "Advanced Investment Strategies",
+          "hi": "उन्नत निवेश रणनीतियाँ",
+          "mr": "प्रगत गुंतवणूक धोरणे",
+          "de": "Fortgeschrittene Anlagestrategien"
+        },
+        "subPrompts": [
+          {
+            "key": "asset_allocation_life_stages",
+            "question": { "en": "What is asset allocation, and how should it change as I approach different life stages?", "hi": "संपत्ति आवंटन क्या है, और जैसे-जैसे मैं विभिन्न जीवन चरणों के करीब आता हूं, इसे कैसे बदलना चाहिए?", "mr": "मालमत्ता वाटप म्हणजे काय, आणि मी वेगवेगळ्या जीवन टप्प्यांजवळ पोहोचत असताना ते कसे बदलले पाहिजे?", "de": "Was ist Vermögensallokation und wie sollte sie sich ändern, wenn ich mich verschiedenen Lebensphasen nähere?" }
+          },
+          {
+            "key": "systematic_investment_planning",
+            "question": { "en": "What is systematic investment planning (SIP), and why is it beneficial for regular investors?", "hi": "व्यवस्थित निवेश योजना (एसआईपी) क्या है, और यह नियमित निवेशकों के लिए क्यों फायदेमंद है?", "mr": "सिस्टमॅटिक इन्व्हेस्टमेंट प्लॅनिंग (एसआयपी) म्हणजे काय, आणि ते नियमित गुंतवणूकदारांसाठी का फायदेशीर आहे?", "de": "Was ist systematische Investitionsplanung (SIP) und warum ist sie für regelmäßige Anleger von Vorteil?" }
+          },
+          {
+            "key": "rebalancing_portfolio",
+            "question": { "en": "What is the concept of rebalancing my investment portfolio, and why is it important?", "hi": "मेरे निवेश पोर्टफोलियो को पुनर्संतुलित करने की अवधारणा क्या है, और यह क्यों महत्वपूर्ण है?", "mr": "माझ्या गुंतवणूक पोर्टफोलिओचे पुनर्संतुलन करण्याची संकल्पना काय आहे, आणि ते का महत्त्वाचे आहे?", "de": "Was ist das Konzept des Rebalancings meines Anlageportfolios und warum ist es wichtig?" }
+          },
+          {
+            "key": "market_cycles",
+            "question": { "en": "How can understanding market cycles (bull and bear markets) influence my wealth-building decisions?", "hi": "बाजार चक्र (बुल और बेयर मार्केट) को समझना मेरे धन-निर्माण निर्णयों को कैसे प्रभावित कर सकता है?", "mr": "बाजार चक्र (बुल आणि बेअर मार्केट) समजून घेणे माझ्या संपत्ती-निर्मितीच्या निर्णयांवर कसा परिणाम करू शकते?", "de": "Wie kann das Verständnis von Marktzyklen (Bullen- und Bärenmärkte) meine Entscheidungen zum Vermögensaufbau beeinflussen?" }
+          },
+          {
+            "key": "sustainable_investing_frameworks",
+            "question": { "en": "Do financial regulations provide specific frameworks for sustainable investing?", "hi": "क्या वित्तीय नियम टिकाऊ निवेश के लिए विशिष्ट ढाँचे प्रदान करते हैं?", "mr": "आर्थिक नियम टिकाऊ गुंतवणुकीसाठी विशिष्ट चौकट प्रदान करतात का?", "de": "Bieten Finanzvorschriften spezifische Rahmenbedingungen für nachhaltiges Investieren?" }
+          }
+        ]
+      },
+      {
+        "key": "role_of_professional_advice",
+        "title": {
+          "en": "Role of Professional Advice",
+          "hi": "पेशेवर सलाह की भूमिका",
+          "mr": "व्यावसायिक सल्ल्याची भूमिका",
+          "de": "Rolle professioneller Beratung"
+        },
+        "subPrompts": [
+          {
+            "key": "when_to_consult_advisor",
+            "question": { "en": "When should I consider consulting a financial advisor for wealth building?", "hi": "धन निर्माण के लिए मुझे एक वित्तीय सलाहकार से परामर्श करने पर कब विचार करना चाहिए?", "mr": "संपत्ती निर्मितीसाठी मी आर्थिक सल्लागाराचा सल्ला घेण्याचा विचार कधी करावा?", "de": "Wann sollte ich einen Finanzberater für den Vermögensaufbau konsultieren?" }
+          },
+          {
+            "key": "fee_only_vs_commission",
+            "question": { "en": "What is the difference between fee-only and commission-based financial advisors?", "hi": "केवल-शुल्क और कमीशन-आधारित वित्तीय सलाहकारों के बीच क्या अंतर है?", "mr": "केवळ-शुल्क आणि कमिशन-आधारित आर्थिक सल्लागारांमध्ये काय फरक आहे?", "de": "Was ist der Unterschied zwischen reinen Honorar- und provisionsbasierten Finanzberatern?" }
+          },
+          {
+            "key": "choosing_financial_advisor",
+            "question": { "en": "How do I choose a credible and trustworthy financial advisor?", "hi": "मैं एक विश्वसनीय और भरोसेमंद वित्तीय सलाहकार कैसे चुनूं?", "mr": "मी एक विश्वासार्ह आणि विश्वसनीय आर्थिक सल्लागार कसा निवडू?", "de": "Wie wähle ich einen glaubwürdigen und vertrauenswürdigen Finanzberater aus?" }
+          },
+          {
+            "key": "financial_planning_vs_investing",
+            "question": { "en": "What is financial planning, and how does it differ from just investing?", "hi": "वित्तीय नियोजन क्या है, और यह सिर्फ निवेश से कैसे अलग है?", "mr": "आर्थिक नियोजन म्हणजे काय, आणि ते फक्त गुंतवणुकीपेक्षा कसे वेगळे आहे?", "de": "Was ist Finanzplanung und wie unterscheidet sie sich vom reinen Investieren?" }
+          },
+          {
+            "key": "regulations_for_advisors",
+            "question": { "en": "Are there any regulations or national codes of conduct for financial advisors to protect consumers?", "hi": "क्या उपभोक्ताओं की सुरक्षा के लिए वित्तीय सलाहकारों के लिए कोई नियम या राष्ट्रीय आचार संहिताएं हैं?", "mr": "ग्राहकांचे संरक्षण करण्यासाठी आर्थिक सल्लागारांसाठी कोणतेही नियम किंवा राष्ट्रीय आचारसंहिता आहेत का?", "de": "Gibt es Vorschriften oder nationale Verhaltenskodizes für Finanzberater zum Schutz der Verbraucher?" }
+          }
+        ]
+      },
+      {
+        "key": "wealth_transfer_estate_planning",
+        "title": {
+          "en": "Wealth Transfer and Estate Planning",
+          "hi": "धन हस्तांतरण और संपत्ति योजना",
+          "mr": "संपत्ती हस्तांतरण आणि इस्टेट नियोजन",
+          "de": "Vermögensübertragung und Nachlassplanung"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_estate_planning",
+            "question": { "en": "What is estate planning, and why is it important for wealth builders?", "hi": "संपत्ति योजना क्या है, और यह धन निर्माताओं के लिए क्यों महत्वपूर्ण है?", "mr": "इस्टेट नियोजन म्हणजे काय, आणि ते संपत्ती निर्मात्यांसाठी का महत्त्वाचे आहे?", "de": "Was ist Nachlassplanung und warum ist sie für Vermögensbildner wichtig?" }
+          },
+          {
+            "key": "what_is_a_will",
+            "question": { "en": "What is a Will, and why should every adult have one?", "hi": "एक वसीयत क्या है, और हर वयस्क के पास एक क्यों होनी चाहिए?", "mr": "मृत्युपत्र म्हणजे काय, आणि प्रत्येक प्रौढ व्यक्तीकडे ते का असावे?", "de": "Was ist ein Testament und warum sollte jeder Erwachsene eines haben?" }
+          },
+          {
+            "key": "methods_for_wealth_transfer",
+            "question": { "en": "What are common methods for wealth transfer ?", "hi": "धन हस्तांतरण के लिए सामान्य तरीके क्या हैं?", "mr": "संपत्ती हस्तांतरणासाठी सामान्य पद्धती कोणत्या आहेत?", "de": "Was sind gängige Methoden zur Vermögensübertragung?" }
+          },
+          {
+            "key": "inheritance_tax_law",
+            "question": { "en": "How does inheritance tax or succession law work ?", "hi": "विरासत कर या उत्तराधिकार कानून कैसे काम करता है?", "mr": "वारसा कर किंवा उत्तराधिकार कायदा कसा कार्य करतो?", "de": "Wie funktioniert das Erbschaftssteuer- oder Erbrecht?" }
+          },
+          {
+            "key": "inheritance_taxes_succession_laws",
+            "question": { "en": "What are inheritance taxes, and how do their succession laws generally function?", "hi": "विरासत कर क्या हैं, और उनके उत्तराधिकार कानून आम तौर पर कैसे कार्य करते हैं?", "mr": "वारसा कर काय आहेत, आणि त्यांचे उत्तराधिकार कायदे सामान्यतः कसे कार्य करतात?", "de": "Was sind Erbschaftssteuern und wie funktionieren ihre Erbrechtsgesetze im Allgemeinen?" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "key": "pension_retirement_planning",
+    "title": {
+      "en": "Pension and Retirement Planning",
+      "hi": "पेंशन और सेवानिवृत्ति योजना",
+      "mr": "पेन्शन आणि सेवानिवृत्ती नियोजन",
+      "de": "Renten- und Ruhestandsplanung"
+    },
+    "description": {
+      "en": "Plan for a secure and comfortable retirement.",
+      "hi": "एक सुरक्षित और आरामदायक सेवानिवृत्ति के लिए योजना बनाएं।",
+      "mr": "सुरक्षित आणि आरामदायक सेवानिवृत्तीसाठी योजना करा.",
+      "de": "Planen Sie für einen sicheren und komfortablen Ruhestand."
+    },
+    "subPrompts": [
+      {
+        "key": "importance_of_retirement_planning",
+        "title": {
+          "en": "Importance of Retirement Planning",
+          "hi": "सेवानिवृत्ति योजना का महत्व",
+          "mr": "सेवानिवृत्ती नियोजनाचे महत्त्व",
+          "de": "Bedeutung der Ruhestandsplanung"
+        },
+        "subPrompts": [
+          {
+            "key": "why_plan_for_retirement_early",
+            "question": { "en": "Why is it crucial to start planning for retirement as early as possible?", "hi": "सेवानिवृत्ति के लिए जितनी जल्दी हो सके योजना बनाना क्यों महत्वपूर्ण है?", "mr": "शक्य तितक्या लवकर सेवानिवृत्तीसाठी नियोजन सुरू करणे का महत्त्वाचे आहे?", "de": "Warum ist es entscheidend, so früh wie möglich mit der Ruhestandsplanung zu beginnen?" }
+          },
+          {
+            "key": "risks_of_not_planning_retirement",
+            "question": { "en": "What are the potential financial risks of not planning for retirement?", "hi": "सेवानिवृत्ति के लिए योजना न बनाने के संभावित वित्तीय जोखिम क्या हैं?", "mr": "सेवानिवृत्तीसाठी नियोजन न करण्याचे संभाव्य आर्थिक धोके काय आहेत?", "de": "Was sind die potenziellen finanziellen Risiken, wenn man nicht für den Ruhestand plant?" }
+          },
+          {
+            "key": "inflation_effect_on_retirement",
+            "question": { "en": "How does inflation affect my retirement savings and future purchasing power?", "hi": "मुद्रास्फीति मेरे सेवानिवृत्ति बचत और भविष्य की क्रय शक्ति को कैसे प्रभावित करती है?", "mr": "महागाई माझ्या सेवानिवृत्तीच्या बचतीवर आणि भविष्यातील खरेदी शक्तीवर कसा परिणाम करते?", "de": "Wie wirkt sich die Inflation auf meine Altersvorsorge und meine zukünftige Kaufkraft aus?" }
+          },
+          {
+            "key": "what_is_retirement_corpus",
+            "question": { "en": "What is the concept of 'retirement corpus,' and how do I estimate how much I'll need?", "hi": "'सेवानिवृत्ति कोष' की अवधारणा क्या है, और मैं यह कैसे अनुमान लगा सकता हूं कि मुझे कितनी आवश्यकता होगी?", "mr": "'सेवानिवृत्ती निधी' ही संकल्पना काय आहे, आणि मला किती लागेल याचा अंदाज मी कसा लावू शकेन?", "de": "Was ist das Konzept des 'Ruhestandsvermögens' und wie schätze ich, wie viel ich brauchen werde?" }
+          },
+          {
+            "key": "retirement_planning_for_self_employed",
+            "question": { "en": "How does retirement planning differ for self-employed individuals versus salaried employees?", "hi": "स्व-नियोजित व्यक्तियों बनाम वेतनभोगी कर्मचारियों के लिए सेवानिवृत्ति योजना कैसे भिन्न होती है?", "mr": "स्वयंरोजगारित व्यक्ती विरुद्ध पगारदार कर्मचाऱ्यांसाठी सेवानिवृत्ती नियोजन कसे वेगळे असते?", "de": "Wie unterscheidet sich die Ruhestandsplanung für Selbstständige von der für Angestellte?" }
+          }
+        ]
+      },
+      {
+        "key": "pension_schemes",
+        "title": {
+          "en": "Pension Schemes",
+          "hi": "पेंशन योजनाएं",
+          "mr": "पेन्शन योजना",
+          "de": "Rentensysteme"
+        },
+        "subPrompts": [
+          {
+            "key": "what_is_pension_scheme",
+            "question": { "en": "What is a pension scheme, and why is it important?", "hi": "एक पेंशन योजना क्या है, और यह क्यों महत्वपूर्ण है?", "mr": "पेन्शन योजना म्हणजे काय, आणि ती का महत्त्वाची आहे?", "de": "Was ist ein Rentensystem und warum ist es wichtig?" }
+          },
+          {
+            "key": "main_types_of_pension_schemes",
+            "question": { "en": "What are the main types of pension schemes commonly offered?", "hi": "आमतौर पर दी जाने वाली मुख्य प्रकार की पेंशन योजनाएं क्या हैं?", "mr": "सामान्यतः देऊ केल्या जाणाऱ्या मुख्य प्रकारच्या पेन्शन योजना कोणत्या आहेत?", "de": "Was sind die Haupttypen von Rentensystemen, die üblicherweise angeboten werden?" }
+          },
+          {
+            "key": "role_of_private_pension_plans",
+            "question": { "en": "What role do private pension plans play in retirement planning?", "hi": "सेवानिवृत्ति योजना में निजी पेंशन योजनाओं की क्या भूमिका है?", "mr": "सेवानिवृत्ती नियोजनात खाजगी पेन्शन योजनांची काय भूमिका आहे?", "de": "Welche Rolle spielen private Pensionspläne bei der Ruhestandsplanung?" }
+          },
+          {
+            "key": "factors_influencing_pension_benefits",
+            "question": { "en": "What factors influence the amount of pension benefits a retiree receives?", "hi": "एक सेवानिवृत्त व्यक्ति को मिलने वाली पेंशन लाभ की राशि को कौन से कारक प्रभावित करते हैं?", "mr": "एका सेवानिवृत्ताला मिळणाऱ्या पेन्शन लाभांच्या रकमेवर कोणते घटक परिणाम करतात?", "de": "Welche Faktoren beeinflussen die Höhe der Rentenleistungen, die ein Rentner erhält?" }
+          },
+          {
+            "key": "significance_of_retirement_age",
+            "question": { "en": "What is the significance of the retirement age in pension schemes?", "hi": "पेंशन योजनाओं में सेवानिवृत्ति की आयु का क्या महत्व है?", "mr": "पेन्शन योजनांमध्ये सेवानिवृत्तीच्या वयाचे महत्त्व काय आहे?", "de": "Welche Bedeutung hat das Rentenalter in den Rentensystemen?" }
+          }
+        ]
+      },
+      {
+        "key": "importance_of_early_retirement",
+        "title": {
+          "en": "Importance of Early Retirement",
+          "hi": "प्रारंभिक सेवानिवृत्ति का महत्व",
+          "mr": "लवकर सेवानिवृत्तीचे महत्त्व",
+          "de": "Bedeutung des frühen Ruhestands"
+        },
+        "subPrompts": [
+          {
+            "key": "why_start_planning_early",
+            "question": { "en": "Why is it important to start planning for retirement early in life?", "hi": "जीवन में जल्दी सेवानिवृत्ति के लिए योजना बनाना क्यों महत्वपूर्ण है?", "mr": "आयुष्यात लवकर सेवानिवृत्तीसाठी नियोजन सुरू करणे का महत्त्वाचे आहे?", "de": "Warum ist es wichtig, früh im Leben mit der Ruhestandsplanung zu beginnen?" }
+          },
+          {
+            "key": "impact_of_starting_early",
+            "question": { "en": "How does starting early impact the total amount saved for retirement?", "hi": "जल्दी शुरू करने से सेवानिवृत्ति के लिए बचाई गई कुल राशि पर क्या प्रभाव पड़ता है?", "mr": "लवकर सुरुवात केल्याने सेवानिवृत्तीसाठी वाचवलेल्या एकूण रकमेवर कसा परिणाम होतो?", "de": "Wie wirkt sich ein früher Beginn auf den Gesamtbetrag aus, der für den Ruhestand gespart wird?" }
+          },
+          {
+            "key": "reduce_financial_stress",
+            "question": { "en": "How can early retirement planning reduce financial stress later in life?", "hi": "प्रारंभिक सेवानिवृत्ति योजना बाद के जीवन में वित्तीय तनाव को कैसे कम कर सकती है?", "mr": "लवकर सेवानिवृत्ती नियोजन नंतरच्या आयुष्यात आर्थिक ताण कसा कमी करू शकते?", "de": "Wie kann eine frühe Ruhestandsplanung den finanziellen Stress im späteren Leben reduzieren?" }
+          },
+          {
+            "key": "risks_of_delaying_planning",
+            "question": { "en": "What are the risks of delaying retirement planning?", "hi": "सेवानिवृत्ति योजना में देरी करने के क्या जोखिम हैं?", "mr": "सेवानिवृत्ती नियोजनात उशीर करण्याचे धोके काय आहेत?", "de": "Was sind die Risiken einer verspäteten Ruhestandsplanung?" }
+          },
+          {
+            "key": "effective_strategies_for_early_saving",
+            "question": { "en": "What strategies are most effective when saving for retirement early?", "hi": "जल्दी सेवानिवृत्ति के लिए बचत करते समय कौन सी रणनीतियाँ सबसे प्रभावी होती हैं?", "mr": "लवकर सेवानिवृत्तीसाठी बचत करताना कोणती धोरणे सर्वात प्रभावी आहेत?", "de": "Welche Strategien sind am effektivsten, wenn man früh für den Ruhestand spart?" }
+          }
+        ]
+      },
+      {
+        "key": "investment_for_retirement",
+        "title": {
+          "en": "Investment for Retirement",
+          "hi": "सेवानिवृत्ति के लिए निवेश",
+          "mr": "सेवानिवृत्तीसाठी गुंतवणूक",
+          "de": "Investition für den Ruhestand"
+        },
+        "subPrompts": [
+          {
+            "key": "longevity_risk_in_retirement",
+            "question": { "en": "What is the concept of 'longevity risk' in retirement planning?", "hi": "सेवानिवृत्ति योजना में 'दीर्घायु जोखिम' की अवधारणा क्या है?", "mr": "सेवानिवृत्ती नियोजनात 'दीर्घायुष्य जोखीम' ही संकल्पना काय आहे?", "de": "Was ist das Konzept des 'Langlebigkeitsrisikos' in der Ruhestandsplanung?" }
+          },
+          {
+            "key": "equity_mutual_funds_for_retirement",
+            "question": { "en": "How can equity mutual funds or exchange-traded funds (ETFs) be part of a long-term retirement portfolio?", "hi": "इक्विटी म्यूचुअल फंड या एक्सचेंज-ट्रेडेड फंड (ईटीएफ) एक दीर्घकालिक सेवानिवृत्ति पोर्टफोलियो का हिस्सा कैसे हो सकते हैं?", "mr": "इक्विटी म्युच्युअल फंड किंवा एक्सचेंज-ट्रेडेड फंड (ईटीएफ) दीर्घकालीन सेवानिवृत्ती पोर्टफोलिओचा भाग कसे असू शकतात?", "de": "Wie können Aktienfonds oder börsengehandelte Fonds (ETFs) Teil eines langfristigen Altersvorsorgeportfolios sein?" }
+          },
+          {
+            "key": "debt_instruments_in_retirement",
+            "question": { "en": "What is the role of debt instruments in a retirement portfolio, especially closer to retirement?", "hi": "एक सेवानिवृत्ति पोर्टफोलियो में ऋण उपकरणों की क्या भूमिका है, खासकर सेवानिवृत्ति के करीब?", "mr": "सेवानिवृत्ती पोर्टफोलिओमध्ये कर्ज साधनांची काय भूमिका आहे, विशेषतः सेवानिवृत्तीच्या जवळ?", "de": "Welche Rolle spielen Schuldtitel in einem Altersvorsorgeportfolio, insbesondere näher am Ruhestand?" }
+          },
+          {
+            "key": "portfolio_review_for_retirement",
+            "question": { "en": "What is the importance of regular portfolio review and rebalancing for retirement savings?", "hi": "सेवानिवृत्ति बचत के लिए नियमित पोर्टफोलियो समीक्षा और पुनर्संतुलन का क्या महत्व है?", "mr": "सेवानिवृत्ती बचतीसाठी नियमित पोर्टफोलिओ पुनरावलोकन आणि पुनर्संतुलनाचे महत्त्व काय आहे?", "de": "Welche Bedeutung hat die regelmäßige Überprüfung und Neuausrichtung des Portfolios für die Altersvorsorge?" }
+          },
+          {
+            "key": "manage_withdrawals_from_corpus",
+            "question": { "en": "How can I manage withdrawals from my retirement corpus to ensure it lasts throughout my retirement?", "hi": "मैं अपने सेवानिवृत्ति कोष से निकासी का प्रबंधन कैसे कर सकता हूं ताकि यह मेरी पूरी सेवानिवृत्ति तक चले?", "mr": "माझ्या सेवानिवृत्ती निधीतून पैसे काढण्याचे व्यवस्थापन कसे करू शकेन जेणेकरून ते माझ्या संपूर्ण सेवानिवृत्तीपर्यंत टिकेल?", "de": "Wie kann ich Abhebungen aus meinem Altersvorsorgevermögen verwalten, um sicherzustellen, dass es während meines gesamten Ruhestands ausreicht?" }
+          }
+        ]
+      },
+      {
+        "key": "challenges_of_pension_availment",
+        "title": {
+          "en": "Challenges of Pension Availment",
+          "hi": "पेंशन लाभ की चुनौतियां",
+          "mr": "पेन्शन मिळवण्यातील आव्हाने",
+          "de": "Herausforderungen beim Rentenbezug"
+        },
+        "subPrompts": [
+          {
+            "key": "complex_documentation_requirements",
+            "question": { "en": "How do complex documentation requirements affect pension availment?", "hi": "जटिल दस्तावेज़ीकरण आवश्यकताएं पेंशन लाभ को कैसे प्रभावित करती हैं?", "mr": "गुंतागुंतीच्या कागदपत्रांच्या आवश्यकता पेन्शन मिळवण्यावर कसा परिणाम करतात?", "de": "Wie wirken sich komplexe Dokumentationsanforderungen auf den Rentenbezug aus?" }
+          },
+          {
+            "key": "challenges_in_understanding_pension",
+            "question": { "en": "What challenges do retirees face in understanding their pension entitlements?", "hi": "सेवानिवृत्त लोगों को अपने पेंशन अधिकारों को समझने में किन चुनौतियों का सामना करना पड़ता है?", "mr": "सेवानिवृत्तांना त्यांचे पेन्शन हक्क समजून घेण्यास कोणती आव्हाने येतात?", "de": "Welchen Herausforderungen stehen Rentner gegenüber, wenn es darum geht, ihre Rentenansprüche zu verstehen?" }
+          },
+          {
+            "key": "lack_of_awareness_about_pension",
+            "question": { "en": "How does lack of awareness about pension schemes impact timely pension claims?", "hi": "पेंशन योजनाओं के बारे में जागरूकता की कमी समय पर पेंशन दावों को कैसे प्रभावित करती है?", "mr": "पेन्शन योजनांबद्दल जागरूकतेचा अभाव वेळेवर पेन्शन दाव्यांवर कसा परिणाम करतो?", "de": "Wie wirkt sich mangelndes Bewusstsein für Rentensysteme auf rechtzeitige Rentenanträge aus?" }
+          },
+          {
+            "key": "delays_in_pension_disbursement",
+            "question": { "en": "How do delays in pension disbursement affect retirees’ financial stability?", "hi": "पेंशन वितरण में देरी सेवानिवृत्त लोगों की वित्तीय स्थिरता को कैसे प्रभावित करती है?", "mr": "पेन्शन वितरणातील विलंब सेवानिवृत्तांच्या आर्थिक स्थिरतेवर कसा परिणाम करतो?", "de": "Wie wirken sich Verzögerungen bei der Rentenauszahlung auf die finanzielle Stabilität von Rentnern aus?" }
+          },
+          {
+            "key": "role_of_digital_literacy",
+            "question": { "en": "What role do digital literacy and access to technology play in pension availment?", "hi": "पेंशन लाभ में डिजिटल साक्षरता और प्रौद्योगिकी तक पहुंच क्या भूमिका निभाती है?", "mr": "पेन्शन मिळवण्यात डिजिटल साक्षरता आणि तंत्रज्ञानाचा प्रवेश काय भूमिका बजावतो?", "de": "Welche Rolle spielen digitale Kompetenz und der Zugang zu Technologie beim Rentenbezug?" }
           }
         ]
       }
