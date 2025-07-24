@@ -9,14 +9,13 @@ import {
   financialCoach,
   type FinancialCoachInput,
 } from "@/ai/flows/financial-coach";
-import { generatePersonalizedAdvice } from "@/ai/flows/generate-personalized-advice";
+import type { ChatMessage, ChatRequest, User } from "@/lib/db/schema";
 import {
   sendMessage,
   getMessagesForChat,
   updateChatRequestStatus,
   markMessagesAsRead
 } from "@/services/chat-service";
-import type { ChatMessage, ChatRequest, User } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,7 +33,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut, Play, Save } from "lucide-react";
+import { Loader2, Send, Bot, User as UserIcon, Mic, Square, LogOut, Play } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,16 +44,14 @@ import { createId } from "@paralleldrive/cuid2";
 import { useAppTranslations } from "@/providers/translations-provider";
 import { useToast } from "@/hooks/use-toast";
 import advicePrompts from "@/lib/advice-prompts.json";
-import { createAdviceSessionForCurrentUser } from "@/services/advice-service";
 
 type MessageRole = "user" | "assistant";
-type ConversationStage = "greeting" | "prompt_selection" | "questioning" | "generating_advice" | "chatting";
 
 type Message = {
   id: string;
   role: MessageRole;
   content: string;
-  buttons?: { label: string; value: string; action?: "select_prompt" }[];
+  buttons?: { label: string; value: string; isQuestion?: boolean; answer?: string; isCustomQuery?: boolean }[];
 };
 
 const formSchema = z.object({
@@ -69,20 +66,14 @@ interface FinancialCoachProps {
   chatPartner?: User;
 }
 
-const getPromptsForLevel = (level = 0, path: string[] = []) => {
-    let prompts: any[] = advicePrompts;
-    for (let i = 0; i < path.length; i++) {
-        const key = path[i];
-        const nextPrompt = prompts.find(p => p.key === key);
-        if (nextPrompt && nextPrompt.subPrompts) {
-            prompts = nextPrompt.subPrompts;
-        } else {
-            return []; // Path is invalid
-        }
-    }
-    return prompts;
-}
-
+type Prompt = {
+    key: string;
+    title: Record<LanguageCode, string>;
+    description?: Record<LanguageCode, string>;
+    subPrompts?: Prompt[];
+    question?: Record<LanguageCode, string>;
+    answer?: Record<LanguageCode, string>;
+};
 
 export function FinancialCoach({ currentUser, chatSession, chatPartner }: FinancialCoachProps) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -92,15 +83,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const { t, languageCode } = useAppTranslations();
   const { toast } = useToast();
   const isHumanChat = !!(chatSession && chatPartner);
-  const isGuest = currentUser.id === 'guest';
 
-  // Guided flow state
-  const [conversationStage, setConversationStage] = useState<ConversationStage>(isHumanChat ? "chatting" : "greeting");
+  // New state for FAQ flow
   const [promptPath, setPromptPath] = useState<string[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [collectedAnswers, setCollectedAnswers] = useState<Record<string, string>>({});
-  const [generatedAdvice, setGeneratedAdvice] = useState<string | null>(null);
-  const [isAdviceSaved, setIsAdviceSaved] = useState(false);
+  const [isAwaitingCustomQuery, setIsAwaitingCustomQuery] = useState(false);
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -129,171 +116,118 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   }, [transcript, isListening, form]);
 
-  const getCurrentPrompt = () => {
-    let prompt: any = { subPrompts: advicePrompts };
+  const getCurrentOptions = useCallback((): Prompt[] => {
+    let currentLevel: Prompt[] = advicePrompts;
     for (const key of promptPath) {
-        prompt = prompt.subPrompts?.find((p: any) => p.key === key);
-        if (!prompt) return null;
+        const nextLevel = currentLevel.find(p => p.key === key)?.subPrompts;
+        if (nextLevel) {
+            currentLevel = nextLevel;
+        } else {
+            return []; // Path is invalid or leads to a leaf
+        }
     }
-    return prompt;
-  }
-  
-  const startNewGuidedFlow = useCallback(() => {
-    const greetingText = isGuest ? t.coach.greeting_guest : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User');
-    const greetingMessage: Message = {
-      id: createId(),
-      role: 'assistant',
-      content: greetingText,
-    };
-    
-    const topLevelPrompts = getPromptsForLevel(0, []);
-    const promptButtons = topLevelPrompts.map(p => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
+    return currentLevel;
+  }, [promptPath]);
 
-    const promptMessage: Message = {
-      id: createId(),
-      role: 'assistant',
-      content: t.coach.prompt_selection_title,
-      buttons: promptButtons,
-    };
-    setMessages([greetingMessage, promptMessage]);
-    setConversationStage("prompt_selection");
+  const startNewFaqFlow = useCallback(() => {
+    setMessages([]);
     setPromptPath([]);
-    setCurrentQuestionIndex(0);
-    setCollectedAnswers({});
-    setGeneratedAdvice(null);
-    setIsAdviceSaved(false);
-  }, [currentUser, languageCode, t, isGuest]);
-
-  useEffect(() => {
-    if (conversationStage === 'greeting' && !isHumanChat) {
-      startNewGuidedFlow();
-    }
-  }, [conversationStage, isHumanChat, startNewGuidedFlow]);
-
-  const handlePromptSelection = async (promptKey: string) => {
-    const newPath = [...promptPath, promptKey];
-    setPromptPath(newPath);
-
-    const currentPrompt = getCurrentPrompt();
-    const selectedPrompt = currentPrompt?.subPrompts?.find((p: any) => p.key === promptKey);
+    setIsAwaitingCustomQuery(false);
     
-    if (!selectedPrompt) return;
-    
-    setMessages(prev => prev.map(m => ({ ...m, buttons: undefined })));
-    const userSelectionMessage: Message = {
-      id: createId(),
-      role: 'user',
-      content: selectedPrompt.title[languageCode as LanguageCode],
-    };
-    setMessages(prev => [...prev, userSelectionMessage]);
-    
-    if (selectedPrompt.subPrompts) {
-        const promptButtons = selectedPrompt.subPrompts.map((p: any) => ({ label: p.title[languageCode as LanguageCode], value: p.key, action: "select_prompt" as const }));
-        const promptMessage: Message = {
-            id: createId(),
-            role: 'assistant',
-            content: selectedPrompt.description?.[languageCode] || t.coach.prompt_selection_title,
-            buttons: promptButtons,
-        };
-        setMessages(prev => [...prev, promptMessage]);
-    } else if (selectedPrompt.questions) {
-        setConversationStage("questioning");
-        setCurrentQuestionIndex(0);
-        askQuestion(0, newPath);
-    }
-  };
+    const greetingText = isHumanChat ? t.coach.start_conversation : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User');
+    const greetingMessage: Message = { id: createId(), role: 'assistant', content: greetingText };
+    setMessages(prev => [...prev, greetingMessage]);
 
-  const askQuestion = (qIndex: number, path: string[]) => {
-    let prompt: any = { subPrompts: advicePrompts };
-    for (const key of path) {
-        prompt = prompt.subPrompts?.find((p: any) => p.key === key);
-    }
-    if (prompt && prompt.questions[qIndex]) {
-      const question = prompt.questions[qIndex];
-      const questionMessage: Message = {
+    if (!isHumanChat) {
+      const topLevelOptions = advicePrompts;
+      const optionsMessage: Message = {
         id: createId(),
         role: 'assistant',
-        content: question.label[languageCode as LanguageCode],
+        content: "What can I help you with today?",
+        buttons: topLevelOptions.map(p => ({ label: p.title[languageCode], value: p.key })),
       };
-      setMessages(prev => [...prev, questionMessage]);
+      setMessages(prev => [...prev, optionsMessage]);
     }
-  };
+  }, [isHumanChat, t, currentUser.fullName, languageCode]);
 
-  const handleSaveAndEndChat = async () => {
-    if (!generatedAdvice || isGuest) return;
-    const finalPrompt = getCurrentPrompt();
-    if (!finalPrompt || !finalPrompt.key) return;
+  useEffect(() => {
+    startNewFaqFlow();
+  }, [startNewFaqFlow]);
 
-    try {
-        if (!isAdviceSaved) {
-            await createAdviceSessionForCurrentUser({
-                promptKey: finalPrompt.key,
-                formData: collectedAnswers,
-                language: languageCode as LanguageCode,
-                generatedAdvice: generatedAdvice,
-            }, true);
-            
-            toast({ title: t.coach.toast_advice_saved_title, description: t.coach.toast_advice_saved_desc });
-            setIsAdviceSaved(true);
-        }
-        startNewGuidedFlow();
+  const handleOptionSelection = (key: string) => {
+    setIsAwaitingCustomQuery(false);
+    const currentOptions = getCurrentOptions();
+    const selectedOption = currentOptions.find(p => p.key === key);
+    if (!selectedOption) return;
 
-    } catch(error) {
-        console.error("Failed to save advice:", error);
-        toast({ title: t.common.error, description: t.coach.toast_advice_save_error, variant: "destructive" });
-    }
-  };
-
-  const handleQuestionAnswer = async (answer: string) => {
-    const userMessage: Message = { role: 'user', content: answer, id: createId() };
+    // Add user's choice to history and remove buttons from previous message
+    setMessages(prev => prev.map(m => ({ ...m, buttons: undefined })));
+    const userMessage: Message = { id: createId(), role: 'user', content: selectedOption.title[languageCode] };
     setMessages(prev => [...prev, userMessage]);
-    
-    const prompt = getCurrentPrompt();
-    if (!prompt || !prompt.questions) return;
 
-    const questionKey = prompt.questions[currentQuestionIndex].key;
-    const newAnswers = { ...collectedAnswers, [questionKey]: answer };
-    setCollectedAnswers(newAnswers);
+    // Check for sub-prompts (it's a category)
+    if (selectedOption.subPrompts && selectedOption.subPrompts.length > 0) {
+      const newPath = [...promptPath, key];
+      setPromptPath(newPath);
 
-    const nextQuestionIndex = currentQuestionIndex + 1;
-    if (nextQuestionIndex < prompt.questions.length) {
-      setCurrentQuestionIndex(nextQuestionIndex);
-      askQuestion(nextQuestionIndex, promptPath);
-    } else {
-      setConversationStage("generating_advice");
-      setIsLoading(true);
-      const adviceMessage: Message = { id: createId(), role: 'assistant', content: t.coach.generating_advice };
-      setMessages(prev => [...prev, adviceMessage]);
+      const nextOptions = selectedOption.subPrompts;
+      const buttons = nextOptions.map(p => ({
+          label: p.question?.[languageCode] ?? p.title?.[languageCode],
+          value: p.key,
+          isQuestion: !!p.question,
+          answer: p.answer?.[languageCode]
+      }));
+      // Add "Any Other Query?" option
+      buttons.push({ label: 'Any Other Query?', value: 'custom_query', isCustomQuery: true });
       
-      try {
-        const adviceResult = await generatePersonalizedAdvice({
-          promptKey: prompt.key,
-          formData: newAnswers,
-          language: languageCode,
-        });
-
-        setGeneratedAdvice(adviceResult.advice);
-        setIsAdviceSaved(false);
-
-        const resultMessage: Message = { 
-            id: createId(), 
-            role: 'assistant', 
-            content: adviceResult.advice,
-        };
-        setMessages(prev => [...prev.filter(m => m.id !== adviceMessage.id), resultMessage]);
-        
-        const finalMessage: Message = { id: createId(), role: 'assistant', content: t.coach.follow_up_prompt };
-        setMessages(prev => [...prev, finalMessage]);
-
-      } catch (e) {
-        const errorMessage: Message = { id: createId(), role: 'assistant', content: t.common.error_generic };
-        setMessages(prev => [...prev.filter(m => m.id !== adviceMessage.id), errorMessage]);
-      } finally {
-        setIsLoading(false);
-        setConversationStage("chatting");
-      }
+      const nextMessage: Message = {
+        id: createId(),
+        role: 'assistant',
+        content: selectedOption.description?.[languageCode] || `Here are some topics under "${selectedOption.title[languageCode]}":`,
+        buttons: buttons,
+      };
+      setMessages(prev => [...prev, nextMessage]);
     }
   };
+
+  const handleQuestionSelection = (label: string, answer: string) => {
+    // Add user's question to history
+    setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
+    const userMessage: Message = { id: createId(), role: 'user', content: label };
+    setMessages(prev => [...prev, userMessage]);
+
+    // Immediately provide the answer
+    const answerMessage: Message = { id: createId(), role: 'assistant', content: answer };
+    setMessages(prev => [...prev, answerMessage]);
+
+    // Follow up with the same options again
+    const currentOptions = getCurrentOptions();
+    const buttons = currentOptions.map(p => ({
+        label: p.question?.[languageCode] ?? p.title[languageCode],
+        value: p.key,
+        isQuestion: !!p.question,
+        answer: p.answer?.[languageCode]
+    }));
+    buttons.push({ label: 'Any Other Query?', value: 'custom_query', isCustomQuery: true });
+
+    const followUpMessage: Message = {
+        id: createId(),
+        role: 'assistant',
+        content: "Is there anything else I can help you with from this topic?",
+        buttons: buttons
+    };
+    setMessages(prev => [...prev, followUpMessage]);
+  };
+  
+  const handleCustomQuerySelected = () => {
+    setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
+    const userMessage: Message = { id: createId(), role: 'user', content: "Any Other Query?" };
+    setMessages(prev => [...prev, userMessage]);
+
+    const promptMessage: Message = { id: createId(), role: 'assistant', content: "Of course. Please type your question below." };
+    setMessages(prev => [...prev, promptMessage]);
+    setIsAwaitingCustomQuery(true);
+  }
 
   const fetchHumanMessages = useCallback(async () => {
     if (!chatSession) return;
@@ -345,30 +279,18 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   }
 
   const handleSubmit = form.handleSubmit(async (data: FormValues) => {
-    if (conversationStage === 'questioning') {
-      handleQuestionAnswer(data.query);
-      form.reset({ query: '' });
-      return;
-    }
-    
     const userMessage: Message = { role: 'user', content: data.query, id: createId() };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     setError('');
     form.reset({ query: '' });
+    setIsAwaitingCustomQuery(false);
   
     try {
       if (isHumanChat) {
         await sendMessage(chatSession.id, currentUser.id, data.query);
         await fetchHumanMessages(); 
       } else {
-        if (conversationStage !== "chatting") {
-            setConversationStage("chatting");
-            setPromptPath([]);
-            setCollectedAnswers({});
-            setCurrentQuestionIndex(0);
-        }
-
         const historyForAI = [...messages.map(m => ({role: m.role, content: m.content})), {role: userMessage.role, content: userMessage.content}];
         
         const langName = languages[languageCode]?.name || "English";
@@ -422,11 +344,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full w-full" viewportRef={scrollViewportRef}>
           <div className="space-y-4 p-4">
-            {messages.length === 0 && (
-                <div className="text-center text-muted-foreground pt-10">
-                    {isHumanChat ? t.coach.start_conversation : t.coach.starting_conversation}
-                </div>
-            )}
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -467,11 +384,17 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                          )}
                      </div>
                       {message.buttons && (
-                        <div className="flex flex-wrap gap-2 ml-10">
+                        <div className="flex flex-col items-start gap-2 ml-10 mt-2">
                           {message.buttons.map(button => (
                             <Button key={button.value} size="sm" variant="outline" 
                                 onClick={() => {
-                                    if (button.action === 'select_prompt') handlePromptSelection(button.value);
+                                    if(button.isCustomQuery) {
+                                      handleCustomQuerySelected();
+                                    } else if (button.isQuestion && button.answer) {
+                                      handleQuestionSelection(button.label, button.answer);
+                                    } else {
+                                      handleOptionSelection(button.value);
+                                    }
                                 }}
                             >
                               {button.label}
@@ -522,20 +445,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter className="pt-4 border-t flex flex-col items-stretch gap-2">
-        {!isHumanChat && generatedAdvice && (
-          <div className="flex justify-center">
-            <Button
-              onClick={handleSaveAndEndChat}
-              disabled={isAdviceSaved || isGuest}
-              variant="outline"
-              size="sm"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {isAdviceSaved ? t.coach.advice_saved_button : t.coach.save_and_new_chat_button}
-            </Button>
-          </div>
-        )}
+      <CardFooter className="pt-4 border-t">
         <Form {...form}>
           <form
             onSubmit={handleSubmit}
@@ -547,7 +457,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                     size="icon" 
                     className={cn("shrink-0", isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600')}
                     onClick={() => isListening ? stopListening() : startListening({ lang: locale })}
-                    disabled={isLoading || conversationStage === 'prompt_selection'}
+                    disabled={isLoading || !isAwaitingCustomQuery}
                 >
                    {isListening ? <Square className="h-5 w-5"/> : <Mic className="h-5 w-5" />}
                    <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
@@ -560,9 +470,9 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      placeholder={isListening ? "Listening..." : (conversationStage === 'questioning' ? t.coach.answer_placeholder : t.coach.placeholder)}
+                      placeholder={isListening ? "Listening..." : (isAwaitingCustomQuery ? t.coach.placeholder : "Select an option above to continue...")}
                       {...field}
-                      disabled={isLoading || isListening || conversationStage === 'prompt_selection'}
+                      disabled={isLoading || isListening || !isAwaitingCustomQuery}
                       autoComplete="off"
                     />
                   </FormControl>
@@ -572,7 +482,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
             />
             <Button
               type="submit"
-              disabled={isLoading || conversationStage === 'prompt_selection'}
+              disabled={isLoading || !isAwaitingCustomQuery}
               size="icon"
               className="shrink-0"
             >
