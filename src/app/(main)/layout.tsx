@@ -18,6 +18,7 @@ import {
   LogOut,
   Users,
   History,
+  Contact
 } from "lucide-react";
 import {
   Sidebar,
@@ -105,7 +106,7 @@ function MainSidebar() {
   const { state } = useSidebar();
   const { user, logout } = useAuth();
   const { t } = useAppTranslations();
-  const router = useRouter();
+  router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -138,6 +139,7 @@ function MainSidebar() {
     { href: "/summarizer", label: t.nav.summarizer, icon: FileText },
     { href: "/translator", label: t.nav.translator, icon: Languages },
     { href: "/coaches", label: "Regional Coaches", icon: Users },
+    { href: "/contact", label: "Contact Us", icon: Contact },
   ];
 
   return (
