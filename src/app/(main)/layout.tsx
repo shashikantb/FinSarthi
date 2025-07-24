@@ -138,8 +138,8 @@ function MainSidebar() {
     { href: "/advice", label: t.nav.advice, icon: History },
     { href: "/summarizer", label: t.nav.summarizer, icon: FileText },
     { href: "/translator", label: t.nav.translator, icon: Languages },
-    { href: "/coaches", label: "Regional Coaches", icon: Users },
-    { href: "/contact", label: "Contact Us", icon: Contact },
+    { href: "/coaches", label: t.nav.regional_coaches, icon: Users },
+    { href: "/contact", label: t.nav.contact_us, icon: Contact },
   ];
 
   return (

@@ -38,6 +38,8 @@ export const translations = {
       summarizer: "News Summarizer",
       translator: "Term Translator",
       advice: "Advice History",
+      regional_coaches: "Regional Coaches",
+      contact_us: "Contact Us",
     },
     // Home Page
     home: {
@@ -197,6 +199,8 @@ export const translations = {
       summarizer: "समाचार सारांशक",
       translator: "शब्द अनुवादक",
       advice: "सलाह का इतिहास",
+      regional_coaches: "क्षेत्रीय कोच",
+      contact_us: "हमसे संपर्क करें",
     },
     home: {
         title: "आपका व्यक्तिगत AI वित्तीय कोच",
@@ -348,6 +352,8 @@ export const translations = {
       summarizer: "बातम्या सारांशक",
       translator: "शब्द अनुवादक",
       advice: "सल्ला इतिहास",
+      regional_coaches: "प्रादेशिक प्रशिक्षक",
+      contact_us: "आमच्याशी संपर्क साधा",
     },
     home: {
         title: "तुमचा वैयक्तिक AI आर्थिक प्रशिक्षक",
@@ -499,6 +505,8 @@ export const translations = {
       summarizer: "Nachrichten-Zusammenfassung",
       translator: "Begriffsübersetzer",
       advice: "Beratungsverlauf",
+      regional_coaches: "Regionale Trainer",
+      contact_us: "Kontaktieren Sie uns",
     },
     home: {
         title: "Ihr persönlicher KI-Finanzcoach",
