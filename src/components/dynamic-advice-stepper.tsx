@@ -3,9 +3,6 @@
 
 import { useState, useMemo } from "react";
 import { useForm, FormProvider, type SubmitHandler, Controller } from "react-hook-form";
-import {
-  generatePersonalizedAdvice,
-} from "@/ai/flows/generate-personalized-advice";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,6 +35,7 @@ import type { AdviceSession } from "@/lib/db/schema";
 import { createAdviceSessionForCurrentUser } from "@/services/advice-service";
 import advicePrompts from "@/lib/advice-prompts.json";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 interface DynamicAdviceStepperProps {
     onComplete: (newAdvice: AdviceSession) => void;
@@ -111,6 +109,7 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
   const [progress, setProgress] = useState(0);
   const [path, setPath] = useState<string[]>([]);
   const { t, languageCode } = useAppTranslations();
+  const { user } = useAuth();
   
   const methods = useForm<FormValues>({ 
     mode: "onChange",
@@ -169,20 +168,13 @@ export function DynamicAdviceStepper({ onComplete, onCancel, isLoggedIn = false 
         }, {} as Record<string, string>);
       
       const newSession = await createAdviceSessionForCurrentUser({
-        promptKey: selectedPrompt.key,
-        formData: relevantFormData,
-        language: languageCode,
-        generatedAdvice: " ", // Will be filled by AI
-      }, isLoggedIn);
-
-      const adviceResult = await generatePersonalizedAdvice({
-        promptKey: selectedPrompt.key,
-        formData: relevantFormData,
-        language: languageCode,
-      });
-
-      // Update the session with the real advice
-      newSession.generatedAdvice = adviceResult.advice;
+          promptKey: selectedPrompt.key,
+          formData: relevantFormData,
+        }, 
+        user, 
+        languageCode, 
+        isLoggedIn
+      );
       
       setProgress(100);
       onComplete(newSession);

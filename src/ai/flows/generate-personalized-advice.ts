@@ -22,6 +22,10 @@ const GeneratePersonalizedAdviceInputSchema = z.object({
   promptKey: z.string().describe("The key of the selected prompt from the JSON config."),
   formData: z.record(z.string()).describe("The user's answers to the dynamic questions."),
   language: z.enum(["en", "hi", "mr", "de"]),
+  age: z.number().optional().describe("The user's age."),
+  gender: z.string().optional().describe("The user's gender."),
+  city: z.string().optional().describe("The user's city."),
+  country: z.string().optional().describe("The user's country."),
 });
 
 export type GeneratePersonalizedAdviceInput = z.infer<typeof GeneratePersonalizedAdviceInputSchema>;
@@ -48,7 +52,7 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
     });
 
     try {
-        const { promptKey, formData, language } = input;
+        const { promptKey, formData, language, age, gender, city, country } = input;
         
         // Find the selected prompt configuration from the JSON file
         const promptConfig = advicePrompts.find(p => p.key === promptKey);
@@ -86,21 +90,34 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
       - Loan Products: ${JSON.stringify(loans)}
       `;
 
+      // Build the user context string conditionally.
+      let userContext = "";
+      if (age || gender || city || country) {
+          userContext = `
+          For context, here is some information about the user you are advising:
+          - Age: ${age || 'Not provided'}
+          - Gender: ${gender || 'Not provided'}
+          - Location: ${city || ''}, ${country || ''}
+          Use this information to tailor your advice. For example, investment advice might differ for a 25-year-old versus a 55-year-old.
+          `.replace(/\s+/g, ' ').trim();
+      }
+
       // Use the system prompt from the JSON config
       const systemPrompt = promptConfig.systemPrompt[language as LanguageCode];
       const languageName = languages[language]?.name || "English";
 
       const finalPrompt = `
       ${systemPrompt}
+      ${userContext}
 
-      The user has provided the following information:
+      The user has provided the following information through a questionnaire:
       ${userAnswers}
       
       Available Financial Products for Recommendation:
       ${productContext}
 
       Your Task:
-      1.  **Analyze the user's situation** based on the information they provided.
+      1.  **Analyze the user's situation** based on all available information (their profile and their answers).
       2.  **Provide Actionable Steps:** Give 3-5 clear, simple, and prioritized steps. Your response should be well-structured, easy to read, and use markdown for formatting (like lists and bold text).
       3.  **Suggest Products:** When relevant, suggest suitable products from the list provided. Do not invent products.
       4.  **Language and Tone:** Your response MUST be in ${languageName}. Be encouraging, empathetic, and supportive. Your name is FINmate.

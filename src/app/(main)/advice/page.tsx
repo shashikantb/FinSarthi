@@ -11,6 +11,7 @@ import type { AdviceSession } from "@/lib/db/schema";
 import advicePrompts from "@/lib/advice-prompts.json";
 import { useAppTranslations } from "@/providers/translations-provider";
 import type { LanguageCode } from "@/lib/translations";
+import { useAuth } from "@/hooks/use-auth";
 
 function getPromptTitle(promptKey: string, lang: LanguageCode): string {
     if (promptKey === 'ai_chat_session') {
@@ -38,12 +39,14 @@ export default function AdvicePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const { t, languageCode } = useAppTranslations();
+  const { user } = useAuth();
 
   useEffect(() => {
     async function fetchHistory() {
+      if (!user) return;
       setIsLoadingHistory(true);
       try {
-        const history = await getAdviceHistoryForUser();
+        const history = await getAdviceHistoryForUser(user.id);
         setAdviceHistory(history);
       } catch (error) {
         console.error("Failed to fetch advice history:", error);
@@ -51,7 +54,7 @@ export default function AdvicePage() {
       setIsLoadingHistory(false);
     }
     fetchHistory();
-  }, []);
+  }, [user]);
 
   const handleNewAdvice = (newAdvice: AdviceSession) => {
     setAdviceHistory((prev) => [newAdvice, ...prev]);
