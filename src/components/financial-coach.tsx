@@ -114,18 +114,25 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     }
   }, [transcript, isListening, form]);
 
-  const getCurrentOptions = useCallback((): Prompt[] => {
+  const getCurrentOptions = useCallback((): any[] => {
     let currentLevel: any = advicePrompts;
-    for (const key of promptPath) {
-        const nextLevel = currentLevel.find((p: any) => p.key === key)?.subPrompts;
-        if (nextLevel) {
-            currentLevel = nextLevel;
+    let pathIndex = 0;
+    while(pathIndex < promptPath.length) {
+        const key = promptPath[pathIndex];
+        const hasSubPrompts = currentLevel[0]?.subPrompts;
+        const levelToSearch = hasSubPrompts ? currentLevel : currentLevel.flatMap((p: any) => p.subPrompts || []);
+        
+        const selected = levelToSearch.find((p: any) => p.key === key);
+
+        if (selected && selected.subPrompts) {
+            currentLevel = selected.subPrompts;
         } else {
-            return []; // Path is invalid or leads to a leaf
+            return [];
         }
+        pathIndex++;
     }
-    return currentLevel;
-  }, [promptPath]);
+    return Array.isArray(currentLevel) ? currentLevel : [];
+}, [promptPath]);
 
   const startNewFaqFlow = useCallback(() => {
     setMessages([]);
@@ -140,7 +147,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
       const optionsMessage: Message = {
         id: createId(),
         role: 'assistant',
-        content: topLevelOptions[0].description?.[languageCode] ?? "What can I help you with today?",
+        content: topLevelOptions[0].description?.[languageCode] ?? "Please select one of the following topics to get started:",
         buttons: topLevelOptions.map(p => ({ label: p.title[languageCode], value: p.key })),
       };
       setMessages([greetingMessage, optionsMessage]);
@@ -204,37 +211,41 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     setIsAwaitingCustomQuery(false);
     const updatedMessages = messages.map(m => ({ ...m, buttons: undefined }));
     const userMessage: Message = { id: createId(), role: 'user', content: label };
-    
-    const currentOptions = getCurrentOptions();
-    const selectedOption = currentOptions.find(p => p.key === key);
-    if (!selectedOption) return;
+    setMessages([...updatedMessages, userMessage]);
 
-    if (selectedOption.subPrompts && selectedOption.subPrompts.length > 0) {
-      const newPath = [...promptPath, key];
-      setPromptPath(newPath);
+    const newPath = [...promptPath, key];
+    setPromptPath(newPath);
 
-      const nextOptions = selectedOption.subPrompts;
-      const buttons = nextOptions.map(p => ({
-          label: p.question?.[languageCode] ?? p.title[languageCode],
-          value: p.key,
-          isQuestion: !!p.question
-      }));
-      
-      const isFinalQuestionLevel = nextOptions.every(p => p.question);
-      if (isFinalQuestionLevel) {
-        buttons.push({ label: 'Any Other Query?', value: 'custom_query', isCustomQuery: true });
-      }
-      
-      const nextMessage: Message = {
-        id: createId(),
-        role: 'assistant',
-        content: "Please select an option:",
-        buttons: buttons,
-      };
-      setMessages([...updatedMessages, userMessage, nextMessage]);
+    let nextLevel = advicePrompts as any[];
+    for (const p of newPath) {
+        const selected = nextLevel.find(i => i.key === p);
+        if (selected && selected.subPrompts) {
+            nextLevel = selected.subPrompts;
+        }
     }
-  };
-  
+
+    if (nextLevel && nextLevel.length > 0) {
+        const buttons = nextLevel.map(p => ({
+            label: p.question?.[languageCode] ?? p.title[languageCode],
+            value: p.key,
+            isQuestion: !!p.question
+        }));
+        
+        // Only add "Any Other Query?" if the next level has questions, not more categories.
+        if (nextLevel.some(p => p.question)) {
+           buttons.push({ label: t.coach.any_other_query, value: 'custom_query', isCustomQuery: true });
+        }
+
+        const nextMessage: Message = {
+            id: createId(),
+            role: 'assistant',
+            content: t.coach.select_option,
+            buttons: buttons,
+        };
+        setMessages(prev => [...prev, nextMessage]);
+    }
+};
+
   const handleQuestionSelection = (label: string) => {
     // A question from the menu was selected, send it to the AI.
     setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
@@ -243,8 +254,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   
   const handleCustomQuerySelected = () => {
     setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
-    const userMessage: Message = { id: createId(), role: 'user', content: "Any Other Query?" };
-    const promptMessage: Message = { id: createId(), role: 'assistant', content: "Of course. Please type your question below." };
+    const userMessage: Message = { id: createId(), role: 'user', content: t.coach.any_other_query };
+    const promptMessage: Message = { id: createId(), role: 'assistant', content: t.coach.type_your_question };
     setMessages(prev => [...prev, userMessage, promptMessage]);
     setIsAwaitingCustomQuery(true);
   }
@@ -319,6 +330,12 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 <Button variant="outline" size="sm" onClick={handleCloseChat}>
                     <LogOut className="mr-2 h-4 w-4"/>
                     {t.coach.close_chat}
+                </Button>
+            )}
+             {isHumanChat && currentUser.role === 'customer' && (
+                <Button variant="outline" size="sm" onClick={handleCloseChat}>
+                    <LogOut className="mr-2 h-4 w-4"/>
+                    {t.coach.end_chat}
                 </Button>
             )}
         </div>
@@ -452,7 +469,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      placeholder={isListening ? "Listening..." : (isAwaitingCustomQuery ? t.coach.placeholder : "Select an option above to continue...")}
+                      placeholder={isListening ? "Listening..." : (isAwaitingCustomQuery ? t.coach.placeholder : t.coach.select_option_placeholder)}
                       {...field}
                       disabled={isLoading || isListening || !isAwaitingCustomQuery}
                       autoComplete="off"
@@ -481,5 +498,3 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
-
-    
