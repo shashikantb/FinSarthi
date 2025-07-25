@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   FileText,
-  LayoutGrid,
   Lightbulb,
   Languages,
   Menu,
@@ -44,7 +43,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Logo } from "@/components/logo";
 import { useAuth } from "@/hooks/use-auth";
@@ -52,7 +50,6 @@ import { useAppTranslations } from "@/providers/translations-provider";
 import { getUnreadMessageCountForUser } from "@/services/chat-service";
 
 function AppHeader() {
-  const isMobile = useIsMobile();
   const { user, logout } = useAuth();
   const { t } = useAppTranslations();
   const router = useRouter();
@@ -64,12 +61,12 @@ function AppHeader() {
 
   return (
     <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
-      <div className="flex items-center gap-2">
-        {isMobile && <SidebarTrigger><Menu className="h-5 w-5"/></SidebarTrigger>}
-         <div className="hidden md:block">
-            <Logo/>
-         </div>
+      <div className="flex items-center gap-2 lg:hidden">
+        <SidebarTrigger><Menu className="h-5 w-5"/></SidebarTrigger>
       </div>
+       <div className="hidden md:block">
+          <Logo/>
+       </div>
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <div className="ml-auto flex-1 sm:flex-initial">
           {/* Search can go here */}
@@ -145,8 +142,11 @@ function MainSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="p-2">
+        <div className="p-2 flex items-center justify-between">
           <Logo />
+           <div className="hidden lg:block">
+            <SidebarTrigger />
+           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -200,15 +200,13 @@ function MainSidebar() {
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
     return (
-        <SidebarProvider>
-            <div className="flex min-h-screen w-full bg-background">
-                <MainSidebar />
-                <div className="flex flex-1 flex-col sm:gap-4 sm:py-4 md:pl-[var(--sidebar-width-icon)] group-data-[state=expanded]/sidebar-wrapper:md:pl-[var(--sidebar-width)] transition-[padding-left] duration-200">
-                    <AppHeader/>
-                    <main className="flex-1 p-4 sm:px-6 sm:py-0">{children}</main>
-                </div>
+        <div className="flex min-h-screen w-full bg-background">
+            <MainSidebar />
+            <div className="flex flex-1 flex-col sm:gap-4 sm:py-4 md:pl-[var(--sidebar-width-icon)] group-data-[state=expanded]/sidebar-wrapper:md:pl-[var(--sidebar-width)] transition-[padding-left] duration-200">
+                <AppHeader/>
+                <main className="flex-1 p-4 sm:px-6 sm:py-0">{children}</main>
             </div>
-        </SidebarProvider>
+        </div>
     );
 }
 
@@ -288,23 +286,26 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     );
   }
   
+  // Wrap the layout in SidebarProvider for customer routes
+  const renderCustomerLayout = (content: React.ReactNode) => (
+    <SidebarProvider>
+      <ProtectedLayout>{content}</ProtectedLayout>
+    </SidebarProvider>
+  );
+
   if (user.role === 'coach') {
     const allowedCoachRoutes = ['/coach-dashboard', '/coach'];
-    // If user is a coach and not on an allowed coach page, redirect them.
     if (!allowedCoachRoutes.includes(pathname)) {
       router.replace('/coach-dashboard');
-      // Show a loading spinner while redirecting
       return (
         <div className="flex min-h-screen w-full items-center justify-center bg-background">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       );
     }
-    // Render the dedicated layout for coaches
     return <CoachLayout>{children}</CoachLayout>;
   }
 
-  // If a customer tries to access a coach route, redirect them to their main page
   if (user.role === 'customer' && (pathname === '/coach-dashboard')) {
       router.replace('/coach');
       return (
@@ -314,6 +315,5 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       );
   }
 
-  // Render the standard protected layout for customers
-  return <ProtectedLayout>{children}</ProtectedLayout>;
+  return renderCustomerLayout(children);
 }

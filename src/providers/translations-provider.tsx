@@ -1,12 +1,13 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { translations, type LanguageCode } from '@/lib/translations';
 import { LanguageSelectionModal } from '@/components/language-selection-modal';
 import { cn } from '@/lib/utils';
 
 const DEFAULT_LANGUAGE: LanguageCode = "en";
+const LANGUAGE_STORAGE_KEY = "finmate_language";
 
 interface TranslationsContextType {
   t: (typeof translations)[LanguageCode];
@@ -22,29 +23,42 @@ export function TranslationsProvider({ children }: { children: ReactNode }) {
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("finmate_language") as LanguageCode | null;
+    // This effect runs once on the client to check for a saved language.
+    const savedLang = localStorage.getItem(LANGUAGE_STORAGE_KEY) as LanguageCode | null;
     if (savedLang && translations[savedLang]) {
       setLanguageCode(savedLang);
     } else {
+      // If no language is saved, open the modal.
       setIsLanguageModalOpen(true);
     }
     setIsMounted(true);
   }, []);
 
-  const setLanguage = (code: LanguageCode) => {
+  const setLanguage = useCallback((code: LanguageCode) => {
     if (translations[code]) {
-      localStorage.setItem("finmate_language", code);
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
       setLanguageCode(code);
       setIsLanguageModalOpen(false);
-      // Optional: a gentle reload could still be useful in some complex cases
-      // window.location.reload(); 
     }
-  };
+  }, []);
+
+  // Effect to register the service worker
+  useEffect(() => {
+    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('SW registered: ', registration);
+        }).catch(registrationError => {
+          console.log('SW registration failed: ', registrationError);
+        });
+      });
+    }
+  }, []);
 
   const t = translations[languageCode] || translations[DEFAULT_LANGUAGE];
   
   if (!isMounted) {
-    // Render nothing on the server and until the client has mounted
+    // Render nothing on the server and until the client has mounted.
     // This prevents hydration mismatch.
     return null; 
   }
@@ -55,7 +69,7 @@ export function TranslationsProvider({ children }: { children: ReactNode }) {
         isOpen={isLanguageModalOpen}
         onSelectLanguage={setLanguage}
       />
-      <div className={cn(isLanguageModalOpen && "blur-sm")}>
+      <div className={cn(isLanguageModalOpen && "blur-sm transition-all")}>
         {children}
       </div>
     </TranslationsContext.Provider>
