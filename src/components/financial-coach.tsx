@@ -134,7 +134,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     startNewFaqFlow();
   }, [startNewFaqFlow]);
   
-  const callAI = async (query: string, isCustomQuery: boolean) => {
+  const callAI = async (query: string) => {
     setIsLoading(true);
     setError('');
     setIsAiResponding(true);
@@ -155,15 +155,11 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         const input: FinancialCoachInput = {
           language: langName as "English" | "Hindi" | "Marathi" | "German",
           history: historyForAI,
+          age: currentUser.age ?? undefined,
+          gender: currentUser.gender ?? undefined,
+          city: currentUser.city ?? undefined,
+          country: currentUser.country ?? undefined,
         };
-
-        // Only add user profile data for custom queries
-        if (isCustomQuery) {
-          input.age = currentUser.age ?? undefined;
-          input.gender = currentUser.gender ?? undefined;
-          input.city = currentUser.city ?? undefined;
-          input.country = currentUser.country ?? undefined;
-        }
 
         const result = await financialCoach(input);
         if (!result || !result.response) throw new Error("AI returned an invalid response.");
@@ -230,7 +226,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   const handleQuestionSelection = (questionText: string) => {
     setMessages(prev => prev.map(m => ({...m, buttons: undefined})));
-    callAI(questionText, false); // This is a pre-defined question, so isCustomQuery is false
+    callAI(questionText);
   };
   
   const handleCustomQuerySelected = () => {
@@ -289,7 +285,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   const handleSubmit = form.handleSubmit(async (data: FormValues) => {
     form.reset({ query: '' });
-    callAI(data.query, true); // This is a custom query, so isCustomQuery is true
+    callAI(data.query);
   });
 
   const handleSaveAndEndChat = async () => {
@@ -306,7 +302,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         generatedAdvice: conversationText,
       };
 
-      await createAdviceSessionForCurrentUser(sessionData, true);
+      await createAdviceSessionForCurrentUser(sessionData, currentUser, languageCode, true);
 
       toast({
         title: t.coach.toast_advice_saved_title,
@@ -515,3 +511,5 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
+
+    
