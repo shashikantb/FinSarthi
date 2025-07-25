@@ -78,7 +78,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
 
   const [promptPath, setPromptPath] = useState<string[]>([]);
   const [isAwaitingCustomQuery, setIsAwaitingCustomQuery] = useState(false);
-  const [isAiResponding, setIsAiResponding] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -111,9 +110,8 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     setMessages([]);
     setPromptPath([]);
     setIsAwaitingCustomQuery(false);
-    setIsAiResponding(false);
     
-    const greetingText = isHumanChat ? t.coach.start_conversation : (isAiResponding ? t.coach.greeting_guest : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User'));
+    const greetingText = isHumanChat ? t.coach.start_conversation : t.coach.greeting_user.replace('{name}', currentUser.fullName || 'User');
     const greetingMessage: Message = { id: createId(), role: 'assistant', content: greetingText };
     
     if (!isHumanChat) {
@@ -128,7 +126,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     } else {
       setMessages([greetingMessage]);
     }
-  }, [isHumanChat, t, currentUser.fullName, languageCode, isAiResponding]);
+  }, [isHumanChat, t, currentUser.fullName, languageCode]);
 
   useEffect(() => {
     startNewFaqFlow();
@@ -137,7 +135,6 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
   const callAI = async (query: string) => {
     setIsLoading(true);
     setError('');
-    setIsAiResponding(true);
     
     const userMessage: Message = { role: 'user', content: query, id: createId() };
     const messagesWithUserQuery = [...messages.map(m => ({ ...m, buttons: undefined })), userMessage];
@@ -386,9 +383,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
                          )}
                      </div>
                       {message.buttons && (
-                        <div className={cn(
-                          "flex gap-2 ml-10 mt-2 flex-wrap",
-                        )}>
+                        <div className="flex gap-2 ml-10 mt-2 flex-wrap">
                           {message.buttons.map(button => (
                             <Button key={button.value} size="sm" variant="outline" 
                                 onClick={() => {
@@ -450,7 +445,7 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
         </ScrollArea>
       </CardContent>
       <CardFooter className="pt-4 border-t flex flex-col items-stretch gap-3">
-        {isLoggedIn && !isHumanChat && isAiResponding && !isLoading && (
+        {isLoggedIn && !isHumanChat && !isLoading && messages.some(m => m.role === 'assistant' && !m.buttons) && (
             <div className="flex justify-end">
                 <Button variant="ghost" onClick={handleSaveAndEndChat} disabled={isLoading}>
                     <Save className="mr-2 h-4 w-4" />
@@ -511,5 +506,3 @@ export function FinancialCoach({ currentUser, chatSession, chatPartner }: Financ
     </Card>
   );
 }
-
-    
