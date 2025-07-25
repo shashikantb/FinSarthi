@@ -47,6 +47,7 @@ const financialCoachFlow = ai.defineFlow(
     outputSchema: FinancialCoachOutputSchema,
   },
   async (input) => {
+    console.log("Calling financialCoachFlow with input:", JSON.stringify(input, null, 2));
     if (!process.env.GROQ_API_KEY) {
       return { response: "I'm sorry, the AI service is not configured. The GROQ_API_KEY is missing." };
     }

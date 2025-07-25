@@ -42,6 +42,8 @@ const generatePersonalizedAdviceFlow = ai.defineFlow(
     outputSchema: GeneratePersonalizedAdviceOutputSchema,
   },
   async (input) => {
+    console.log("Calling generatePersonalizedAdviceFlow with input:", JSON.stringify(input, null, 2));
+
     if (!process.env.GROQ_API_KEY) {
       return { advice: "I'm sorry, the AI service is not configured. The GROQ_API_KEY is missing." };
     }
