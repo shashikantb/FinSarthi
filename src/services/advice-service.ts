@@ -1,30 +1,16 @@
 
 "use server";
 
-import { getDbInstance } from "@/lib/db";
-import { adviceSessions, users, type NewAdviceSession, type AdviceSession as RawAdviceSession, User } from "@/lib/db/schema";
-import { eq, desc, isNull, and, ne } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { type NewAdviceSession, type AdviceSession as RawAdviceSession, User } from "@/lib/db/schema";
 import { revalidatePath } from "next/cache";
 import { generatePersonalizedAdvice, GeneratePersonalizedAdviceInput } from "@/ai/flows/generate-personalized-advice";
+import { createId } from "@paralleldrive/cuid2";
 
 // Redefine AdviceSession locally to remove income/expenses which are no longer part of the flow.
 export type AdviceSession = Omit<RawAdviceSession, 'formData'> & {
   formData: Record<string, any>;
 };
-
-
-/**
- * A helper function to process a raw database session object
- * into the AdviceSession type used by the application.
- */
-function processSession(session: typeof adviceSessions.$inferSelect): AdviceSession {
-    const formData = (session.formData as Record<string, any>) || {};
-    return {
-        ...session,
-        formData: formData,
-    }
-}
-
 
 /**
  * Creates a new advice session.
@@ -35,7 +21,7 @@ function processSession(session: typeof adviceSessions.$inferSelect): AdviceSess
  * @returns The newly created advice session.
  */
 export async function createAdviceSessionForCurrentUser(
-  data: Omit<GeneratePersonalizedAdviceInput, 'language'>,
+  data: Omit<GeneratePersonalizedAdviceInput, 'language' | 'age' | 'gender' | 'city' | 'country'>,
   user: User | null,
   language: GeneratePersonalizedAdviceInput['language'],
   isLoggedIn: boolean
@@ -52,37 +38,23 @@ export async function createAdviceSessionForCurrentUser(
   
   const adviceResult = await generatePersonalizedAdvice(adviceInput);
 
-  const db = getDbInstance();
-  if (!db) {
-    // If there's no DB, we can't save but we should return a mock session
-    // so the onboarding flow can complete without crashing.
-    const mockSession = {
-      id: "temp_id",
-      userId: user?.id ?? null,
-      createdAt: new Date(),
-      promptKey: data.promptKey,
-      formData: data.formData,
-      language: language,
-      generatedAdvice: adviceResult.advice,
-    };
-    return processSession(mockSession as any);
-  }
-
-  const valuesToInsert: NewAdviceSession = {
+  const newSession: AdviceSession = {
+    id: createId(),
     promptKey: data.promptKey,
     formData: data.formData,
     language,
     generatedAdvice: adviceResult.advice,
-    userId: isLoggedIn ? user?.id : null,
+    userId: isLoggedIn ? user?.id ?? null : null,
+    createdAt: new Date(),
   };
 
-  const [newSession] = await db.insert(adviceSessions).values(valuesToInsert).returning();
+  db.adviceSessions.push(newSession);
   
   if (isLoggedIn) {
       revalidatePath('/advice');
   }
 
-  return processSession(newSession);
+  return newSession;
 }
 
 /**
@@ -91,40 +63,24 @@ export async function createAdviceSessionForCurrentUser(
  * @param userId The ID of the user.
  */
 export async function associateSessionWithUser(sessionId: string, userId: string) {
-  const db = getDbInstance();
-  if (!db) return;
-
-  await db.update(adviceSessions)
-    .set({ userId })
-    .where(eq(adviceSessions.id, sessionId));
-
-  revalidatePath('/advice');
+  const sessionIndex = db.adviceSessions.findIndex(s => s.id === sessionId);
+  if (sessionIndex !== -1) {
+    db.adviceSessions[sessionIndex].userId = userId;
+    revalidatePath('/advice');
+  }
 }
-
 
 /**
  * Fetches the most recent advice session for a given user.
- * If no userId is provided, it fetches for the most recent user.
  * @param userId The ID of the user.
  * @returns The latest advice session, or null if none exists.
  */
 export async function getLatestAdviceSessionForUser(userId: string): Promise<AdviceSession | null> {
-  const db = getDbInstance();
-  if (!db) return null;
-
-  const [latestSession] = await db
-    .select()
-    .from(adviceSessions)
-    .where(and(
-        eq(adviceSessions.userId, userId),
-        ne(adviceSessions.promptKey, 'ai_chat_session')
-    ))
-    .orderBy(desc(adviceSessions.createdAt))
-    .limit(1);
+  const userSessions = db.adviceSessions
+    .filter(s => s.userId === userId && s.promptKey !== 'ai_chat_session')
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   
-  if (!latestSession) return null;
-
-  return processSession(latestSession);
+  return userSessions[0] ?? null;
 }
 
 /**
@@ -133,14 +89,9 @@ export async function getLatestAdviceSessionForUser(userId: string): Promise<Adv
  * @returns An array of advice sessions.
  */
 export async function getAdviceHistoryForUser(userId: string): Promise<AdviceSession[]> {
-    const db = getDbInstance();
-    if (!db) return [];
-
-    const history = await db
-        .select()
-        .from(adviceSessions)
-        .where(eq(adviceSessions.userId, userId))
-        .orderBy(desc(adviceSessions.createdAt));
+    const userSessions = db.adviceSessions
+        .filter(s => s.userId === userId)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     
-    return history.map(processSession);
+    return userSessions;
 }

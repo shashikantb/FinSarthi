@@ -1,10 +1,10 @@
 
 "use server";
 
-import { getDbInstance } from "@/lib/db";
-import { chatRequests, chatMessages, type NewChatRequest, users, type User } from "@/lib/db/schema";
-import { and, eq, desc, or, ne, count } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { type NewChatRequest, type User, type ChatRequest, type ChatMessage } from "@/lib/db/schema";
 import { revalidatePath } from "next/cache";
+import { createId } from "@paralleldrive/cuid2";
 
 /**
  * Creates a new chat request from a customer to a coach.
@@ -13,35 +13,34 @@ import { revalidatePath } from "next/cache";
  * @returns The newly created chat request object.
  */
 export async function createChatRequest(customerId: string, coachId: string) {
-  const db = getDbInstance();
-  if (!db) throw new Error("Database not available.");
-
   // Check if an active request already exists
-  const existingRequest = await db.query.chatRequests.findFirst({
-    where: and(
-      eq(chatRequests.customerId, customerId),
-      eq(chatRequests.coachId, coachId),
-      ne(chatRequests.status, 'declined'),
-      ne(chatRequests.status, 'closed')
-    ),
-  });
+  const existingRequest = db.chatRequests.find(r =>
+    r.customerId === customerId &&
+    r.coachId === coachId &&
+    r.status !== 'declined' &&
+    r.status !== 'closed'
+  );
 
   if (existingRequest) {
     console.log("An active chat request already exists for this pair.");
     return existingRequest;
   }
 
-  const newRequest: NewChatRequest = {
+  const newRequest: ChatRequest = {
+    id: createId(),
     customerId,
     coachId,
     status: 'pending',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
-  const [createdRequest] = await db.insert(chatRequests).values(newRequest).returning();
+  
+  db.chatRequests.push(newRequest);
   
   // Revalidate the coach's dashboard to show the new request
   revalidatePath('/coach-dashboard');
 
-  return createdRequest;
+  return newRequest;
 }
 
 /**
@@ -50,25 +49,21 @@ export async function createChatRequest(customerId: string, coachId: string) {
  * @returns An array of chat requests with associated customer information.
  */
 export async function getChatRequestsForCoach(coachId: string) {
-    const db = getDbInstance();
-    if (!db) return [];
-
-    const requests = await db
-        .select({
-            request: chatRequests,
-            customer: {
-                id: users.id,
-                fullName: users.fullName,
-                email: users.email
-            }
+    const requests = db.chatRequests
+        .filter(r => r.coachId === coachId)
+        .map(request => {
+            const customer = db.users.find(u => u.id === request.customerId);
+            return {
+                request,
+                customer: customer ? { id: customer.id, fullName: customer.fullName, email: customer.email } : null
+            };
         })
-        .from(chatRequests)
-        .where(eq(chatRequests.coachId, coachId))
-        .innerJoin(users, eq(chatRequests.customerId, users.id))
-        .orderBy(desc(chatRequests.createdAt));
+        .filter(item => item.customer !== null) // Ensure customer was found
+        .sort((a, b) => b.request.createdAt.getTime() - a.request.createdAt.getTime());
     
-    return requests;
+    return requests as { request: ChatRequest; customer: Pick<User, "id" | "fullName" | "email">; }[];
 }
+
 
 /**
  * Fetches all chat requests initiated by a specific customer.
@@ -76,17 +71,11 @@ export async function getChatRequestsForCoach(coachId: string) {
  * @returns An array of chat requests.
  */
 export async function getChatRequestsForCustomer(customerId: string) {
-    const db = getDbInstance();
-    if (!db) return [];
-
-    const requests = await db
-        .select()
-        .from(chatRequests)
-        .where(eq(chatRequests.customerId, customerId))
-        .orderBy(desc(chatRequests.createdAt));
+    const requests = db.chatRequests
+        .filter(r => r.customerId === customerId)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     return requests;
 }
-
 
 /**
  * Updates the status of a chat request.
@@ -94,21 +83,19 @@ export async function getChatRequestsForCustomer(customerId: string) {
  * @param status The new status ('accepted' or 'declined').
  */
 export async function updateChatRequestStatus(requestId: string, status: 'accepted' | 'declined' | 'closed') {
-    const db = getDbInstance();
-    if (!db) return null;
-
-    const [updatedRequest] = await db.update(chatRequests)
-        .set({ status, updatedAt: new Date() })
-        .where(eq(chatRequests.id, requestId))
-        .returning();
-    
-    revalidatePath('/coach-dashboard');
-    revalidatePath('/coaches');
-    revalidatePath('/coach');
-
-    return updatedRequest;
+    const requestIndex = db.chatRequests.findIndex(r => r.id === requestId);
+    if (requestIndex !== -1) {
+        db.chatRequests[requestIndex].status = status;
+        db.chatRequests[requestIndex].updatedAt = new Date();
+        
+        revalidatePath('/coach-dashboard');
+        revalidatePath('/coaches');
+        revalidatePath('/coach');
+        
+        return db.chatRequests[requestIndex];
+    }
+    return null;
 }
-
 
 /**
  * Sends a message from one user to another within a chat request context.
@@ -118,15 +105,15 @@ export async function updateChatRequestStatus(requestId: string, status: 'accept
  * @returns The newly created message object.
  */
 export async function sendMessage(chatRequestId: string, senderId: string, content: string) {
-    const db = getDbInstance();
-    if (!db) throw new Error("Database not available.");
-
-    const [newMessage] = await db.insert(chatMessages).values({
+    const newMessage: ChatMessage = {
+        id: createId(),
         chatRequestId,
         senderId,
         content,
         isRead: false,
-    }).returning();
+        createdAt: new Date(),
+    };
+    db.chatMessages.push(newMessage);
     
     // Revalidate the chat page for both users.
     revalidatePath('/coach');
@@ -140,13 +127,9 @@ export async function sendMessage(chatRequestId: string, senderId: string, conte
  * @returns An array of message objects, ordered by creation date.
  */
 export async function getMessagesForChat(chatRequestId: string) {
-    const db = getDbInstance();
-    if (!db) return [];
-    
-    return await db.query.chatMessages.findMany({
-        where: eq(chatMessages.chatRequestId, chatRequestId),
-        orderBy: desc(chatMessages.createdAt)
-    });
+    return db.chatMessages
+        .filter(m => m.chatRequestId === chatRequestId)
+        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
 /**
@@ -155,24 +138,17 @@ export async function getMessagesForChat(chatRequestId: string) {
  * @param userId The ID of the user.
  * @returns The chat request and the chat partner, or null if no active chat is found.
  */
-export async function getActiveChatSession(userId: string): Promise<{ session: typeof chatRequests.$inferSelect, partner: User } | null> {
-    const db = getDbInstance();
-    if (!db) return null;
-
-    const session = await db.query.chatRequests.findFirst({
-        where: and(
-            or(eq(chatRequests.customerId, userId), eq(chatRequests.coachId, userId)),
-            eq(chatRequests.status, 'accepted')
-        ),
-        orderBy: desc(chatRequests.updatedAt)
-    });
+export async function getActiveChatSession(userId: string): Promise<{ session: ChatRequest, partner: User } | null> {
+    const session = db.chatRequests
+        .filter(r => (r.customerId === userId || r.coachId === userId) && r.status === 'accepted')
+        .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())[0];
 
     if (!session) {
         return null;
     }
 
     const partnerId = session.coachId === userId ? session.customerId : session.coachId;
-    const partner = await db.query.users.findFirst({ where: eq(users.id, partnerId) });
+    const partner = db.users.find(u => u.id === partnerId);
 
     if (!partner) {
         return null;
@@ -187,17 +163,15 @@ export async function getActiveChatSession(userId: string): Promise<{ session: t
  * @param recipientId The ID of the user for whom messages should be marked as read.
  */
 export async function markMessagesAsRead(chatRequestId: string, recipientId: string) {
-    const db = getDbInstance();
-    if (!db) return;
-
-    await db.update(chatMessages)
-        .set({ isRead: true })
-        .where(and(
-            eq(chatMessages.chatRequestId, chatRequestId),
-            ne(chatMessages.senderId, recipientId), // Only mark messages sent by the other person as read
-            eq(chatMessages.isRead, false)
-        ));
-    
+    db.chatMessages.forEach(message => {
+        if (
+            message.chatRequestId === chatRequestId &&
+            message.senderId !== recipientId &&
+            !message.isRead
+        ) {
+            message.isRead = true;
+        }
+    });
     revalidatePath('/(main)/layout'); // To update the badge
 }
 
@@ -207,30 +181,19 @@ export async function markMessagesAsRead(chatRequestId: string, recipientId: str
  * @returns The total number of unread messages.
  */
 export async function getUnreadMessageCountForUser(userId: string): Promise<number> {
-    const db = getDbInstance();
-    if (!db) return 0;
+    const activeChatIds = db.chatRequests
+        .filter(r => (r.customerId === userId || r.coachId === userId) && r.status === 'accepted')
+        .map(r => r.id);
     
-    const activeChats = await db.select({ id: chatRequests.id })
-        .from(chatRequests)
-        .where(and(
-            or(eq(chatRequests.customerId, userId), eq(chatRequests.coachId, userId)),
-            eq(chatRequests.status, 'accepted')
-        ));
-    
-    if (activeChats.length === 0) {
+    if (activeChatIds.length === 0) {
         return 0;
     }
 
-    const chatIds = activeChats.map(c => c.id);
-
-    const [result] = await db.select({
-        value: count()
-    }).from(chatMessages)
-    .where(and(
-        or(...chatIds.map(id => eq(chatMessages.chatRequestId, id))),
-        ne(chatMessages.senderId, userId),
-        eq(chatMessages.isRead, false)
-    ));
+    const unreadCount = db.chatMessages.filter(m =>
+        activeChatIds.includes(m.chatRequestId) &&
+        m.senderId !== userId &&
+        !m.isRead
+    ).length;
     
-    return result.value;
+    return unreadCount;
 }
